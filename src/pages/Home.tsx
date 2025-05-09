@@ -110,12 +110,12 @@ const Home = () => {
             <CarouselContent>
               <CarouselItem>
                 <div className="relative h-[400px] md:h-[500px] w-full rounded-xl overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-900/80 to-amber-700/50 z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-900/90 to-amber-800/70 z-10"></div>
                   <div className="absolute z-20 text-white max-w-xl p-10 top-1/2 transform -translate-y-1/2">
                     <h1 className="text-4xl md:text-6xl font-black mb-4">Step into Ghanaian Excellence</h1>
                     <p className="text-lg md:text-xl mb-6">Premium footwear with authentic Ghanaian style and quality craftsmanship.</p>
                     <Button 
-                      className="bg-amber-400 hover:bg-amber-500 text-red-900 font-bold"
+                      className="bg-amber-500 hover:bg-amber-600 text-red-900 font-bold"
                       onClick={() => document.getElementById("featured-products")?.scrollIntoView({ behavior: "smooth" })}
                     >
                       Shop Now
@@ -142,13 +142,13 @@ const Home = () => {
                 </div>
               </CarouselItem>
               <CarouselItem>
-                <div className="relative h-[400px] md:h-[500px] w-full rounded-xl overflow-hidden bg-gradient-to-r from-green-900 to-green-600">
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-900/80 to-amber-600/50 z-10"></div>
+                <div className="relative h-[400px] md:h-[500px] w-full rounded-xl overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-900/80 to-green-800/50 z-10"></div>
                   <div className="absolute z-20 text-white max-w-xl p-10 top-1/2 transform -translate-y-1/2">
                     <h1 className="text-4xl md:text-6xl font-black mb-4">New Collection Arrived</h1>
                     <p className="text-lg md:text-xl mb-6">Limited edition sneakers inspired by Ghana's rich culture.</p>
                     <Button 
-                      className="bg-amber-400 hover:bg-amber-500 text-green-900 font-bold"
+                      className="bg-green-600 hover:bg-green-700 text-amber-100 font-bold"
                       onClick={() => document.getElementById("categories")?.scrollIntoView({ behavior: "smooth" })}
                     >
                       Explore Collection
@@ -183,7 +183,7 @@ const Home = () => {
             {categories.map((category) => (
               <motion.div 
                 key={category.id} 
-                className="bg-gradient-to-b from-amber-100 to-amber-200 rounded-lg p-4 hover:shadow-lg transition-shadow duration-300 cursor-pointer group"
+                className="bg-gradient-to-b from-red-900/5 to-amber-200/30 rounded-lg p-4 hover:shadow-lg transition-shadow duration-300 cursor-pointer group"
                 whileHover={{ y: -5 }}
               >
                 <div className="aspect-square relative overflow-hidden rounded-md bg-white flex items-center justify-center">
@@ -192,11 +192,11 @@ const Home = () => {
                     alt={category.name} 
                     className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-amber-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                  <div className="absolute inset-0 bg-gradient-to-t from-red-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
                     <div className="w-full p-4">
-                      <Button className="w-full bg-amber-500 hover:bg-amber-600">
+                      <a href="#" className="block w-full text-center text-white font-semibold hover:underline">
                         View All
-                      </Button>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -208,13 +208,13 @@ const Home = () => {
       </section>
       
       {/* Featured Products Section */}
-      <section id="featured-products" className="py-10 px-4 md:px-8 bg-gradient-to-b from-amber-100 to-amber-200">
+      <section id="featured-products" className="py-10 px-4 md:px-8 bg-gradient-to-b from-amber-100 to-amber-50/80">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-3xl font-bold text-red-900">Featured Products</h2>
-            <Button variant="outline" className="border-amber-600 text-amber-800">
+            <a href="#" className="text-amber-800 hover:text-red-800 font-medium hover:underline">
               View All
-            </Button>
+            </a>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -235,7 +235,7 @@ const Home = () => {
                     >
                       <Heart 
                         size={18} 
-                        className={wishlist.includes(sneaker.id) ? "fill-red-500 text-red-500" : "text-gray-500"} 
+                        className={wishlist.includes(sneaker.id) ? "fill-red-600 text-red-600" : "text-gray-500"} 
                       />
                     </button>
                     <div 
@@ -252,12 +252,12 @@ const Home = () => {
                   </div>
                   <CardContent className="p-4">
                     <div className="mb-3">
-                      <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-1 rounded">
+                      <span className="text-xs font-medium text-red-700 bg-amber-100 px-2 py-1 rounded">
                         {sneaker.category}
                       </span>
                     </div>
                     <h3 
-                      className="font-semibold text-lg text-gray-800 cursor-pointer hover:text-amber-800"
+                      className="font-semibold text-lg text-gray-800 cursor-pointer hover:text-red-800"
                       onClick={() => goToProductDetail(sneaker.id)}
                     >
                       {sneaker.name}
@@ -267,7 +267,7 @@ const Home = () => {
                       <Button 
                         size="sm" 
                         onClick={() => addToCart(sneaker.id)}
-                        className="bg-amber-500 hover:bg-amber-600 text-white"
+                        className="bg-red-800 hover:bg-red-900 text-amber-100"
                       >
                         <ShoppingCart size={16} className="mr-1" /> Add
                       </Button>
@@ -283,7 +283,7 @@ const Home = () => {
       {/* CTA Section */}
       <section className="py-16 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-700 via-amber-700 to-amber-500">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-800 via-red-700 to-amber-600">
             {/* Enhanced milk splatter overlays */}
             <div className="absolute inset-0 opacity-20">
               <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-white blur-xl"></div>
@@ -333,17 +333,17 @@ const Home = () => {
           <div>
             <h4 className="font-bold mb-4">Shopping</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-amber-400 transition-colors">All Products</a></li>
-              <li><a href="#" className="hover:text-amber-400 transition-colors">New Arrivals</a></li>
-              <li><a href="#" className="hover:text-amber-400 transition-colors">Sales</a></li>
+              <li><a href="#" className="nav-link text-amber-200 hover:text-amber-400">All Products</a></li>
+              <li><a href="#" className="nav-link text-amber-200 hover:text-amber-400">New Arrivals</a></li>
+              <li><a href="#" className="nav-link text-amber-200 hover:text-amber-400">Sales</a></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold mb-4">Help</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-amber-400 transition-colors">FAQ</a></li>
-              <li><a href="#" className="hover:text-amber-400 transition-colors">Shipping</a></li>
-              <li><a href="#" className="hover:text-amber-400 transition-colors">Returns</a></li>
+              <li><a href="#" className="nav-link text-amber-200 hover:text-amber-400">FAQ</a></li>
+              <li><a href="#" className="nav-link text-amber-200 hover:text-amber-400">Shipping</a></li>
+              <li><a href="#" className="nav-link text-amber-200 hover:text-amber-400">Returns</a></li>
             </ul>
           </div>
           <div>
