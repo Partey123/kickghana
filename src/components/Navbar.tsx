@@ -7,9 +7,10 @@ import { ShoppingBag, Heart, Search, User, Menu, X } from "lucide-react";
 
 interface NavbarProps {
   cartItemsCount?: number;
+  onCartClick?: () => void;
 }
 
-const Navbar = ({ cartItemsCount = 0 }: NavbarProps) => {
+const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -27,6 +28,14 @@ const Navbar = ({ cartItemsCount = 0 }: NavbarProps) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  // Handle cart click
+  const handleCartClick = (e: React.MouseEvent) => {
+    if (onCartClick) {
+      e.preventDefault();
+      onCartClick();
+    }
+  };
   
   return (
     <header 
@@ -86,9 +95,13 @@ const Navbar = ({ cartItemsCount = 0 }: NavbarProps) => {
               <Heart size={20} strokeWidth={1.5} />
             </Link>
             
-            <Link to="/cart" className={`transition-colors duration-300 relative ${
-              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
-            }`}>
+            <Link 
+              to="/cart" 
+              onClick={handleCartClick}
+              className={`transition-colors duration-300 relative ${
+                isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+              }`}
+            >
               <ShoppingBag size={20} strokeWidth={1.5} />
               {cartItemsCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
@@ -106,9 +119,13 @@ const Navbar = ({ cartItemsCount = 0 }: NavbarProps) => {
           
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-4">
-            <Link to="/cart" className={`transition-colors duration-300 relative ${
-              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
-            }`}>
+            <Link 
+              to="/cart" 
+              onClick={handleCartClick}
+              className={`transition-colors duration-300 relative ${
+                isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+              }`}
+            >
               <ShoppingBag size={20} strokeWidth={1.5} />
               {cartItemsCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">

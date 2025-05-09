@@ -20,23 +20,36 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   subtotal: string;
+  wishlist: number[];
+  addToWishlist: (id: number) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [wishlist, setWishlist] = useState<number[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [subtotal, setSubtotal] = useState("₵0");
 
   useEffect(() => {
-    // Load cart from localStorage on initial load
+    // Load cart and wishlist from localStorage on initial load
     const savedCart = localStorage.getItem("cart");
+    const savedWishlist = localStorage.getItem("wishlist");
+    
     if (savedCart) {
       try {
         setCartItems(JSON.parse(savedCart));
       } catch (e) {
         console.error("Failed to parse cart from localStorage", e);
+      }
+    }
+    
+    if (savedWishlist) {
+      try {
+        setWishlist(JSON.parse(savedWishlist));
+      } catch (e) {
+        console.error("Failed to parse wishlist from localStorage", e);
       }
     }
   }, []);
@@ -56,6 +69,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, 0);
     setSubtotal(`₵${total.toFixed(2)}`);
   }, [cartItems]);
+  
+  useEffect(() => {
+    // Save wishlist to localStorage whenever it changes
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  }, [wishlist]);
 
   const addToCart = (item: CartItem) => {
     setCartItems(prevItems => {
@@ -111,6 +129,26 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       description: "All items have been removed from your cart",
     });
   };
+  
+  const addToWishlist = (id: number) => {
+    setWishlist(prevWishlist => {
+      if (prevWishlist.includes(id)) {
+        // Remove from wishlist if already exists
+        toast({
+          title: "Removed from wishlist",
+          description: "Item has been removed from your wishlist",
+        });
+        return prevWishlist.filter(itemId => itemId !== id);
+      } else {
+        // Add to wishlist
+        toast({
+          title: "Added to wishlist",
+          description: "Item has been added to your wishlist",
+        });
+        return [...prevWishlist, id];
+      }
+    });
+  };
 
   return (
     <CartContext.Provider value={{
@@ -120,7 +158,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateQuantity,
       clearCart,
       totalItems,
-      subtotal
+      subtotal,
+      wishlist,
+      addToWishlist
     }}>
       {children}
     </CartContext.Provider>
