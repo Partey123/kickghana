@@ -1,0 +1,125 @@
+
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+
+const Onboarding = () => {
+  const navigate = useNavigate();
+  const [showLogo, setShowLogo] = useState(false);
+  const [showButton, setShowButton] = useState(false);
+
+  useEffect(() => {
+    // Show logo after sneakers animation
+    const logoTimer = setTimeout(() => setShowLogo(true), 1800);
+    // Show button after logo animation
+    const buttonTimer = setTimeout(() => setShowButton(true), 2500);
+
+    return () => {
+      clearTimeout(logoTimer);
+      clearTimeout(buttonTimer);
+    };
+  }, []);
+
+  return (
+    <div className="h-screen w-full bg-gradient-to-r from-red-900 via-amber-800 to-amber-600 flex flex-col items-center justify-center relative overflow-hidden">
+      {/* Milk splatters */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-white blur-xl"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-80 h-80 rounded-full bg-white blur-xl"></div>
+        <div className="absolute top-2/3 left-1/2 w-40 h-40 rounded-full bg-white blur-lg"></div>
+      </div>
+      
+      {/* Green bubbles */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/2 left-10 w-20 h-20 rounded-full bg-green-500/20 blur-sm"></div>
+        <div className="absolute top-1/4 right-20 w-16 h-16 rounded-full bg-green-600/20 blur-sm"></div>
+        <div className="absolute bottom-20 left-1/3 w-24 h-24 rounded-full bg-green-400/20 blur-sm"></div>
+      </div>
+      
+      {/* Sneaker animation container */}
+      <div className="h-32 w-full relative mb-12">
+        <motion.div
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: window.innerWidth + 100, opacity: [0, 1, 1, 0] }}
+          transition={{ duration: 3, ease: "easeInOut" }}
+          className="absolute top-0"
+        >
+          <div className="flex space-x-4">
+            <motion.img 
+              src="/sneaker1.png" 
+              alt="Sneaker"
+              className="h-20 w-28 object-contain"
+              initial={{ rotate: 0 }}
+              animate={{ rotate: [0, 10, 0, 10, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, repeatType: "loop" }}
+            />
+            <motion.img 
+              src="/sneaker2.png" 
+              alt="Sneaker"
+              className="h-20 w-28 object-contain"
+              initial={{ rotate: 0 }}
+              animate={{ rotate: [0, -10, 0, -10, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, repeatType: "loop", delay: 0.75 }}
+            />
+          </div>
+        </motion.div>
+      </div>
+      
+      {/* Logo with swoosh animation */}
+      {showLogo && (
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.7, type: "spring" }}
+          className="mb-12"
+        >
+          <div className="relative">
+            <h1 className="text-7xl font-black tracking-tighter z-10 relative">
+              <span className="text-red-600">Kick</span>
+              <span className="text-amber-400">Ghana</span>
+            </h1>
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="absolute bottom-0 h-2 bg-green-600 rounded-full"
+            ></motion.div>
+          </div>
+        </motion.div>
+      )}
+      
+      {/* CTA button with breathing animation */}
+      {showButton && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="z-10"
+        >
+          <motion.div
+            animate={{ 
+              scale: [1, 1.05, 1],
+              boxShadow: [
+                "0px 0px 0px rgba(0,0,0,0.2)", 
+                "0px 10px 20px rgba(0,0,0,0.3)", 
+                "0px 0px 0px rgba(0,0,0,0.2)"
+              ]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <Button 
+              onClick={() => navigate("/home")} 
+              className="text-lg font-semibold px-8 py-6 bg-gradient-to-r from-red-700 to-amber-500 hover:from-red-800 hover:to-amber-600 text-white rounded-full"
+            >
+              Get Started <ArrowRight className="ml-2" />
+            </Button>
+          </motion.div>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+export default Onboarding;

@@ -1,42 +1,65 @@
+
 #root {
-  max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Animation for the breathing effect */
+@keyframes breathing {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+/* Walking animation for sneakers */
+@keyframes walking {
+  0% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(25%) rotate(10deg);
+  }
+  50% {
+    transform: translateX(50%) rotate(0deg);
+  }
+  75% {
+    transform: translateX(75%) rotate(-10deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(0deg);
   }
 }
 
-.card {
-  padding: 2em;
+/* Product card hover effects */
+.product-card {
+  transition: all 0.3s ease;
 }
 
-.read-the-docs {
-  color: #888;
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Milk splatter effect */
+.milk-splatter {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  filter: blur(10px);
+}
+
+/* Ghana flag colors */
+:root {
+  --ghana-red: #CE1126;
+  --ghana-gold: #FCD116;
+  --ghana-green: #006B3F;
 }
