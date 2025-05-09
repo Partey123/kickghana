@@ -1,8 +1,9 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ProductCard, { Product } from "./ProductCard";
-import { toast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
+import { useCart, CartItem } from "@/contexts/CartContext";
 
 // Mock data for featured sneakers
 const featuredSneakers = [
@@ -10,7 +11,7 @@ const featuredSneakers = [
     id: 1,
     name: "Air Max Elevate",
     price: "₵850",
-    image: "/sneaker1.png",
+    image: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     category: "Running",
     isNew: true
   },
@@ -18,7 +19,7 @@ const featuredSneakers = [
     id: 2,
     name: "Flex Stride Pro",
     price: "₵720",
-    image: "/sneaker2.png",
+    image: "https://images.unsplash.com/photo-1605408499391-6368c628ef42?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     category: "Casual",
     isNew: false
   },
@@ -26,7 +27,7 @@ const featuredSneakers = [
     id: 3,
     name: "Court Vision Elite",
     price: "₵650",
-    image: "/sneaker3.png",
+    image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     category: "Basketball",
     isNew: true
   },
@@ -34,7 +35,7 @@ const featuredSneakers = [
     id: 4,
     name: "React Infinity",
     price: "₵920",
-    image: "/sneaker4.png",
+    image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     category: "Running",
     isNew: false
   }
@@ -42,37 +43,28 @@ const featuredSneakers = [
 
 interface FeaturedProductsProps {
   cartItems: number[];
-  setCartItems: React.Dispatch<React.SetStateAction<number[]>>;
   wishlist: number[];
-  setWishlist: React.Dispatch<React.SetStateAction<number[]>>;
+  addToCart: (item: CartItem) => void;
+  addToWishlist: (id: number) => void;
 }
 
-const FeaturedProducts = ({ cartItems, setCartItems, wishlist, setWishlist }: FeaturedProductsProps) => {
+const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: FeaturedProductsProps) => {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const categories = ["All", "Running", "Basketball", "Casual", "Training"];
+  const navigate = useNavigate();
   
-  const addToCart = (id: number) => {
-    setCartItems([...cartItems, id]);
-    toast({
-      title: "Added to cart",
-      description: "Item has been added to your cart",
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1
     });
   };
   
-  const addToWishlist = (id: number) => {
-    if (wishlist.includes(id)) {
-      setWishlist(wishlist.filter(item => item !== id));
-      toast({
-        title: "Removed from wishlist",
-        description: "Item has been removed from your wishlist",
-      });
-    } else {
-      setWishlist([...wishlist, id]);
-      toast({
-        title: "Added to wishlist",
-        description: "Item has been added to your wishlist",
-      });
-    }
+  const handleProductClick = (id: number) => {
+    navigate(`/product/${id}`);
   };
   
   const filteredProducts = activeCategory === "All" 
@@ -118,9 +110,10 @@ const FeaturedProducts = ({ cartItems, setCartItems, wishlist, setWishlist }: Fe
             >
               <ProductCard 
                 product={sneaker} 
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
+                onAddToCart={() => handleAddToCart(sneaker)}
+                onAddToWishlist={() => addToWishlist(sneaker.id)}
                 isInWishlist={wishlist.includes(sneaker.id)}
+                onProductClick={() => handleProductClick(sneaker.id)}
               />
             </motion.div>
           ))}

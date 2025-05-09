@@ -1,17 +1,37 @@
 
 import { motion } from "framer-motion";
 
-// Mock data for categories
+// Categories with real images
 const categories = [
-  { id: 1, name: "Running", image: "/category-running.png", count: 24 },
-  { id: 2, name: "Basketball", image: "/category-basketball.png", count: 18 },
-  { id: 3, name: "Casual", image: "/category-casual.png", count: 32 },
-  { id: 4, name: "Training", image: "/category-training.png", count: 16 }
+  { 
+    id: 1, 
+    name: "Running", 
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", 
+    count: 24 
+  },
+  { 
+    id: 2, 
+    name: "Basketball", 
+    image: "https://images.unsplash.com/photo-1579338559194-a162d19bf842?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", 
+    count: 18 
+  },
+  { 
+    id: 3, 
+    name: "Casual", 
+    image: "https://images.unsplash.com/photo-1544441893-675973e31985?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", 
+    count: 32 
+  },
+  { 
+    id: 4, 
+    name: "Training", 
+    image: "https://images.unsplash.com/photo-1606890658317-7d14490b76fd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", 
+    count: 16 
+  }
 ];
 
 const CategorySection = () => {
   return (
-    <section id="categories" className="py-20 px-4 md:px-8 bg-accent">
+    <section id="categories" className="py-20 px-4 md:px-8 bg-accent/80">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <span className="text-primary text-sm font-medium uppercase tracking-wider">Categories</span>

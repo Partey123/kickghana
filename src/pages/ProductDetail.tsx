@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, ShoppingCart, ArrowLeft, Plus } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
+import { useCart } from "@/contexts/CartContext";
 
 // Sample product data - this would typically come from an API
 const products = [
@@ -14,7 +15,7 @@ const products = [
     id: "1",
     name: "Air Max Elevate",
     price: "₵850",
-    image: "/sneaker1.png",
+    image: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     category: "Running",
     colors: ["Red/Black", "Blue/White", "All Black"],
     sizes: ["US 7", "US 8", "US 9", "US 10", "US 11"],
@@ -27,7 +28,7 @@ const products = [
     id: "2",
     name: "Flex Stride Pro",
     price: "₵720",
-    image: "/sneaker2.png",
+    image: "https://images.unsplash.com/photo-1605408499391-6368c628ef42?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     category: "Casual",
     colors: ["White/Gum", "Black/White", "Gray/Blue"],
     sizes: ["US 7", "US 8", "US 9", "US 10", "US 11"],
@@ -40,7 +41,7 @@ const products = [
     id: "3",
     name: "Court Vision Elite",
     price: "₵650",
-    image: "/sneaker3.png",
+    image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     category: "Basketball",
     colors: ["Black/Red", "White/Blue", "Gray/Orange"],
     sizes: ["US 8", "US 9", "US 10", "US 11", "US 12"],
@@ -53,7 +54,7 @@ const products = [
     id: "4",
     name: "React Infinity",
     price: "₵920",
-    image: "/sneaker4.png",
+    image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     category: "Running",
     colors: ["Green/Black", "Blue/Orange", "Red/White"],
     sizes: ["US 7", "US 8", "US 9", "US 10", "US 11"],
@@ -67,6 +68,7 @@ const products = [
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addToCart, addToWishlist, wishlist, totalItems } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
@@ -85,26 +87,32 @@ const ProductDetail = () => {
       return;
     }
     
-    toast({
-      title: "Added to cart",
-      description: `${product.name} (${selectedColor}, ${selectedSize}) × ${quantity} has been added to your cart`,
+    addToCart({
+      id: parseInt(product.id),
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: quantity,
+      color: selectedColor,
+      size: selectedSize
     });
   };
   
   const handleToggleWishlist = () => {
     setIsInWishlist(!isInWishlist);
-    toast({
-      title: isInWishlist ? "Removed from wishlist" : "Added to wishlist",
-      description: `${product.name} has been ${isInWishlist ? "removed from" : "added to"} your wishlist`,
-    });
+    addToWishlist(parseInt(product.id));
   };
   
   const incrementQuantity = () => setQuantity(prev => prev + 1);
   const decrementQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
+  
+  const handleCartClick = () => {
+    navigate("/cart");
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100">
-      <Navbar cartItemsCount={0} />
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/80 to-amber-100/80">
+      <Navbar cartItemsCount={totalItems} onCartClick={handleCartClick} />
       
       <div className="container mx-auto px-4 py-8">
         <Button 
@@ -117,7 +125,7 @@ const ProductDetail = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Product Image Section */}
-          <div className="bg-gradient-to-b from-amber-100 to-amber-200 rounded-xl p-6 shadow-lg">
+          <div className="bg-gradient-to-b from-amber-100/80 to-amber-200/80 rounded-xl p-6 shadow-lg">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -144,7 +152,7 @@ const ProductDetail = () => {
           
           {/* Product Info Section */}
           <div>
-            <div className="bg-white rounded-xl p-6 shadow-lg">
+            <div className="bg-white/90 rounded-xl p-6 shadow-lg">
               <span className="inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium mb-4">
                 {product.category}
               </span>
@@ -244,9 +252,9 @@ const ProductDetail = () => {
         </div>
         
         {/* Product Details Tabs */}
-        <div className="mt-12 bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="mt-12 bg-white/90 rounded-xl shadow-lg overflow-hidden">
           <Tabs defaultValue="features">
-            <TabsList className="w-full justify-start bg-amber-50 border-b border-amber-200 p-0">
+            <TabsList className="w-full justify-start bg-amber-50/90 border-b border-amber-200 p-0">
               <TabsTrigger value="features" className="py-4 px-6">Features</TabsTrigger>
               <TabsTrigger value="details" className="py-4 px-6">Details</TabsTrigger>
               <TabsTrigger value="reviews" className="py-4 px-6">Reviews</TabsTrigger>
@@ -342,10 +350,10 @@ const ProductDetail = () => {
                 <motion.div
                   key={relatedProduct.id}
                   whileHover={{ y: -5 }}
-                  className="bg-white rounded-lg overflow-hidden shadow-md cursor-pointer"
+                  className="bg-white/90 rounded-lg overflow-hidden shadow-md cursor-pointer"
                   onClick={() => navigate(`/product/${relatedProduct.id}`)}
                 >
-                  <div className="bg-gradient-to-b from-amber-50 to-amber-100 p-4">
+                  <div className="bg-gradient-to-b from-amber-50/80 to-amber-100/80 p-4">
                     <div className="aspect-square flex items-center justify-center">
                       <img 
                         src={relatedProduct.image} 
@@ -368,7 +376,7 @@ const ProductDetail = () => {
       </div>
       
       {/* Footer - reusing the footer from Home page */}
-      <footer className="bg-red-900 text-amber-200 py-10 px-4 md:px-8 mt-16">
+      <footer className="bg-red-900/90 text-amber-200 py-10 px-4 md:px-8 mt-16">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <h3 className="font-bold text-xl mb-4 text-amber-400">KickGhana</h3>

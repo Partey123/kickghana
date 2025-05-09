@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, Eye } from "lucide-react";
 import { motion } from "framer-motion";
@@ -18,16 +17,12 @@ interface ProductCardProps {
   product: Product;
   onAddToCart: (id: number) => void;
   onAddToWishlist: (id: number) => void;
+  onProductClick: (id: number) => void;
   isInWishlist: boolean;
 }
 
-const ProductCard = ({ product, onAddToCart, onAddToWishlist, isInWishlist }: ProductCardProps) => {
-  const navigate = useNavigate();
+const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, isInWishlist }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  
-  const goToProductDetail = (id: number) => {
-    navigate(`/product/${id}`);
-  };
 
   return (
     <div 
@@ -35,7 +30,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, isInWishlist }: Pr
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative rounded-2xl overflow-hidden bg-gray-50 aspect-square">
+      <div className="relative rounded-2xl overflow-hidden bg-gray-50/80 aspect-square">
         {/* Product Image */}
         <img 
           src={product.image} 
@@ -72,7 +67,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, isInWishlist }: Pr
               size="icon"
               variant="secondary"
               className="rounded-full bg-white text-secondary hover:bg-primary hover:text-secondary h-10 w-10"
-              onClick={() => goToProductDetail(product.id)}
+              onClick={() => onProductClick(product.id)}
             >
               <Eye size={18} />
             </Button>
@@ -94,7 +89,10 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, isInWishlist }: Pr
         {/* Quick Add Button */}
         <div className="absolute -bottom-10 left-0 right-0 group-hover:bottom-0 transition-all duration-300 px-4 py-3">
           <Button 
-            onClick={() => onAddToCart(product.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddToCart(product.id);
+            }}
             className="w-full bg-primary text-secondary hover:bg-primary/90 rounded-full"
           >
             <ShoppingBag size={16} className="mr-2" /> Quick Add
@@ -113,7 +111,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, isInWishlist }: Pr
       <div className="mt-4 text-center">
         <h3 
           className="font-medium text-secondary truncate cursor-pointer hover:text-primary transition-colors"
-          onClick={() => goToProductDetail(product.id)}
+          onClick={() => onProductClick(product.id)}
         >
           {product.name}
         </h3>

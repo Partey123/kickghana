@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { toast } from "@/components/ui/use-toast";
 import HeroSection from "@/components/home/HeroSection";
@@ -8,12 +9,13 @@ import FeaturedProducts from "@/components/home/FeaturedProducts";
 import CTASection from "@/components/home/CTASection";
 import Footer from "@/components/home/Footer";
 import SearchModal from "@/components/home/SearchModal";
+import { useCart } from "@/contexts/CartContext";
 
 const Home = () => {
-  const [cartItems, setCartItems] = useState<number[]>([]);
-  const [wishlist, setWishlist] = useState<number[]>([]);
+  const { addToCart, totalItems, cartItems, addToWishlist, wishlist } = useCart();
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const navigate = useNavigate();
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,20 +25,24 @@ const Home = () => {
     });
     setShowSearchModal(false);
   };
+  
+  const handleCartClick = () => {
+    navigate("/cart");
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar cartItemsCount={cartItems.length} />
+    <div className="min-h-screen bg-background/80">
+      <Navbar cartItemsCount={totalItems} onCartClick={handleCartClick} />
       
       <HeroSection />
       
       <CategorySection />
       
       <FeaturedProducts 
-        cartItems={cartItems}
-        setCartItems={setCartItems}
+        cartItems={cartItems.map(item => item.id)}
+        addToCart={addToCart}
         wishlist={wishlist}
-        setWishlist={setWishlist}
+        addToWishlist={addToWishlist}
       />
       
       <CTASection />
