@@ -3,39 +3,54 @@ import { motion } from "framer-motion";
 
 // Mock data for categories
 const categories = [
-  { id: 1, name: "Running", image: "/category-running.png" },
-  { id: 2, name: "Basketball", image: "/category-basketball.png" },
-  { id: 3, name: "Casual", image: "/category-casual.png" },
-  { id: 4, name: "Training", image: "/category-training.png" }
+  { id: 1, name: "Running", image: "/category-running.png", count: 24 },
+  { id: 2, name: "Basketball", image: "/category-basketball.png", count: 18 },
+  { id: 3, name: "Casual", image: "/category-casual.png", count: 32 },
+  { id: 4, name: "Training", image: "/category-training.png", count: 16 }
 ];
 
 const CategorySection = () => {
   return (
-    <section id="categories" className="py-10 px-4 md:px-8">
+    <section id="categories" className="py-20 px-4 md:px-8 bg-accent">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-red-900 mb-6">Shop by Category</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {categories.map((category) => (
+        <div className="text-center mb-12">
+          <span className="text-primary text-sm font-medium uppercase tracking-wider">Categories</span>
+          <h2 className="text-3xl md:text-4xl font-bold mt-2 text-secondary">Shop by Category</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          {categories.map((category, i) => (
             <motion.div 
               key={category.id} 
-              className="bg-gradient-to-b from-red-900/5 to-amber-200/30 rounded-lg p-4 hover:shadow-lg transition-shadow duration-300 cursor-pointer group"
-              whileHover={{ y: -5 }}
+              className="group relative overflow-hidden rounded-2xl aspect-square cursor-pointer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.03 }}
             >
-              <div className="aspect-square relative overflow-hidden rounded-md bg-white flex items-center justify-center">
+              {/* Category Image */}
+              <div className="absolute inset-0">
                 <img 
                   src={category.image} 
                   alt={category.name} 
-                  className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-red-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                  <div className="w-full p-4">
-                    <a href="#" className="block w-full text-center text-white font-semibold hover:underline">
-                      View All
-                    </a>
-                  </div>
+              </div>
+              
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+              
+              {/* Content */}
+              <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                <h3 className="text-2xl font-bold">{category.name}</h3>
+                <p className="text-white/70 mt-1">{category.count} Products</p>
+                <div className="mt-4 overflow-hidden h-8">
+                  <span className="inline-flex items-center rounded-full bg-primary/20 px-4 py-1 text-sm text-primary transition-transform duration-300 translate-y-8 group-hover:translate-y-0">
+                    Shop Now
+                  </span>
                 </div>
               </div>
-              <h3 className="mt-2 text-center font-semibold text-amber-900">{category.name}</h3>
             </motion.div>
           ))}
         </div>

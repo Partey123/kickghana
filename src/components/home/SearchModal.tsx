@@ -1,8 +1,9 @@
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Search, X } from "lucide-react";
 
 interface SearchModalProps {
   showSearchModal: boolean;
@@ -19,61 +20,119 @@ const SearchModal = ({
   setSearchTerm, 
   handleSearch 
 }: SearchModalProps) => {
+  // Close on escape key
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowSearchModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [setShowSearchModal]);
+
+  // Recent searches
+  const recentSearches = ["Air Max", "Casual Sneakers", "Gold Accent", "Limited Edition"];
+  
   if (!showSearchModal) return null;
   
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-lg p-6 w-full max-w-md"
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold text-gray-800">Search Products</h3>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-gray-500"
-            onClick={() => setShowSearchModal(false)}
+    <AnimatePresence>
+      {showSearchModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center"
+          onClick={() => setShowSearchModal(false)}
+        >
+          <motion.div
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 500 }}
+            className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mt-24 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
           >
-            &times;
-          </Button>
-        </div>
-        
-        <form onSubmit={handleSearch}>
-          <div className="flex">
-            <input
-              type="search"
-              placeholder="Search for sneakers..."
-              className="flex-1 border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Button type="submit" className="rounded-l-none bg-amber-500 hover:bg-amber-600">
-              <Search size={18} />
-            </Button>
-          </div>
-        </form>
-        
-        <div className="mt-4">
-          <h4 className="text-sm font-medium text-gray-500 mb-2">Popular searches</h4>
-          <div className="flex flex-wrap gap-2">
-            {["Running", "Basketball", "Casual", "Limited Edition"].map((term, index) => (
+            {/* Header */}
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-semibold text-secondary">Search Products</h3>
               <Button 
-                key={index} 
-                variant="outline" 
-                size="sm"
-                className="text-xs"
-                onClick={() => setSearchTerm(term)}
+                variant="ghost" 
+                size="icon" 
+                className="text-gray-500 hover:text-secondary"
+                onClick={() => setShowSearchModal(false)}
               >
-                {term}
+                <X size={20} />
               </Button>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-    </div>
+            </div>
+            
+            {/* Search Form */}
+            <div className="p-4">
+              <form onSubmit={handleSearch} className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Input
+                  type="search"
+                  placeholder="Search for sneakers..."
+                  className="pl-10 pr-4 py-6 w-full rounded-full border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/30 text-lg"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  autoFocus
+                />
+                <Button 
+                  type="submit" 
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary text-secondary hover:bg-primary/90 rounded-full px-6 py-2"
+                >
+                  Search
+                </Button>
+              </form>
+            </div>
+            
+            {/* Recent Searches */}
+            <div className="px-4 pb-6">
+              <h4 className="text-sm font-medium text-gray-500 mb-3">Recent Searches</h4>
+              <div className="flex flex-wrap gap-2">
+                {recentSearches.map((term, index) => (
+                  <Button 
+                    key={index} 
+                    variant="outline" 
+                    size="sm"
+                    className="rounded-full text-sm border-gray-200 hover:bg-primary hover:text-secondary hover:border-primary"
+                    onClick={() => setSearchTerm(term)}
+                  >
+                    {term}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Popular Categories */}
+            <div className="bg-gray-50 px-4 py-4 border-t">
+              <h4 className="text-sm font-medium text-gray-500 mb-3">Popular Categories</h4>
+              <div className="flex flex-wrap gap-2">
+                {["Running", "Basketball", "Casual", "Training", "Limited Edition"].map((category, index) => (
+                  <Button 
+                    key={index} 
+                    variant="outline" 
+                    size="sm"
+                    className="rounded-full text-sm border-gray-200 hover:bg-primary hover:text-secondary hover:border-primary bg-white"
+                    onClick={() => {
+                      setSearchTerm(category);
+                      handleSearch(new Event('submit') as any);
+                    }}
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

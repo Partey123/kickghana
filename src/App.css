@@ -40,21 +40,55 @@
   }
 }
 
+/* Floating animation */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Glow effect for premium products */
+.premium-glow {
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+}
+
 /* Product card hover effects */
 .product-card {
   transition: all 0.3s ease;
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
 }
 
-/* Milk splatter effect */
-.milk-splatter {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  filter: blur(10px);
+/* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.2) 20%, 
+    rgba(255,255,255,0.5) 60%, 
+    rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
 }
 
 /* Ghana flag colors */
@@ -62,4 +96,12 @@
   --ghana-red: #CE1126;
   --ghana-gold: #FCD116;
   --ghana-green: #006B3F;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(90deg, var(--ghana-gold) 0%, #E6A817 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

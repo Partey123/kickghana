@@ -25,7 +25,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100">
+    <div className="min-h-screen bg-background">
       <Navbar cartItemsCount={cartItems.length} />
       
       <HeroSection />

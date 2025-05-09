@@ -1,11 +1,9 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingBag, Eye } from "lucide-react";
 import { motion } from "framer-motion";
-import { toast } from "@/components/ui/use-toast";
 
 export interface Product {
   id: number;
@@ -13,6 +11,7 @@ export interface Product {
   price: string;
   image: string;
   category: string;
+  isNew?: boolean;
 }
 
 interface ProductCardProps {
@@ -24,67 +23,105 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onAddToCart, onAddToWishlist, isInWishlist }: ProductCardProps) => {
   const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
   
   const goToProductDetail = (id: number) => {
     navigate(`/product/${id}`);
   };
 
   return (
-    <motion.div
-      whileHover={{ y: -8 }}
-      transition={{ type: "spring", stiffness: 300 }}
+    <div 
+      className="group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group border-0">
-        <div className="bg-gradient-to-b from-amber-50 to-amber-100 p-6 relative">
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddToWishlist(product.id);
-            }}
-            className="absolute top-2 right-2 p-2 rounded-full bg-white/70 hover:bg-white transition-colors z-10"
-          >
-            <Heart 
-              size={18} 
-              className={isInWishlist ? "fill-red-600 text-red-600" : "text-gray-500"} 
-            />
-          </button>
-          <div 
-            className="aspect-square flex items-center justify-center overflow-hidden cursor-pointer"
-            onClick={() => goToProductDetail(product.id)} 
-          >
-            <motion.img 
-              src={product.image} 
-              alt={product.name} 
-              className="h-full w-auto object-contain"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-            />
+      <div className="relative rounded-2xl overflow-hidden bg-gray-50 aspect-square">
+        {/* Product Image */}
+        <img 
+          src={product.image} 
+          alt={product.name} 
+          className="w-full h-full object-contain transition-transform duration-700 transform group-hover:scale-110"
+        />
+        
+        {/* New Badge */}
+        {product.isNew && (
+          <div className="absolute top-4 left-4 bg-primary text-secondary text-xs font-bold px-3 py-1 rounded-full">
+            NEW
           </div>
-        </div>
-        <CardContent className="p-4">
-          <div className="mb-3">
-            <span className="text-xs font-medium text-red-700 bg-amber-100 px-2 py-1 rounded">
-              {product.category}
-            </span>
-          </div>
-          <h3 
-            className="font-semibold text-lg text-gray-800 cursor-pointer hover:text-red-800"
-            onClick={() => goToProductDetail(product.id)}
-          >
-            {product.name}
-          </h3>
-          <div className="flex justify-between items-center mt-2">
-            <span className="font-bold text-lg text-red-900">{product.price}</span>
-            <Button 
-              size="sm" 
-              onClick={() => onAddToCart(product.id)}
-              className="bg-red-800 hover:bg-red-900 text-amber-100"
+        )}
+        
+        {/* Action Buttons */}
+        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <div className="flex flex-col gap-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
+            <Button
+              size="icon"
+              variant="secondary"
+              className="rounded-full bg-white text-secondary hover:bg-primary hover:text-secondary h-10 w-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddToWishlist(product.id);
+              }}
             >
-              <ShoppingCart size={16} className="mr-1" /> Add
+              <Heart 
+                size={18} 
+                className={isInWishlist ? "fill-primary text-primary" : ""} 
+              />
+            </Button>
+            
+            <Button
+              size="icon"
+              variant="secondary"
+              className="rounded-full bg-white text-secondary hover:bg-primary hover:text-secondary h-10 w-10"
+              onClick={() => goToProductDetail(product.id)}
+            >
+              <Eye size={18} />
+            </Button>
+            
+            <Button
+              size="icon"
+              variant="secondary"
+              className="rounded-full bg-white text-secondary hover:bg-primary hover:text-secondary h-10 w-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddToCart(product.id);
+              }}
+            >
+              <ShoppingBag size={18} />
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+        </div>
+        
+        {/* Quick Add Button */}
+        <div className="absolute -bottom-10 left-0 right-0 group-hover:bottom-0 transition-all duration-300 px-4 py-3">
+          <Button 
+            onClick={() => onAddToCart(product.id)}
+            className="w-full bg-primary text-secondary hover:bg-primary/90 rounded-full"
+          >
+            <ShoppingBag size={16} className="mr-2" /> Quick Add
+          </Button>
+        </div>
+        
+        {/* Category Tag */}
+        <div className="absolute top-4 right-4">
+          <span className="bg-white/90 text-secondary text-xs px-3 py-1 rounded-full">
+            {product.category}
+          </span>
+        </div>
+      </div>
+      
+      {/* Product Info */}
+      <div className="mt-4 text-center">
+        <h3 
+          className="font-medium text-secondary truncate cursor-pointer hover:text-primary transition-colors"
+          onClick={() => goToProductDetail(product.id)}
+        >
+          {product.name}
+        </h3>
+        <span className="block mt-1 font-semibold text-primary">
+          {product.price}
+        </span>
+      </div>
+    </div>
   );
 };
 

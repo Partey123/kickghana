@@ -1,85 +1,108 @@
 
 import { Button } from "@/components/ui/button";
-import { 
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section className="relative pt-16 pb-10 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto">
-        <Carousel className="w-full">
-          <CarouselContent>
-            <CarouselItem>
-              <div className="relative h-[400px] md:h-[500px] w-full rounded-xl overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-900/90 to-amber-800/70 z-10"></div>
-                <div className="absolute z-20 text-white max-w-xl p-10 top-1/2 transform -translate-y-1/2">
-                  <h1 className="text-4xl md:text-6xl font-black mb-4">Step into Ghanaian Excellence</h1>
-                  <p className="text-lg md:text-xl mb-6">Premium footwear with authentic Ghanaian style and quality craftsmanship.</p>
-                  <Button 
-                    className="bg-amber-500 hover:bg-amber-600 text-red-900 font-bold"
-                    onClick={() => document.getElementById("featured-products")?.scrollIntoView({ behavior: "smooth" })}
-                  >
-                    Shop Now
-                  </Button>
-                </div>
-                <div className="absolute right-0 bottom-0 w-1/2 h-full">
-                  <motion.img 
-                    src="/hero-sneaker.png" 
-                    alt="Premium Sneakers" 
-                    className="absolute bottom-0 right-5 md:right-10 w-auto h-4/5 object-contain"
-                    initial={{ rotate: 12, y: 20 }}
-                    animate={{ 
-                      rotate: [12, 15, 12],
-                      y: [20, 10, 20]
-                    }}
-                    transition={{ 
-                      duration: 4,
-                      repeat: Infinity,
-                      repeatType: "reverse",
-                      ease: "easeInOut"
-                    }}
-                  />
-                </div>
-              </div>
-            </CarouselItem>
-            <CarouselItem>
-              <div className="relative h-[400px] md:h-[500px] w-full rounded-xl overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-900/80 to-green-800/50 z-10"></div>
-                <div className="absolute z-20 text-white max-w-xl p-10 top-1/2 transform -translate-y-1/2">
-                  <h1 className="text-4xl md:text-6xl font-black mb-4">New Collection Arrived</h1>
-                  <p className="text-lg md:text-xl mb-6">Limited edition sneakers inspired by Ghana's rich culture.</p>
-                  <Button 
-                    className="bg-green-600 hover:bg-green-700 text-amber-100 font-bold"
-                    onClick={() => document.getElementById("categories")?.scrollIntoView({ behavior: "smooth" })}
-                  >
-                    Explore Collection
-                  </Button>
-                </div>
-                <div className="absolute right-0 bottom-0 w-1/2 h-full">
-                  <motion.div
-                    className="absolute bottom-0 right-5 md:right-10 w-auto h-4/5 flex items-end"
-                    initial={{ y: 0 }}
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    <span className="text-9xl">👟</span>
-                    <span className="text-8xl ml-4 mb-6">👞</span>
-                    <span className="text-7xl ml-4 mb-12">🥾</span>
-                  </motion.div>
-                </div>
-              </div>
-            </CarouselItem>
-          </CarouselContent>
-          <CarouselPrevious className="left-2" />
-          <CarouselNext className="right-2" />
-        </Carousel>
+    <section className="pt-24 pb-10 px-4 md:px-8 relative min-h-screen flex items-center overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-secondary via-secondary/90 to-secondary/70 z-0">
+        <div className="absolute inset-0 opacity-10">
+          {/* Abstract patterns */}
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/30 blur-3xl"></div>
+          <div className="absolute bottom-1/3 right-1/3 w-80 h-80 rounded-full bg-primary/20 blur-2xl"></div>
+        </div>
       </div>
+      
+      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative z-10">
+        {/* Text Content */}
+        <div className="text-white space-y-8">
+          <motion.span 
+            className="inline-block px-4 py-1 rounded-full bg-primary/20 text-primary text-sm font-medium"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            New Collection 2025
+          </motion.span>
+          
+          <motion.h1 
+            className="text-5xl md:text-7xl font-bold leading-tight"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <span className="block">Step into</span>
+            <span className="text-primary">Excellence</span>
+          </motion.h1>
+          
+          <motion.p 
+            className="text-lg text-white/80 max-w-md"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            Premium footwear with authentic Ghanaian style and craftsmanship. 
+            Elevate your style with our luxurious collection.
+          </motion.p>
+          
+          <motion.div 
+            className="flex flex-wrap gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Button 
+              className="bg-primary text-secondary hover:bg-primary/90 rounded-full px-8 py-6 text-lg font-medium"
+              onClick={() => document.getElementById("featured-products")?.scrollIntoView({ behavior: "smooth" })}
+            >
+              Shop Collection
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 rounded-full px-8 py-6 text-lg font-medium"
+            >
+              Learn More
+            </Button>
+          </motion.div>
+        </div>
+        
+        {/* Hero Image */}
+        <div className="relative flex justify-center md:justify-end">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ delay: 0.5, duration: 0.7, type: "spring" }}
+            className="relative"
+          >
+            <div className="relative z-10 animate-float">
+              <img 
+                src="/hero-sneaker.png" 
+                alt="Premium Sneakers" 
+                className="max-h-[70vh] object-contain drop-shadow-2xl"
+              />
+            </div>
+            <div className="absolute -inset-4 bg-gradient-to-r from-primary/40 to-primary/10 rounded-full blur-3xl z-0 animate-pulse"></div>
+          </motion.div>
+        </div>
+      </div>
+      
+      {/* Scroll indicator */}
+      <motion.div 
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/70 flex flex-col items-center"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1, duration: 0.5 }}
+      >
+        <span className="text-sm mb-2">Scroll to explore</span>
+        <div className="w-0.5 h-8 bg-white/30">
+          <motion.div 
+            className="w-full h-1/3 bg-primary" 
+            animate={{ y: [0, 16, 0] }} 
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          ></motion.div>
+        </div>
+      </motion.div>
     </section>
   );
 };

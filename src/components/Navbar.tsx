@@ -1,266 +1,229 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { 
-  NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
-import { ShoppingCart, Heart, Search, User, Menu, X } from "lucide-react";
+import { ShoppingBag, Heart, Search, User, Menu, X } from "lucide-react";
 
 interface NavbarProps {
   cartItemsCount?: number;
 }
 
 const Navbar = ({ cartItemsCount = 0 }: NavbarProps) => {
-  const [searchExpanded, setSearchExpanded] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-amber-200 bg-gradient-to-r from-red-900 via-amber-900 to-amber-800 text-white">
-      <div className="container mx-auto px-4 py-3">
+    <header 
+      className={`fixed top-0 z-40 w-full transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-white/95 backdrop-blur-md shadow-md py-2' 
+          : 'bg-transparent py-4'
+      }`}
+    >
+      <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center mr-4">
+          <Link to="/" className="flex items-center">
             <div className="relative">
-              <h1 className="text-2xl font-black tracking-tighter z-10 relative">
-                <span className="text-red-500">Kick</span>
-                <span className="text-amber-400">Ghana</span>
+              <h1 className={`text-2xl font-bold transition-colors duration-300 ${
+                isScrolled ? 'text-secondary' : 'text-white'
+              }`}>
+                <span className="font-serif font-black">KICK</span>
+                <span className="text-primary">GHANA</span>
               </h1>
-              <div className="absolute bottom-0 h-1 w-full bg-green-600 rounded-full"></div>
             </div>
           </Link>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1 flex-1 justify-center">
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <Link to="/home">
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                      Home
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link to="/collections">
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                      Collections
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link to="/men">
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                      Men
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link to="/women">
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                      Women
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link to="/about">
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                      About Us
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/home" className={`font-medium transition-colors duration-300 ${
+              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+            }`}>Home</Link>
+            <Link to="/collections" className={`font-medium transition-colors duration-300 ${
+              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+            }`}>Collections</Link>
+            <Link to="/men" className={`font-medium transition-colors duration-300 ${
+              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+            }`}>Men</Link>
+            <Link to="/women" className={`font-medium transition-colors duration-300 ${
+              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+            }`}>Women</Link>
+            <Link to="/about" className={`font-medium transition-colors duration-300 ${
+              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+            }`}>About</Link>
           </div>
           
           {/* Desktop Icons */}
-          <div className="hidden md:flex items-center space-x-4">
-            {/* Search */}
-            <div className="relative">
-              {searchExpanded ? (
-                <div className="flex items-center bg-white/10 rounded-full p-1 pl-3 backdrop-blur-sm">
-                  <Input 
-                    type="search"
-                    placeholder="Search products..."
-                    className="border-0 bg-transparent text-white placeholder-white/70 focus-visible:ring-0 focus-visible:ring-offset-0 w-40"
-                  />
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-white hover:text-amber-200 hover:bg-transparent"
-                    onClick={() => setSearchExpanded(false)}
-                  >
-                    <X size={18} />
-                  </Button>
-                </div>
-              ) : (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="text-white hover:text-amber-200 hover:bg-transparent"
-                  onClick={() => setSearchExpanded(true)}
-                >
-                  <Search size={20} />
-                </Button>
+          <div className="hidden md:flex items-center space-x-6">
+            <button 
+              onClick={() => setSearchOpen(!searchOpen)}
+              className={`transition-colors duration-300 ${
+                isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+              }`}
+            >
+              <Search size={20} strokeWidth={1.5} />
+            </button>
+            
+            <Link to="/wishlist" className={`transition-colors duration-300 ${
+              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+            }`}>
+              <Heart size={20} strokeWidth={1.5} />
+            </Link>
+            
+            <Link to="/cart" className={`transition-colors duration-300 relative ${
+              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+            }`}>
+              <ShoppingBag size={20} strokeWidth={1.5} />
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {cartItemsCount}
+                </span>
               )}
-            </div>
+            </Link>
             
-            {/* Wishlist */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:text-amber-200 hover:bg-transparent"
-              asChild
-            >
-              <Link to="/wishlist">
-                <Heart size={20} />
-              </Link>
-            </Button>
-            
-            {/* Cart */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:text-amber-200 hover:bg-transparent relative"
-              asChild
-            >
-              <Link to="/cart">
-                <ShoppingCart size={20} />
-                {cartItemsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartItemsCount}
-                  </span>
-                )}
-              </Link>
-            </Button>
-            
-            {/* Profile */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:text-amber-200 hover:bg-transparent"
-              asChild
-            >
-              <Link to="/profile">
-                <User size={20} />
-              </Link>
-            </Button>
+            <Link to="/profile" className={`transition-colors duration-300 ${
+              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+            }`}>
+              <User size={20} strokeWidth={1.5} />
+            </Link>
           </div>
           
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-3">
-            {/* Cart icon for mobile */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:text-amber-200 hover:bg-transparent relative"
-              asChild
-            >
-              <Link to="/cart">
-                <ShoppingCart size={20} />
-                {cartItemsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartItemsCount}
-                  </span>
-                )}
-              </Link>
-            </Button>
+          <div className="md:hidden flex items-center space-x-4">
+            <Link to="/cart" className={`transition-colors duration-300 relative ${
+              isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+            }`}>
+              <ShoppingBag size={20} strokeWidth={1.5} />
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {cartItemsCount}
+                </span>
+              )}
+            </Link>
             
-            {/* Mobile menu toggle */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:text-amber-200 hover:bg-transparent"
+            <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`transition-colors duration-300 ${
+                isScrolled ? 'text-secondary hover:text-primary' : 'text-white/90 hover:text-white'
+              }`}
             >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </Button>
+              {mobileMenuOpen ? (
+                <X size={24} strokeWidth={1.5} /> 
+              ) : (
+                <Menu size={24} strokeWidth={1.5} />
+              )}
+            </button>
           </div>
         </div>
       </div>
       
-      {/* Mobile menu */}
+      {/* Search Bar (Desktop) */}
+      {searchOpen && (
+        <div className="absolute top-full left-0 w-full bg-white shadow-md py-4 px-6 transform origin-top transition-transform duration-300">
+          <div className="max-w-2xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Input 
+                type="search" 
+                placeholder="Search for products..." 
+                className="pl-10 pr-4 py-2 w-full rounded-full border-gray-200 focus:border-primary"
+              />
+              <button 
+                onClick={() => setSearchOpen(false)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-red-900 border-t border-amber-800">
-          <div className="px-4 pt-2 pb-3 space-y-1">
+        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg z-50">
+          <div className="flex flex-col p-4 space-y-4">
             <Link 
-              to="/home" 
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-amber-800"
+              to="/home"
+              className="px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50 rounded-md" 
               onClick={() => setMobileMenuOpen(false)}
             >
               Home
             </Link>
-            <Link
-              to="/collections"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-amber-800"
+            <Link 
+              to="/collections" 
+              className="px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50 rounded-md"
               onClick={() => setMobileMenuOpen(false)}
             >
               Collections
             </Link>
-            <Link
-              to="/men"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-amber-800"
+            <Link 
+              to="/men" 
+              className="px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50 rounded-md"
               onClick={() => setMobileMenuOpen(false)}
             >
               Men
             </Link>
-            <Link
-              to="/women"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-amber-800"
+            <Link 
+              to="/women" 
+              className="px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50 rounded-md"
               onClick={() => setMobileMenuOpen(false)}
             >
               Women
             </Link>
-            <Link
-              to="/about"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-amber-800"
+            <Link 
+              to="/about" 
+              className="px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50 rounded-md"
               onClick={() => setMobileMenuOpen(false)}
             >
-              About Us
+              About
             </Link>
-          </div>
-          
-          {/* Mobile search */}
-          <div className="px-4 py-3 border-t border-amber-800">
-            <div className="flex items-center bg-white/10 rounded-full p-1 pl-3 backdrop-blur-sm">
-              <Input 
-                type="search"
-                placeholder="Search products..."
-                className="border-0 bg-transparent text-white placeholder-white/70 focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="text-white hover:text-amber-200 hover:bg-transparent"
-              >
-                <Search size={18} />
-              </Button>
+            
+            <div className="pt-4 border-t border-gray-100">
+              <div className="flex justify-between">
+                <Link 
+                  to="/wishlist" 
+                  className="px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50 rounded-md flex items-center"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Heart size={18} className="mr-2" strokeWidth={1.5} /> Wishlist
+                </Link>
+                <Link 
+                  to="/profile" 
+                  className="px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50 rounded-md flex items-center"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <User size={18} className="mr-2" strokeWidth={1.5} /> Profile
+                </Link>
+              </div>
+              
+              <div className="mt-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  <Input 
+                    type="search" 
+                    placeholder="Search for products..." 
+                    className="pl-10 pr-4 py-2 w-full rounded-full border-gray-200 focus:border-primary"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-          
-          {/* Mobile user links */}
-          <div className="px-4 py-3 border-t border-amber-800 flex justify-between">
-            <Link 
-              to="/wishlist" 
-              className="flex items-center text-sm font-medium"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <Heart size={16} className="mr-1" />
-              Wishlist
-            </Link>
-            <Link 
-              to="/profile" 
-              className="flex items-center text-sm font-medium"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <User size={16} className="mr-1" />
-              Profile
-            </Link>
           </div>
         </div>
       )}
