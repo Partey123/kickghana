@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "@/components/ui/use-toast";
+import { featuredSneakers } from "@/data/products";
 
 const Profile = () => {
   const { wishlist } = useCart();
