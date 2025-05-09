@@ -18,6 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { motion } from "framer-motion";
 
 const checkoutSchema = z.object({
@@ -42,18 +43,46 @@ const checkoutSchema = z.object({
   postalCode: z.string().min(4, {
     message: "Postal code must be at least 4 digits.",
   }),
-  cardNumber: z.string().min(16, {
-    message: "Card number must be at least 16 digits.",
-  }),
-  cardName: z.string().min(2, {
-    message: "Card holder name is required.",
-  }),
-  cardExpiry: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, {
-    message: "Expiry date must be in MM/YY format.",
-  }),
-  cardCvv: z.string().length(3, {
-    message: "CVV must be 3 digits.",
-  }),
+  paymentMethod: z.enum(["card", "mobileMoney"]),
+  // Card fields - conditional validation based on payment method
+  cardNumber: z.string().optional().refine(val => {
+    // If payment method is card, validate card number
+    if (z.string()._type === "card") {
+      return !!val && val.length >= 16;
+    }
+    return true;
+  }, { message: "Card number must be at least 16 digits." }),
+  cardName: z.string().optional().refine(val => {
+    if (z.string()._type === "card") {
+      return !!val && val.length >= 2;
+    }
+    return true;
+  }, { message: "Card holder name is required." }),
+  cardExpiry: z.string().optional().refine(val => {
+    if (z.string()._type === "card") {
+      return !!val && /^(0[1-9]|1[0-2])\/\d{2}$/.test(val);
+    }
+    return true;
+  }, { message: "Expiry date must be in MM/YY format." }),
+  cardCvv: z.string().optional().refine(val => {
+    if (z.string()._type === "card") {
+      return !!val && val.length === 3;
+    }
+    return true;
+  }, { message: "CVV must be 3 digits." }),
+  // Mobile Money fields - conditional validation
+  mobileNumber: z.string().optional().refine(val => {
+    if (z.string()._type === "mobileMoney") {
+      return !!val && val.length >= 10;
+    }
+    return true;
+  }, { message: "Mobile money number must be at least 10 digits." }),
+  mobileNetwork: z.enum(["mtn", "vodafone", "airtelTigo"]).optional().refine(val => {
+    if (z.string()._type === "mobileMoney") {
+      return !!val;
+    }
+    return true;
+  }, { message: "Please select a mobile network." }),
 });
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
@@ -62,6 +91,7 @@ const Checkout = () => {
   const { cartItems, subtotal, clearCart, totalItems } = useCart();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "mobileMoney">("card");
   
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
@@ -73,12 +103,18 @@ const Checkout = () => {
       address: "",
       city: "",
       postalCode: "",
+      paymentMethod: "card",
       cardNumber: "",
       cardName: "",
       cardExpiry: "",
       cardCvv: "",
+      mobileNumber: "",
+      mobileNetwork: undefined,
     },
   });
+  
+  // Watch payment method to conditionally render fields
+  const selectedPaymentMethod = form.watch("paymentMethod");
   
   const handleCheckout = (values: CheckoutFormValues) => {
     setIsSubmitting(true);
@@ -94,13 +130,14 @@ const Checkout = () => {
         date: new Date().toISOString(),
         items: cartItems,
         total: (parseFloat(subtotal.replace(/[^\d.]/g, "")) + 30).toFixed(2),
-        shipping: {
+        delivery: {
           firstName: values.firstName,
           lastName: values.lastName,
           address: values.address,
           city: values.city,
           postalCode: values.postalCode,
         },
+        paymentMethod: values.paymentMethod,
         status: "processing",
         estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       };
@@ -140,7 +177,7 @@ const Checkout = () => {
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleCheckout)} className="space-y-6">
                   <div>
-                    <h2 className="text-xl font-bold mb-4">Shipping Information</h2>
+                    <h2 className="text-xl font-bold mb-4">Delivery Information</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
@@ -205,7 +242,7 @@ const Checkout = () => {
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Address</FormLabel>
+                            <FormLabel>Delivery Address</FormLabel>
                             <FormControl>
                               <Input placeholder="123 Main St" {...field} />
                             </FormControl>
@@ -246,67 +283,154 @@ const Checkout = () => {
                   </div>
                   
                   <div className="border-t pt-6">
-                    <h2 className="text-xl font-bold mb-4">Payment Information</h2>
-                    <div>
-                      <FormField
-                        control={form.control}
-                        name="cardNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Card Number</FormLabel>
-                            <FormControl>
-                              <Input placeholder="XXXX XXXX XXXX XXXX" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    <h2 className="text-xl font-bold mb-4">Payment Method</h2>
                     
-                    <div className="mt-4">
-                      <FormField
-                        control={form.control}
-                        name="cardName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Cardholder Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="John Doe" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="paymentMethod"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel>Select Payment Method</FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="card" id="card" />
+                                <FormLabel htmlFor="card" className="font-normal cursor-pointer">
+                                  Credit/Debit Card
+                                </FormLabel>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="mobileMoney" id="mobileMoney" />
+                                <FormLabel htmlFor="mobileMoney" className="font-normal cursor-pointer">
+                                  Mobile Money
+                                </FormLabel>
+                              </div>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      <FormField
-                        control={form.control}
-                        name="cardExpiry"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Expiry Date</FormLabel>
-                            <FormControl>
-                              <Input placeholder="MM/YY" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="cardCvv"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>CVV</FormLabel>
-                            <FormControl>
-                              <Input placeholder="123" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    {selectedPaymentMethod === "card" && (
+                      <div className="mt-4 space-y-4">
+                        <FormField
+                          control={form.control}
+                          name="cardNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Card Number</FormLabel>
+                              <FormControl>
+                                <Input placeholder="XXXX XXXX XXXX XXXX" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="cardName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Cardholder Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="John Doe" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="cardExpiry"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Expiry Date</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="MM/YY" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="cardCvv"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>CVV</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="123" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedPaymentMethod === "mobileMoney" && (
+                      <div className="mt-4 space-y-4">
+                        <FormField
+                          control={form.control}
+                          name="mobileNetwork"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>Mobile Network</FormLabel>
+                              <FormControl>
+                                <RadioGroup
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                  className="flex flex-wrap gap-4"
+                                >
+                                  <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-md">
+                                    <RadioGroupItem value="mtn" id="mtn" />
+                                    <FormLabel htmlFor="mtn" className="font-normal cursor-pointer">
+                                      MTN Mobile Money
+                                    </FormLabel>
+                                  </div>
+                                  <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-md">
+                                    <RadioGroupItem value="vodafone" id="vodafone" />
+                                    <FormLabel htmlFor="vodafone" className="font-normal cursor-pointer">
+                                      Vodafone Cash
+                                    </FormLabel>
+                                  </div>
+                                  <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-md">
+                                    <RadioGroupItem value="airtelTigo" id="airtelTigo" />
+                                    <FormLabel htmlFor="airtelTigo" className="font-normal cursor-pointer">
+                                      AirtelTigo Money
+                                    </FormLabel>
+                                  </div>
+                                </RadioGroup>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="mobileNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Mobile Money Number</FormLabel>
+                              <FormControl>
+                                <Input placeholder="0XX XXX XXXX" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   <Button 
@@ -356,7 +480,7 @@ const Checkout = () => {
                   <span className="font-medium">{subtotal}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping:</span>
+                  <span className="text-gray-600">Delivery Fee:</span>
                   <span className="font-medium">₵30.00</span>
                 </div>
                 <div className="flex justify-between">
