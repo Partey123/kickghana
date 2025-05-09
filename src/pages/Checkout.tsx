@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,10 +18,27 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { 
+  RadioGroup, 
+  RadioGroupItem 
+} from "@/components/ui/radio-group";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { CreditCard, WalletCards, Phone, Truck, Package } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 const checkoutSchema = z.object({
+  // Recipient type fields
+  deliveryType: z.enum(["self", "other"]),
+  
+  // Self fields
   firstName: z.string().min(2, {
     message: "First name must be at least 2 characters.",
   }),
@@ -34,6 +51,28 @@ const checkoutSchema = z.object({
   phone: z.string().min(10, {
     message: "Phone number must be at least 10 digits.",
   }),
+  
+  // Alternative recipient fields (conditional)
+  recipientFirstName: z.string().optional().refine(val => {
+    if (z.string()._type === "other") {
+      return !!val && val.length >= 2;
+    }
+    return true;
+  }, { message: "Recipient first name must be at least 2 characters." }),
+  recipientLastName: z.string().optional().refine(val => {
+    if (z.string()._type === "other") {
+      return !!val && val.length >= 2;
+    }
+    return true;
+  }, { message: "Recipient last name must be at least 2 characters." }),
+  recipientPhone: z.string().optional().refine(val => {
+    if (z.string()._type === "other") {
+      return !!val && val.length >= 10;
+    }
+    return true;
+  }, { message: "Recipient phone must be at least 10 digits." }),
+  
+  // Common address fields
   address: z.string().min(5, {
     message: "Address must be at least 5 characters.",
   }),
@@ -43,7 +82,20 @@ const checkoutSchema = z.object({
   postalCode: z.string().min(4, {
     message: "Postal code must be at least 4 digits.",
   }),
+  deliveryNote: z.string().optional(),
+  
+  // Delivery type
+  deliverySpeed: z.enum(["standard", "express", "scheduled"]),
+  deliveryDate: z.string().optional().refine(val => {
+    if (z.string()._type === "scheduled") {
+      return !!val;
+    }
+    return true;
+  }, { message: "Please select a delivery date." }),
+  
+  // Payment fields
   paymentMethod: z.enum(["card", "mobileMoney"]),
+  
   // Card fields - conditional validation based on payment method
   cardNumber: z.string().optional().refine(val => {
     // If payment method is card, validate card number
@@ -92,17 +144,59 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "mobileMoney">("card");
+  const [deliveryType, setDeliveryType] = useState<"self" | "other">("self");
+  const [deliverySpeed, setDeliverySpeed] = useState<"standard" | "express" | "scheduled">("standard");
+  
+  // Calculate delivery fee based on item count
+  const calculateDeliveryFee = () => {
+    const itemCount = totalItems;
+    
+    let baseFee = 0;
+    if (itemCount >= 20) {
+      baseFee = 0; // Free for 20+ items
+    } else if (itemCount >= 10) {
+      baseFee = 100; // 100 cedis for 10+ items
+    } else if (itemCount >= 4) {
+      baseFee = 80; // 80 cedis for 4-8 items
+    } else if (itemCount >= 1) {
+      baseFee = 40; // 40 cedis for 1-3 items
+    }
+    
+    // Add additional fee based on delivery speed
+    let speedFee = 0;
+    if (deliverySpeed === "express") {
+      speedFee = 20; // +20 cedis for express
+    } else if (deliverySpeed === "scheduled") {
+      speedFee = 10; // +10 cedis for scheduled
+    }
+    
+    return baseFee + speedFee;
+  };
+  
+  const deliveryFee = calculateDeliveryFee();
+  
+  // Update delivery fee when cart items or delivery speed changes
+  useEffect(() => {
+    calculateDeliveryFee();
+  }, [totalItems, deliverySpeed]);
   
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
+      deliveryType: "self",
       firstName: "",
       lastName: "",
       email: "",
       phone: "",
+      recipientFirstName: "",
+      recipientLastName: "",
+      recipientPhone: "",
       address: "",
       city: "",
       postalCode: "",
+      deliveryNote: "",
+      deliverySpeed: "standard",
+      deliveryDate: "",
       paymentMethod: "card",
       cardNumber: "",
       cardName: "",
@@ -115,6 +209,15 @@ const Checkout = () => {
   
   // Watch payment method to conditionally render fields
   const selectedPaymentMethod = form.watch("paymentMethod");
+  const selectedDeliveryType = form.watch("deliveryType");
+  const selectedDeliverySpeed = form.watch("deliverySpeed");
+  
+  // Update the state when form values change
+  useEffect(() => {
+    setPaymentMethod(selectedPaymentMethod);
+    setDeliveryType(selectedDeliveryType);
+    setDeliverySpeed(selectedDeliverySpeed);
+  }, [selectedPaymentMethod, selectedDeliveryType, selectedDeliverySpeed]);
   
   const handleCheckout = (values: CheckoutFormValues) => {
     setIsSubmitting(true);
@@ -124,22 +227,45 @@ const Checkout = () => {
       // Generate order number
       const orderNumber = Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
       
+      // Calculate estimated delivery date based on delivery speed
+      let estimatedDelivery = new Date();
+      if (values.deliverySpeed === "express") {
+        estimatedDelivery.setDate(estimatedDelivery.getDate() + 1); // Next day for express
+      } else if (values.deliverySpeed === "scheduled") {
+        estimatedDelivery = new Date(values.deliveryDate || "");
+      } else {
+        estimatedDelivery.setDate(estimatedDelivery.getDate() + 3); // 2-3 days for standard
+      }
+      
       // Store order in local storage for tracking
       const order = {
         id: orderNumber,
         date: new Date().toISOString(),
         items: cartItems,
-        total: (parseFloat(subtotal.replace(/[^\d.]/g, "")) + 30).toFixed(2),
+        total: (parseFloat(subtotal.replace(/[^\d.]/g, "")) + deliveryFee).toFixed(2),
         delivery: {
-          firstName: values.firstName,
-          lastName: values.lastName,
+          type: values.deliveryType,
+          recipient: values.deliveryType === "self" 
+            ? {
+                firstName: values.firstName,
+                lastName: values.lastName,
+                phone: values.phone,
+              }
+            : {
+                firstName: values.recipientFirstName,
+                lastName: values.recipientLastName,
+                phone: values.recipientPhone,
+              },
           address: values.address,
           city: values.city,
           postalCode: values.postalCode,
+          note: values.deliveryNote,
+          speed: values.deliverySpeed,
+          fee: deliveryFee,
         },
         paymentMethod: values.paymentMethod,
         status: "processing",
-        estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        estimatedDelivery: estimatedDelivery.toISOString(),
       };
       
       const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
@@ -178,65 +304,145 @@ const Checkout = () => {
                 <form onSubmit={form.handleSubmit(handleCheckout)} className="space-y-6">
                   <div>
                     <h2 className="text-xl font-bold mb-4">Delivery Information</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>First Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="John" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Last Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Doe" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                    
+                    {/* Delivery Type Selection */}
+                    <FormField
+                      control={form.control}
+                      name="deliveryType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center space-x-2 mb-4">
+                            <Switch
+                              checked={field.value === "other"}
+                              onCheckedChange={(checked) => 
+                                field.onChange(checked ? "other" : "self")
+                              }
+                              id="delivery-type"
+                            />
+                            <FormLabel htmlFor="delivery-type" className="cursor-pointer">
+                              Deliver to someone else
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Self Delivery Fields */}
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{deliveryType === "self" ? "First Name" : "Your First Name"}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="John" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{deliveryType === "self" ? "Last Name" : "Your Last Name"}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Doe" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <Input type="email" placeholder="john.doe@example.com" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{deliveryType === "self" ? "Phone" : "Your Phone"}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="+233 XX XXX XXXX" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input type="email" placeholder="john.doe@example.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Phone</FormLabel>
-                            <FormControl>
-                              <Input placeholder="+233 XX XXX XXXX" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    {/* Alternative Recipient Fields */}
+                    {deliveryType === "other" && (
+                      <div className="mt-6 pt-6 border-t border-gray-200 space-y-4">
+                        <h3 className="text-lg font-semibold text-secondary mb-3">Recipient Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="recipientFirstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Recipient First Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Jane" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="recipientLastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Recipient Last Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Smith" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        
+                        <div>
+                          <FormField
+                            control={form.control}
+                            name="recipientPhone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Recipient Phone</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="+233 XX XXX XXXX" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    )}
                     
-                    <div className="mt-4">
+                    {/* Common Address Fields */}
+                    <div className="mt-6 pt-6 border-t border-gray-200 space-y-4">
+                      <h3 className="text-lg font-semibold text-secondary mb-3">Delivery Address</h3>
+                      
                       <FormField
                         control={form.control}
                         name="address"
@@ -250,35 +456,141 @@ const Checkout = () => {
                           </FormItem>
                         )}
                       />
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Accra" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="postalCode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Postal Code</FormLabel>
+                              <FormControl>
+                                <Input placeholder="00233" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      
+                      <FormField
+                        control={form.control}
+                        name="deliveryNote"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Delivery Instructions (Optional)</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Add any special instructions for delivery..." 
+                                className="resize-none" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    {/* Delivery Speed Selection */}
+                    <div className="mt-6 pt-6 border-t border-gray-200 space-y-4">
+                      <h3 className="text-lg font-semibold text-secondary mb-3">Delivery Options</h3>
+                      
                       <FormField
                         control={form.control}
-                        name="city"
+                        name="deliverySpeed"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>City</FormLabel>
                             <FormControl>
-                              <Input placeholder="Accra" {...field} />
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-3"
+                              >
+                                <Card className={`cursor-pointer border ${field.value === 'standard' ? 'border-primary bg-muted/20' : 'border-gray-200'}`}>
+                                  <CardHeader className="flex flex-row items-start space-x-3 p-4">
+                                    <div className="flex items-center h-5">
+                                      <RadioGroupItem value="standard" id="standard" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center">
+                                        <Truck className="mr-2 h-4 w-4 text-secondary" />
+                                        <CardTitle className="text-base">Standard Delivery</CardTitle>
+                                      </div>
+                                      <CardDescription>Delivery within 2-3 days</CardDescription>
+                                    </div>
+                                  </CardHeader>
+                                </Card>
+                                
+                                <Card className={`cursor-pointer border ${field.value === 'express' ? 'border-primary bg-muted/20' : 'border-gray-200'}`}>
+                                  <CardHeader className="flex flex-row items-start space-x-3 p-4">
+                                    <div className="flex items-center h-5">
+                                      <RadioGroupItem value="express" id="express" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center">
+                                        <Package className="mr-2 h-4 w-4 text-primary" />
+                                        <CardTitle className="text-base">Express Delivery</CardTitle>
+                                      </div>
+                                      <CardDescription>Next day delivery (+₵20.00)</CardDescription>
+                                    </div>
+                                  </CardHeader>
+                                </Card>
+                                
+                                <Card className={`cursor-pointer border ${field.value === 'scheduled' ? 'border-primary bg-muted/20' : 'border-gray-200'}`}>
+                                  <CardHeader className="flex flex-row items-start space-x-3 p-4">
+                                    <div className="flex items-center h-5">
+                                      <RadioGroupItem value="scheduled" id="scheduled" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center">
+                                        <Package className="mr-2 h-4 w-4 text-secondary" />
+                                        <CardTitle className="text-base">Scheduled Delivery</CardTitle>
+                                      </div>
+                                      <CardDescription>Choose your delivery date (+₵10.00)</CardDescription>
+                                    </div>
+                                  </CardHeader>
+                                </Card>
+                              </RadioGroup>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      <FormField
-                        control={form.control}
-                        name="postalCode"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Postal Code</FormLabel>
-                            <FormControl>
-                              <Input placeholder="00233" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      
+                      {/* Scheduled Delivery Date Field */}
+                      {deliverySpeed === "scheduled" && (
+                        <FormField
+                          control={form.control}
+                          name="deliveryDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Choose Delivery Date</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="date" 
+                                  {...field}
+                                  min={new Date().toISOString().split('T')[0]}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
                     </div>
                   </div>
                   
@@ -290,25 +602,41 @@ const Checkout = () => {
                       name="paymentMethod"
                       render={({ field }) => (
                         <FormItem className="space-y-3">
-                          <FormLabel>Select Payment Method</FormLabel>
                           <FormControl>
                             <RadioGroup
                               onValueChange={field.onChange}
                               defaultValue={field.value}
-                              className="flex flex-col space-y-1"
+                              className="flex flex-col space-y-3"
                             >
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="card" id="card" />
-                                <FormLabel htmlFor="card" className="font-normal cursor-pointer">
-                                  Credit/Debit Card
-                                </FormLabel>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="mobileMoney" id="mobileMoney" />
-                                <FormLabel htmlFor="mobileMoney" className="font-normal cursor-pointer">
-                                  Mobile Money
-                                </FormLabel>
-                              </div>
+                              <Card className={`cursor-pointer border ${field.value === 'card' ? 'border-primary bg-muted/20' : 'border-gray-200'}`}>
+                                <CardHeader className="flex flex-row items-start space-x-3 p-4">
+                                  <div className="flex items-center h-5">
+                                    <RadioGroupItem value="card" id="card" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="flex items-center">
+                                      <CreditCard className="mr-2 h-4 w-4 text-secondary" />
+                                      <CardTitle className="text-base">Credit/Debit Card</CardTitle>
+                                    </div>
+                                    <CardDescription>Pay securely with your card</CardDescription>
+                                  </div>
+                                </CardHeader>
+                              </Card>
+                              
+                              <Card className={`cursor-pointer border ${field.value === 'mobileMoney' ? 'border-primary bg-muted/20' : 'border-gray-200'}`}>
+                                <CardHeader className="flex flex-row items-start space-x-3 p-4">
+                                  <div className="flex items-center h-5">
+                                    <RadioGroupItem value="mobileMoney" id="mobileMoney" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="flex items-center">
+                                      <Phone className="mr-2 h-4 w-4 text-secondary" />
+                                      <CardTitle className="text-base">Mobile Money</CardTitle>
+                                    </div>
+                                    <CardDescription>Pay with MTN, Vodafone, or AirtelTigo</CardDescription>
+                                  </div>
+                                </CardHeader>
+                              </Card>
                             </RadioGroup>
                           </FormControl>
                           <FormMessage />
@@ -317,7 +645,7 @@ const Checkout = () => {
                     />
                     
                     {selectedPaymentMethod === "card" && (
-                      <div className="mt-4 space-y-4">
+                      <div className="mt-4 space-y-4 bg-gray-50 p-5 rounded-lg">
                         <FormField
                           control={form.control}
                           name="cardNumber"
@@ -389,26 +717,34 @@ const Checkout = () => {
                                 <RadioGroup
                                   onValueChange={field.onChange}
                                   defaultValue={field.value}
-                                  className="flex flex-wrap gap-4"
+                                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
                                 >
-                                  <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-md">
-                                    <RadioGroupItem value="mtn" id="mtn" />
-                                    <FormLabel htmlFor="mtn" className="font-normal cursor-pointer">
-                                      MTN Mobile Money
-                                    </FormLabel>
-                                  </div>
-                                  <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-md">
-                                    <RadioGroupItem value="vodafone" id="vodafone" />
-                                    <FormLabel htmlFor="vodafone" className="font-normal cursor-pointer">
-                                      Vodafone Cash
-                                    </FormLabel>
-                                  </div>
-                                  <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-md">
-                                    <RadioGroupItem value="airtelTigo" id="airtelTigo" />
-                                    <FormLabel htmlFor="airtelTigo" className="font-normal cursor-pointer">
-                                      AirtelTigo Money
-                                    </FormLabel>
-                                  </div>
+                                  <Card className={`cursor-pointer border ${field.value === 'mtn' ? 'border-primary' : 'border-gray-200'}`}>
+                                    <CardHeader className="flex flex-row items-start space-x-3 p-4 bg-[#FFCC00]/10">
+                                      <RadioGroupItem value="mtn" id="mtn" />
+                                      <CardTitle className="text-sm font-medium text-[#004f9f]">
+                                        MTN Mobile Money
+                                      </CardTitle>
+                                    </CardHeader>
+                                  </Card>
+                                  
+                                  <Card className={`cursor-pointer border ${field.value === 'vodafone' ? 'border-primary' : 'border-gray-200'}`}>
+                                    <CardHeader className="flex flex-row items-start space-x-3 p-4 bg-[#e60000]/10">
+                                      <RadioGroupItem value="vodafone" id="vodafone" />
+                                      <CardTitle className="text-sm font-medium text-[#e60000]">
+                                        Vodafone Cash
+                                      </CardTitle>
+                                    </CardHeader>
+                                  </Card>
+                                  
+                                  <Card className={`cursor-pointer border ${field.value === 'airtelTigo' ? 'border-primary' : 'border-gray-200'}`}>
+                                    <CardHeader className="flex flex-row items-start space-x-3 p-4 bg-[#0066b3]/10">
+                                      <RadioGroupItem value="airtelTigo" id="airtelTigo" />
+                                      <CardTitle className="text-sm font-medium text-[#0066b3]">
+                                        AirtelTigo Money
+                                      </CardTitle>
+                                    </CardHeader>
+                                  </Card>
                                 </RadioGroup>
                               </FormControl>
                               <FormMessage />
@@ -433,13 +769,18 @@ const Checkout = () => {
                     )}
                   </div>
                   
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-primary text-secondary hover:bg-primary/90 py-6"
-                    disabled={isSubmitting}
+                  <motion.div 
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    {isSubmitting ? "Processing..." : "Place Order"}
-                  </Button>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-primary text-secondary hover:bg-primary/90 py-6"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Processing..." : "Place Order"}
+                    </Button>
+                  </motion.div>
                 </form>
               </Form>
             </div>
@@ -447,10 +788,10 @@ const Checkout = () => {
           
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white/90 rounded-xl p-6 shadow-md">
+            <div className="bg-white/90 rounded-xl p-6 shadow-md sticky top-24">
               <h2 className="text-xl font-bold mb-4 text-secondary">Order Summary</h2>
               
-              <div className="space-y-4 mb-4">
+              <div className="space-y-4 mb-4 max-h-80 overflow-y-auto pr-2">
                 {cartItems.map((item) => {
                   const priceValue = parseFloat(item.price.replace(/[^\d.]/g, ""));
                   const totalPrice = priceValue * item.quantity;
@@ -481,7 +822,7 @@ const Checkout = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Delivery Fee:</span>
-                  <span className="font-medium">₵30.00</span>
+                  <span className="font-medium">₵{deliveryFee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tax:</span>
@@ -492,8 +833,31 @@ const Checkout = () => {
               <div className="flex justify-between py-4">
                 <span className="text-lg font-bold">Total:</span>
                 <span className="text-lg font-bold text-primary">
-                  ₵{(parseFloat(subtotal.replace(/[^\d.]/g, "")) + 30).toFixed(2)}
+                  ₵{(parseFloat(subtotal.replace(/[^\d.]/g, "")) + deliveryFee).toFixed(2)}
                 </span>
+              </div>
+              
+              <div className="mt-4 p-3 bg-accent rounded-lg">
+                <h3 className="font-semibold text-sm mb-1">Delivery Information</h3>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li className="flex items-center">
+                    <Truck className="h-3 w-3 mr-1" />
+                    <span>Standard: 2-3 business days</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Package className="h-3 w-3 mr-1" />
+                    <span>Express: Next business day (+₵20)</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Package className="h-3 w-3 mr-1" />
+                    <span>Scheduled: Choose your day (+₵10)</span>
+                  </li>
+                  {totalItems >= 20 && (
+                    <li className="font-semibold text-primary mt-2">
+                      You qualify for FREE delivery!
+                    </li>
+                  )}
+                </ul>
               </div>
             </div>
           </div>
