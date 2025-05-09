@@ -6,7 +6,7 @@ const HeroSection = () => {
   return (
     <section className="pt-24 pb-10 px-4 md:px-8 relative min-h-screen flex items-center overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-secondary via-secondary/90 to-secondary/70 z-0">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#1A1F2C] via-[#1A1F2C]/90 to-[#1A1F2C]/70 z-0">
         <div className="absolute inset-0 opacity-10">
           {/* Abstract patterns */}
           <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/30 blur-3xl"></div>
@@ -77,9 +77,13 @@ const HeroSection = () => {
           >
             <div className="relative z-10 animate-float">
               <img 
-                src="/hero-sneaker.png" 
-                alt="Premium Sneakers" 
+                src="/hero-shoe.png" 
+                alt="Premium Handcrafted Shoes" 
                 className="max-h-[70vh] object-contain drop-shadow-2xl"
+                onError={(e) => {
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+                  e.currentTarget.onerror = null;
+                }}
               />
             </div>
             <div className="absolute -inset-4 bg-gradient-to-r from-primary/40 to-primary/10 rounded-full blur-3xl z-0 animate-pulse"></div>

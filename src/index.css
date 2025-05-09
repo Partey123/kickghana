@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 220 15% 16%; /* Dark blue-gray background */
     --foreground: 20 14.3% 4.1%;
 
     --card: 0 0% 100%;
@@ -78,7 +78,7 @@
   
   /* Navigation links styling */
   .nav-link {
-    @apply relative text-secondary hover:text-primary transition-colors duration-300;
+    @apply relative text-white hover:text-primary transition-colors duration-300;
     &::after {
       content: '';
       @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300;
