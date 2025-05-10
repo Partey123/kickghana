@@ -37,7 +37,7 @@ export const featuredSneakers = [
     id: 5,
     name: "Traditional Ahenema",
     price: "₵450",
-    image: "https://i.pinimg.com/originals/9c/c7/64/9cc764fb1afeacc0c3f2a8c6f1c46234.jpg",
+    image: "/lovable-uploads/1bee8dee-9f67-4b13-a403-5614817c851b.png",
     category: "Traditional",
     isNew: true
   },
