@@ -37,7 +37,7 @@ const HeroSection = () => {
           </motion.h1>
           
           <motion.p 
-            className="text-lg text-white/80 max-w-md"
+            className="text-lg text-white max-w-md"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -77,12 +77,13 @@ const HeroSection = () => {
           >
             <div className="relative z-10 animate-float">
               <img 
-                src="/hero-shoe.png" 
+                src="/hero-sneaker.png" 
                 alt="Premium Handcrafted Shoes" 
                 className="max-h-[70vh] object-contain drop-shadow-2xl"
                 onError={(e) => {
-                  e.currentTarget.src = "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
-                  e.currentTarget.onerror = null;
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+                  target.onerror = null;
                 }}
               />
             </div>
@@ -93,7 +94,7 @@ const HeroSection = () => {
       
       {/* Scroll indicator */}
       <motion.div 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/70 flex flex-col items-center"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white flex flex-col items-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1, duration: 0.5 }}

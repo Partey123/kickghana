@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
+import RouteGuard from "@/components/RouteGuard";
 import Onboarding from "./pages/Onboarding";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
@@ -28,7 +29,14 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Onboarding />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route 
+              path="/profile" 
+              element={
+                <RouteGuard>
+                  <Profile />
+                </RouteGuard>
+              } 
+            />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />

@@ -76,7 +76,7 @@
     @apply bg-background text-foreground font-sans;
   }
   
-  /* Navigation links styling */
+  /* Navigation links styling - updating for better visibility */
   .nav-link {
     @apply relative text-white hover:text-primary transition-colors duration-300;
     &::after {
@@ -88,9 +88,13 @@
     }
   }
   
-  /* Custom font styling */
+  /* Custom font styling with better visibility */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif tracking-tight;
+    @apply font-serif tracking-tight text-white;
+  }
+  
+  p, span, div, a {
+    @apply text-white/90;
   }
   
   /* Button styling */
