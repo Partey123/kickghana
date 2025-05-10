@@ -4,4 +4,10 @@ import App from './App.tsx'
 import './index.css'
 import './App.css'
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootElement = document.getElementById("root");
+
+if (!rootElement) {
+  console.error("Root element not found");
+} else {
+  createRoot(rootElement).render(<App />);
+}
