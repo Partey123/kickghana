@@ -37,8 +37,11 @@ export const checkoutSchema = z.object({
   }),
   deliveryNote: z.string().optional(),
   
-  // Delivery type
-  deliverySpeed: z.enum(["standard"]),
+  // Delivery type - updated to accept all three options
+  deliverySpeed: z.enum(["standard", "express", "scheduled"]),
+  
+  // Optional field for scheduled delivery date
+  deliveryDate: z.string().optional(),
 });
 
 export type CheckoutFormValues = z.infer<typeof checkoutSchema>;
@@ -58,4 +61,5 @@ export const defaultFormValues = {
   postalCode: "",
   deliveryNote: "",
   deliverySpeed: "standard" as const,
+  deliveryDate: "",
 };
