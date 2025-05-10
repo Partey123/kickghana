@@ -7,7 +7,7 @@ export const PAYSTACK_PUBLIC_KEY = "pk_live_14a6578f3c80b77a102fa28c1362ed5b445f
 // Interface for payment initialization payload
 export interface PaystackPayload {
   email: string;
-  amount: number; // Amount in kobo (multiply Ghana cedis by 100)
+  amount: number; // Amount in pesewas (multiply Ghana cedis by 100)
   metadata?: {
     order_id?: string;
     custom_fields?: Array<{
@@ -31,6 +31,7 @@ export const initializePayment = (payload: PaystackPayload): void => {
       key: PAYSTACK_PUBLIC_KEY,
       email: paystackPayload.email,
       amount: paystackPayload.amount,
+      currency: "GHS", // Explicitly set currency to Ghana Cedi
       metadata: paystackPayload.metadata || {},
       callback_url: paystackPayload.callback_url || window.location.origin + '/order-success',
       onClose: () => {

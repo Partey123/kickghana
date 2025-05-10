@@ -39,10 +39,14 @@ export const processPayment = (
   }
   
   function initializePaystackPayment() {
+    // Convert amount to pesewas (smallest currency unit for Ghana)
+    // Multiply by 100 to convert from cedis to pesewas
+    const amountInPesewas = Math.round(totalAmount * 100);
+    
     // Initialize Paystack payment
     initializePayment({
       email,
-      amount: Math.floor(totalAmount), // Remove decimal places
+      amount: amountInPesewas, // Amount in pesewas
       metadata: {
         order_id: orderNumber,
         custom_fields: [
