@@ -4,13 +4,26 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, Truck } from "lucide-react";
+import { useEffect } from "react";
 
 type DeliveryOptionsProps = {
   form: any;
   deliverySpeed: "standard" | "express" | "scheduled";
+  setDeliverySpeed: (speed: "standard" | "express" | "scheduled") => void;
 };
 
-const DeliveryOptions = ({ form, deliverySpeed }: DeliveryOptionsProps) => {
+const DeliveryOptions = ({ form, deliverySpeed, setDeliverySpeed }: DeliveryOptionsProps) => {
+  // Watch for changes in delivery speed and update parent component
+  useEffect(() => {
+    const subscription = form.watch((value: any) => {
+      if (value.deliverySpeed && value.deliverySpeed !== deliverySpeed) {
+        setDeliverySpeed(value.deliverySpeed);
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form, deliverySpeed, setDeliverySpeed]);
+
   return (
     <div className="mt-6 pt-6 border-t border-gray-200 space-y-4">
       <h3 className="text-lg font-semibold text-secondary mb-3">Delivery Options</h3>
@@ -22,7 +35,10 @@ const DeliveryOptions = ({ form, deliverySpeed }: DeliveryOptionsProps) => {
           <FormItem>
             <FormControl>
               <RadioGroup
-                onValueChange={field.onChange}
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  setDeliverySpeed(value as "standard" | "express" | "scheduled");
+                }}
                 defaultValue={field.value}
                 className="flex flex-col space-y-3"
               >

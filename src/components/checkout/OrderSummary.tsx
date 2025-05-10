@@ -7,9 +7,10 @@ type OrderSummaryProps = {
   subtotal: string;
   deliveryFee: number;
   totalItems: number;
+  deliverySpeed: "standard" | "express" | "scheduled";
 };
 
-const OrderSummary = ({ cartItems, subtotal, deliveryFee, totalItems }: OrderSummaryProps) => {
+const OrderSummary = ({ cartItems, subtotal, deliveryFee, totalItems, deliverySpeed }: OrderSummaryProps) => {
   return (
     <div className="bg-white/90 rounded-xl p-6 shadow-md sticky top-24">
       <h2 className="text-xl font-bold mb-4 text-secondary">Order Summary</h2>
@@ -62,25 +63,40 @@ const OrderSummary = ({ cartItems, subtotal, deliveryFee, totalItems }: OrderSum
       
       <div className="mt-4 p-3 bg-accent rounded-lg">
         <h3 className="font-semibold text-sm mb-1">Delivery Information</h3>
-        <ul className="text-sm text-gray-600 space-y-1">
-          <li className="flex items-center">
-            <Truck className="h-3 w-3 mr-1" />
-            <span>Standard: 2-3 business days</span>
-          </li>
-          <li className="flex items-center">
-            <Package className="h-3 w-3 mr-1" />
-            <span>Express: Next business day (+₵20)</span>
-          </li>
-          <li className="flex items-center">
-            <Package className="h-3 w-3 mr-1" />
-            <span>Scheduled: Choose your day (+₵10)</span>
-          </li>
+        <div className="text-sm text-gray-600 space-y-1">
+          <div className="flex items-center">
+            {deliverySpeed === "standard" ? (
+              <><Truck className="h-3 w-3 mr-1 text-gray-600" />
+              <span className="font-medium">Standard Delivery (Selected)</span></>
+            ) : (
+              <><Truck className="h-3 w-3 mr-1" />
+              <span>Standard: 2-3 business days</span></>
+            )}
+          </div>
+          <div className="flex items-center">
+            {deliverySpeed === "express" ? (
+              <><Package className="h-3 w-3 mr-1 text-primary" />
+              <span className="font-medium">Express Delivery (Selected)</span></>
+            ) : (
+              <><Package className="h-3 w-3 mr-1" />
+              <span>Express: Next business day (+₵20)</span></>
+            )}
+          </div>
+          <div className="flex items-center">
+            {deliverySpeed === "scheduled" ? (
+              <><Package className="h-3 w-3 mr-1 text-secondary" />
+              <span className="font-medium">Scheduled Delivery (Selected)</span></>
+            ) : (
+              <><Package className="h-3 w-3 mr-1" />
+              <span>Scheduled: Choose your day (+₵10)</span></>
+            )}
+          </div>
           {totalItems >= 20 && (
-            <li className="font-semibold text-primary mt-2">
+            <div className="font-semibold text-primary mt-2">
               You qualify for FREE delivery!
-            </li>
+            </div>
           )}
-        </ul>
+        </div>
       </div>
     </div>
   );

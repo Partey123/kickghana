@@ -6,19 +6,25 @@ import { motion } from "framer-motion";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import DeliveryInfoForm from "@/components/checkout/DeliveryInfoForm";
+import DeliveryOptions from "@/components/checkout/DeliveryOptions";
 import { checkoutSchema, CheckoutFormValues, defaultFormValues } from "./CheckoutFormSchema";
 
 type CheckoutFormProps = {
   onSubmit: (values: CheckoutFormValues) => void;
   isSubmitting: boolean;
+  deliverySpeed: "standard" | "express" | "scheduled";
+  setDeliverySpeed: (speed: "standard" | "express" | "scheduled") => void;
 };
 
-const CheckoutForm = ({ onSubmit, isSubmitting }: CheckoutFormProps) => {
+const CheckoutForm = ({ onSubmit, isSubmitting, deliverySpeed, setDeliverySpeed }: CheckoutFormProps) => {
   const [deliveryType, setDeliveryType] = useState<"self" | "other">("self");
   
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
-    defaultValues: defaultFormValues,
+    defaultValues: {
+      ...defaultFormValues,
+      deliverySpeed: deliverySpeed
+    },
   });
   
   // Watch delivery type to update state
@@ -40,11 +46,17 @@ const CheckoutForm = ({ onSubmit, isSubmitting }: CheckoutFormProps) => {
             setDeliveryType={setDeliveryType}
           />
           
+          {/* Delivery Options */}
+          <DeliveryOptions
+            form={form}
+            deliverySpeed={deliverySpeed}
+            setDeliverySpeed={setDeliverySpeed}
+          />
+          
           <div className="border-t pt-6 border-white/20">
-            <h2 className="text-xl font-bold mb-4">Delivery & Payment Options</h2>
+            <h2 className="text-xl font-bold mb-4">Payment Options</h2>
             <p className="mb-6">
-              Your order will be delivered via standard shipping (3-5 business days) and payment will be
-              processed securely through Paystack.
+              Your order will be processed securely through Paystack.
             </p>
           </div>
           

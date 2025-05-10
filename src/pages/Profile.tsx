@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,20 +13,25 @@ import Footer from "@/components/home/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "@/components/ui/use-toast";
 import { featuredSneakers } from "@/data/products";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 const Profile = () => {
   const { wishlist } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   
-  // Mock user data
+  // Real user data from auth context
   const [userData, setUserData] = useState({
-    name: "Samuel Adeku",
-    email: "samuel@example.com",
-    phone: "+233 50 123 4567",
-    address: "123 Independence Ave, Accra, Ghana",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
   });
 
-  // Mock order history data
+  // Mock order history data (this would be replaced with real orders from a database)
   const orderHistory = [
     {
       id: "ORD-2025-1432",
@@ -41,16 +47,105 @@ const Profile = () => {
     }
   ];
 
+  useEffect(() => {
+    if (user) {
+      // Load user data from Supabase
+      const loadUserData = async () => {
+        setLoading(true);
+        try {
+          // Try to get the user's profile data
+          const { data: profile, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (error) {
+            console.error("Error loading user profile:", error);
+            // If no profile found, use data from the auth user
+            setUserData({
+              name: user.user_metadata?.full_name || "",
+              email: user.email || "",
+              phone: user.user_metadata?.phone || "",
+              address: user.user_metadata?.address || "",
+            });
+          } else if (profile) {
+            // Use profile data if found
+            setUserData({
+              name: profile.full_name || "",
+              email: profile.email || "",
+              phone: profile.phone || "",
+              address: "", // This would come from an addresses table in a real app
+            });
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      loadUserData();
+    } else {
+      // Not logged in, redirect to login page
+      navigate("/auth/login");
+    }
+  }, [user, navigate]);
+
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserData(prev => ({ ...prev, [field]: e.target.value }));
   };
 
-  const handleSaveProfile = () => {
-    toast({
-      title: "Profile Updated",
-      description: "Your profile information has been saved successfully.",
-    });
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      // Update user profile in Supabase
+      const { error } = await supabase
+        .from('users')
+        .update({
+          full_name: userData.name,
+          phone: userData.phone,
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Also update the auth metadata
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { 
+          full_name: userData.name,
+          phone: userData.phone
+        }
+      });
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Profile Updated",
+        description: "Your profile information has been saved successfully.",
+      });
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      toast({
+        title: "Update Failed",
+        description: "There was a problem updating your profile.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2">Loading profile...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#1A1F2C]/5">
@@ -63,7 +158,7 @@ const Profile = () => {
         <div className="mb-10 flex items-center space-x-4">
           <Avatar className="h-16 w-16 border-2 border-primary">
             <AvatarFallback className="bg-primary text-secondary text-xl">
-              {userData.name.split(' ').map(n => n[0]).join('')}
+              {userData.name ? userData.name.split(' ').map(n => n[0]).join('') : "U"}
             </AvatarFallback>
           </Avatar>
           <div>
@@ -106,8 +201,9 @@ const Profile = () => {
                     <Input 
                       id="email" 
                       type="email" 
-                      value={userData.email} 
-                      onChange={handleInputChange('email')} 
+                      value={userData.email}
+                      disabled
+                      className="bg-gray-50" 
                     />
                   </div>
                   <div className="space-y-2">
@@ -128,7 +224,16 @@ const Profile = () => {
                   </div>
                 </div>
                 <div className="pt-4">
-                  <Button onClick={handleSaveProfile}>Save Changes</Button>
+                  <Button onClick={handleSaveProfile} disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </Button>
                 </div>
               </CardContent>
             </Card>

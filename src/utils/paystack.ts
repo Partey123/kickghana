@@ -24,25 +24,6 @@ export interface PaystackPayload {
 
 // Initialize Paystack payment
 export const initializePayment = (payload: PaystackPayload): void => {
-  // Load Paystack inline script if not already loaded
-  if (!window.PaystackPop) {
-    const script = document.createElement('script');
-    script.src = 'https://js.paystack.co/v1/inline.js';
-    script.async = true;
-    document.body.appendChild(script);
-    
-    script.onload = () => {
-      // Initialize payment once script is loaded
-      processPayment(payload);
-    };
-  } else {
-    // If script is already loaded, initialize payment directly
-    processPayment(payload);
-  }
-};
-
-// Process the payment with Paystack
-const processPayment = (payload: PaystackPayload): void => {
   try {
     const { onSuccess, onCancel, ...paystackPayload } = payload;
     
@@ -65,6 +46,9 @@ const processPayment = (payload: PaystackPayload): void => {
     handler.openIframe();
   } catch (error) {
     console.error('Failed to initialize Paystack payment:', error);
+    if (payload.onCancel) {
+      payload.onCancel();
+    }
   }
 };
 

@@ -15,9 +15,10 @@ const Checkout = () => {
   const { cartItems, subtotal, clearCart, totalItems } = useCart();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deliverySpeed, setDeliverySpeed] = useState<"standard" | "express" | "scheduled">("standard");
   
   // Calculate delivery fee based on item count and delivery speed
-  const deliveryFee = calculateDeliveryFee(totalItems, "standard");
+  const deliveryFee = calculateDeliveryFee(totalItems, deliverySpeed);
   
   const handleCheckout = (values: CheckoutFormValues) => {
     setIsSubmitting(true);
@@ -77,6 +78,8 @@ const Checkout = () => {
             <CheckoutForm 
               onSubmit={handleCheckout}
               isSubmitting={isSubmitting}
+              deliverySpeed={deliverySpeed}
+              setDeliverySpeed={setDeliverySpeed}
             />
           </div>
           
@@ -87,6 +90,7 @@ const Checkout = () => {
               subtotal={subtotal}
               deliveryFee={deliveryFee}
               totalItems={totalItems}
+              deliverySpeed={deliverySpeed}
             />
           </div>
         </div>

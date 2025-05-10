@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +17,7 @@ const Signup = () => {
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showVerificationAlert, setShowVerificationAlert] = useState(false);
   const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -39,6 +42,7 @@ const Signup = () => {
           data: {
             full_name: fullName,
           },
+          emailRedirectTo: `${window.location.origin}/auth/login`,
         },
       });
       
@@ -48,12 +52,16 @@ const Signup = () => {
           description: error.message,
           variant: "destructive",
         });
-      } else {
+      } else if (data.user && !data.session) {
+        // Email confirmation required
+        setShowVerificationAlert(true);
+      } else if (data.session) {
+        // User is signed in immediately (email confirmation disabled)
         toast({
           title: "Account created successfully",
           description: "Welcome to KickGhana!",
         });
-        navigate("/home");
+        navigate("/profile");
       }
     } catch (error) {
       toast({
@@ -73,6 +81,16 @@ const Signup = () => {
           <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
           <p className="text-gray-200">Join KickGhana for premium footwear</p>
         </div>
+        
+        {showVerificationAlert && (
+          <Alert className="mb-6 bg-primary/20 border-primary">
+            <AlertCircle className="h-4 w-4 text-primary" />
+            <AlertTitle className="text-primary">Check your email</AlertTitle>
+            <AlertDescription className="text-primary/90">
+              We've sent a verification link to your email address. Please click the link to verify your account before logging in.
+            </AlertDescription>
+          </Alert>
+        )}
         
         <form onSubmit={handleSignup} className="space-y-6">
           <div className="space-y-2">
@@ -139,7 +157,7 @@ const Signup = () => {
           <Button 
             type="submit"
             className="w-full bg-primary text-secondary hover:bg-primary/90 py-6"
-            disabled={isLoading}
+            disabled={isLoading || showVerificationAlert}
           >
             {isLoading ? "Creating Account..." : "Sign Up"}
           </Button>
