@@ -6,6 +6,7 @@ import { toast } from "@/components/ui/use-toast";
 import HeroSection from "@/components/home/HeroSection";
 import CategorySection from "@/components/home/CategorySection";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
+import PromoSlider from "@/components/home/PromoSlider";
 import CTASection from "@/components/home/CTASection";
 import Footer from "@/components/home/Footer";
 import SearchModal from "@/components/home/SearchModal";
@@ -82,6 +83,9 @@ const Home = () => {
       <HeroSection />
       
       <CategorySection />
+      
+      {/* Promo Slider - Added Before Featured Products */}
+      <PromoSlider />
       
       <FeaturedProducts 
         cartItems={cartItems.map(item => item.id)}

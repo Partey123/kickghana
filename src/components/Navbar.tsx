@@ -3,8 +3,18 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Heart, Search, User, Menu, X } from "lucide-react";
+import { ShoppingBag, Heart, Search, User, Menu, X, Gift } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
+import { promotions } from "@/data/promotions";
 
 interface NavbarProps {
   cartItemsCount?: number;
@@ -62,8 +72,53 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/home" className="font-medium transition-colors duration-300 hover:text-primary">Home</Link>
             <Link to="/collections" className="font-medium transition-colors duration-300 hover:text-primary">Collections</Link>
+            
+            {/* Promotions Menu */}
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="font-medium bg-transparent hover:bg-transparent hover:text-primary">
+                    <span className="flex items-center">
+                      <Gift className="mr-1 h-4 w-4" />
+                      Promotions
+                    </span>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                      {promotions.slice(0, 4).map((promo) => (
+                        <li key={promo.id}>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to={`/promotions/${promo.id}`}
+                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            >
+                              <div className="text-sm font-medium leading-none">{promo.title}</div>
+                              <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
+                                {promo.description.substring(0, 80)}...
+                              </p>
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                      <li className="col-span-2">
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to="/promotions"
+                            className="block select-none rounded-md p-3 text-center text-sm font-medium leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            View All Promotions
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+            
             <Link to="/men" className="font-medium transition-colors duration-300 hover:text-primary">Men</Link>
             <Link to="/women" className="font-medium transition-colors duration-300 hover:text-primary">Women</Link>
+            <Link to="/accessories" className="font-medium transition-colors duration-300 hover:text-primary">Accessories</Link>
             <Link to="/about" className="font-medium transition-colors duration-300 hover:text-primary">About</Link>
           </div>
           
@@ -172,6 +227,13 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
               Collections
             </Link>
             <Link 
+              to="/promotions" 
+              className="px-4 py-2 hover:text-primary hover:bg-background/10 rounded-md flex items-center"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Gift className="mr-2" size={18} strokeWidth={1.5} /> Promotions
+            </Link>
+            <Link 
               to="/men" 
               className="px-4 py-2 hover:text-primary hover:bg-background/10 rounded-md"
               onClick={() => setMobileMenuOpen(false)}
@@ -184,6 +246,13 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Women
+            </Link>
+            <Link 
+              to="/accessories" 
+              className="px-4 py-2 hover:text-primary hover:bg-background/10 rounded-md"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Accessories
             </Link>
             <Link 
               to="/about" 
