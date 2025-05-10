@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { promotions } from "@/data/promotions";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,20 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { motion } from "framer-motion";
 
 const PromoSlider = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const [activeIndex, setActiveIndex] = useState(0);
+  
+  // Auto-slide functionality
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % promotions.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
   
   const handleViewPromo = (id: number) => {
     navigate(`/promotions/${id}`);
@@ -71,7 +81,12 @@ const PromoSlider = () => {
           <CarouselContent>
             {promotions.map((promo) => (
               <CarouselItem key={promo.id} className="md:basis-1/2 lg:basis-1/3">
-                <div className="bg-background rounded-lg overflow-hidden shadow-md h-full">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-background rounded-lg overflow-hidden shadow-md h-full"
+                >
                   <div className="aspect-[16/9] bg-muted relative overflow-hidden">
                     <img 
                       src={promo.image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff"} 
@@ -108,11 +123,11 @@ const PromoSlider = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="mt-8">
+          <div className="hidden md:block">
             <CarouselPrevious className="absolute -left-4 top-1/3" />
             <CarouselNext className="absolute -right-4 top-1/3" />
           </div>

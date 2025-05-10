@@ -69,7 +69,7 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
           </Link>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-4">
             <Link to="/home" className="font-medium transition-colors duration-300 hover:text-primary">Home</Link>
             <Link to="/collections" className="font-medium transition-colors duration-300 hover:text-primary">Collections</Link>
             
@@ -123,7 +123,7 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
           </div>
           
           {/* Desktop Icons */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
             
             <button 

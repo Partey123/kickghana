@@ -5,22 +5,51 @@ import Footer from "@/components/home/Footer";
 import { useCart } from "@/contexts/CartContext";
 import { featuredSneakers } from "@/data/products";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Trash } from "lucide-react";
+import { ShoppingBag, Trash, Heart } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { accessories } from "@/data/promotions";
 
 const Wishlist = () => {
-  const { wishlist, addToWishlist, addToCart } = useCart();
+  const { wishlist, addToWishlist, addToCart, cartItems } = useCart();
   const [wishlistItems, setWishlistItems] = useState<any[]>([]);
   
   useEffect(() => {
-    // Get wishlist items from featured sneakers
-    const items = wishlist
-      .map(id => featuredSneakers.find(sneaker => sneaker.id === id))
-      .filter(item => item !== undefined);
+    // Get wishlist items from both featured sneakers and accessories
+    const sneakerItems = wishlist
+      .map(id => {
+        const sneaker = featuredSneakers.find(item => item.id === id);
+        if (sneaker) {
+          return {
+            ...sneaker,
+            type: 'sneaker'
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
       
-    setWishlistItems(items as any[]);
+    const accessoryItems = wishlist
+      .filter(id => id >= 2000)  // Accessories have IDs >= 2000
+      .map(id => {
+        // Find a random accessory since we don't have exact matches
+        const randomIndex = Math.floor(Math.random() * accessories.length);
+        const accessory = accessories[randomIndex];
+        if (accessory) {
+          return {
+            id,
+            name: accessory.name,
+            price: accessory.price,
+            image: accessory.image || "https://images.unsplash.com/photo-1585241645927-c7a8e5840c42",
+            type: 'accessory'
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+      
+    setWishlistItems([...sneakerItems, ...accessoryItems] as any[]);
   }, [wishlist]);
   
   const handleRemoveFromWishlist = (id: number) => {
@@ -39,6 +68,15 @@ const Wishlist = () => {
       image: product.image,
       quantity: 1
     });
+    
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart`,
+    });
+  };
+  
+  const isInCart = (id: number) => {
+    return cartItems.some(item => item.id === id);
   };
   
   return (
@@ -63,7 +101,7 @@ const Wishlist = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {wishlistItems.map((item, i) => (
               <motion.div 
-                key={item.id}
+                key={`${item.id}-${i}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: i * 0.1 }}
@@ -98,9 +136,12 @@ const Wishlist = () => {
                     <Button
                       size="sm"
                       className="mt-2"
+                      variant={isInCart(item.id) ? "outline" : "default"}
                       onClick={() => handleAddToCart(item)}
+                      disabled={isInCart(item.id)}
                     >
-                      <ShoppingBag size={14} className="mr-1" /> Add to Cart
+                      <ShoppingBag size={14} className="mr-1" /> 
+                      {isInCart(item.id) ? "In Cart" : "Add to Cart"}
                     </Button>
                   </div>
                 </div>
@@ -116,6 +157,3 @@ const Wishlist = () => {
 };
 
 export default Wishlist;
-
-// Import Heart icon
-import { Heart } from "lucide-react";

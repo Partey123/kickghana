@@ -21,6 +21,10 @@ import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
+import Promotions from "./pages/Promotions";
+import PromotionDetail from "./pages/PromotionDetail";
+import Accessories from "./pages/Accessories";
+import Wishlist from "./pages/Wishlist";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -54,6 +58,10 @@ const App = () => (
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/order-success/:orderId" element={<OrderSuccess />} />
                   <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
+                  <Route path="/promotions" element={<Promotions />} />
+                  <Route path="/promotions/:id" element={<PromotionDetail />} />
+                  <Route path="/accessories" element={<Accessories />} />
+                  <Route path="/wishlist" element={<Wishlist />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

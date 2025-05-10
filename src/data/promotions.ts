@@ -105,6 +105,24 @@ export const promotions: Promotion[] = [
         colors: ["White", "Black", "Green"],
         sizes: [],
         image: "https://images.unsplash.com/photo-1572307796676-9ac13fdd81e6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        name: "Charlie Wote Rubber Slippers",
+        price: "GHS 80",
+        description: "Durable rubber, non-slip sole, lightweight design.",
+        features: "Durable rubber, non-slip sole, lightweight design.",
+        colors: ["Black", "Blue"],
+        sizes: ["39", "40", "41", "42", "43", "44"],
+        image: "https://images.unsplash.com/photo-1603487742131-4160ec999306?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        name: "Jallabia (Handcrafted in Tamale)",
+        price: "GHS 300",
+        description: "Flowing cotton robe, traditional embroidery, loose fit.",
+        features: "Flowing cotton robe, traditional embroidery, loose fit.",
+        colors: ["White", "Cream", "Navy"],
+        sizes: ["M", "L", "XL"],
+        image: "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
       }
     ],
     bundlePrice: "GHS 600",
@@ -118,11 +136,128 @@ export const promotions: Promotion[] = [
     event: "Christmas",
     date: "December 25, 2025",
     description: "Jingle all the way with our festive mega pack! Snag a stylish Puma sneaker, a cozy hoodie, festive socks, and a trendy bucket hat to shine at every Christmas party. Spread joy and slay the holiday season!",
-    products: [],
+    products: [
+      {
+        name: "Puma Suede Classic",
+        price: "GHS 650",
+        description: "Suede upper, EVA foam midsole, rubber outsole, retro style.",
+        features: "Suede upper, EVA foam midsole, rubber outsole, retro style.",
+        colors: ["Black", "Red"],
+        sizes: ["39", "40", "41", "42", "43", "44"],
+        image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        name: "Horseman Hoodie (Local Brand)",
+        price: "GHS 200",
+        description: "Cotton blend, bold print, kangaroo pocket, made in Ghana.",
+        features: "Cotton blend, bold print, kangaroo pocket, made in Ghana.",
+        colors: ["Red/Green", "Black"],
+        sizes: ["S", "M", "L", "XL"],
+        image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        name: "Christmas-Themed Socks (2-Pack)",
+        price: "GHS 100",
+        description: "Cotton blend, festive Santa and tree designs, cushioned sole.",
+        features: "Cotton blend, festive Santa and tree designs, cushioned sole.",
+        colors: ["Red/White", "Green/White"],
+        sizes: [],
+        image: "https://images.unsplash.com/photo-1543585324-23433ec4cae4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        name: "Bucket Hat (Local Artisan)",
+        price: "GHS 120",
+        description: "Reversible design, Kente and plain fabric, adjustable fit.",
+        features: "Reversible design, Kente and plain fabric, adjustable fit.",
+        colors: ["Kente/Black", "Kente/White"],
+        sizes: [],
+        image: "https://images.unsplash.com/photo-1534215754734-18e55d13e346?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      }
+    ],
     bundlePrice: "GHS 1,000",
     savings: "GHS 70",
     significance: "Captures the festive spirit for Christmas gifting, appealing to families and youth in Accra and Kumasi. Kente accents tie into Ghanaian pride.",
     image: "https://images.unsplash.com/photo-1543589077-47d81606c1bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 4,
+    title: "Independence Day Promo: Ghana Pride Bundle",
+    event: "Independence Day",
+    date: "March 6, 2025",
+    description: "Celebrate Ghana's 68th Independence Day with pride! Rock the official Ghana jersey, strut in Ghana-made slippers, and wave a Ghana flag scarf. Show your love for the Black Star nation in style!",
+    products: [
+      {
+        name: "Official Ghana Black Stars Jersey",
+        price: "GHS 350",
+        description: "Polyester fabric, breathable mesh, Black Star logo, authentic design.",
+        features: "Polyester fabric, breathable mesh, Black Star logo, authentic design.",
+        colors: ["White/Black/Red/Yellow"],
+        sizes: ["S", "M", "L", "XL"],
+        image: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        name: "Horseman Ghana-Made Slippers",
+        price: "GHS 100",
+        description: "Rubber sole, Ghana flag print, durable design, made in Kumasi.",
+        features: "Rubber sole, Ghana flag print, durable design, made in Kumasi.",
+        colors: ["Black/Ghana Flag"],
+        sizes: ["39", "40", "41", "42", "43", "44"],
+        image: "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        name: "Ghana Flag Scarf (Local Artisan)",
+        price: "GHS 80",
+        description: "Cotton fabric, vibrant flag colors, lightweight for parades.",
+        features: "Cotton fabric, vibrant flag colors, lightweight for parades.",
+        colors: ["Red/Yellow/Green/Black"],
+        sizes: [],
+        image: "https://images.unsplash.com/photo-1581873372796-635b67ca2008?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      }
+    ],
+    bundlePrice: "GHS 500",
+    savings: "GHS 30",
+    significance: "Aligns with Ghana Month and Independence Day celebrations, boosting patriotism. High demand for flag-themed items during parades and events.",
+    image: "https://images.unsplash.com/photo-1578927752541-5f3e914730e3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 5,
+    title: "Football Season Promo: Ultimate Fan Kit",
+    event: "Ghana Premier League & AFCON",
+    date: "January-February 2025",
+    description: "Get match-ready with the ultimate fan kit! Score a full Black Stars jersey, grippy cleats, and a durable football to dominate the pitch or cheer from the stands. Be the heart of Ghana's football fever!",
+    products: [
+      {
+        name: "Full Black Stars Jersey (Home Kit)",
+        price: "GHS 400",
+        description: "Polyester, moisture-wicking, Black Star emblem, player-fit design.",
+        features: "Polyester, moisture-wicking, Black Star emblem, player-fit design.",
+        colors: ["White/Black/Red/Yellow"],
+        sizes: ["S", "M", "L", "XL"],
+        image: "https://images.unsplash.com/photo-1518013333832-0223879d8daa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        name: "Adidas Predator Freak Cleats",
+        price: "GHS 800",
+        description: "Demonskin spikes, synthetic upper, ControlFrame outsole, ankle support.",
+        features: "Demonskin spikes, synthetic upper, ControlFrame outsole, ankle support.",
+        colors: ["Black/Red", "White/Blue"],
+        sizes: ["40", "41", "42", "43", "44", "45"],
+        image: "https://images.unsplash.com/photo-1543248335-1947d3459d77?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        name: "Mitre Delta Football",
+        price: "GHS 250",
+        description: "FIFA-approved, polyurethane cover, textured surface, durable bladder.",
+        features: "FIFA-approved, polyurethane cover, textured surface, durable bladder.",
+        colors: ["White/Black"],
+        sizes: [],
+        image: "https://images.unsplash.com/photo-1552318965-6e6be7484ada?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+      }
+    ],
+    bundlePrice: "GHS 1,400",
+    savings: "GHS 50",
+    significance: "Targets football fans during the Ghana Premier League and AFCON, with high demand in urban centers like Accra and Tamale. Cleats appeal to amateur players.",
+    image: "https://images.unsplash.com/photo-1522778034537-20a2486be367?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
   }
 ];
 

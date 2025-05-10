@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 const PromotionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   const [promotion, setPromotion] = useState<any>(null);
   
   useEffect(() => {
@@ -34,8 +34,12 @@ const PromotionDetail = () => {
   }, [id, navigate]);
   
   const handleAddProductToCart = (product: any) => {
+    if (!promotion) return;
+    
+    const productId = 3000 + Math.floor(Math.random() * 1000);
+    
     addToCart({
-      id: 3000 + Math.floor(Math.random() * 1000), // Generate random ID for promo products
+      id: productId,
       name: product.name,
       price: product.price,
       image: product.image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
@@ -51,8 +55,19 @@ const PromotionDetail = () => {
   const handleAddBundleToCart = () => {
     if (!promotion) return;
     
+    const bundleId = 1000 + promotion.id;
+    const isInCart = cartItems.some(item => item.id === bundleId);
+    
+    if (isInCart) {
+      toast({
+        title: "Already in cart",
+        description: "This bundle is already in your cart",
+      });
+      return;
+    }
+    
     addToCart({
-      id: 1000 + promotion.id,
+      id: bundleId,
       name: `${promotion.title} (Bundle)`,
       price: promotion.bundlePrice,
       image: promotion.products[0]?.image || promotion.image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
@@ -85,7 +100,12 @@ const PromotionDetail = () => {
           <div className="flex flex-col md:flex-row gap-8">
             {/* Left Column - Image */}
             <div className="md:w-1/2">
-              <div className="aspect-square bg-muted rounded-lg overflow-hidden relative">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="aspect-square bg-muted rounded-lg overflow-hidden relative"
+              >
                 <img 
                   src={promotion.image || promotion.products[0]?.image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff"} 
                   alt={promotion.title}
@@ -94,58 +114,70 @@ const PromotionDetail = () => {
                 <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full">
                   Save {promotion.savings}
                 </div>
-              </div>
+              </motion.div>
             </div>
             
             {/* Right Column - Details */}
             <div className="md:w-1/2">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                  {promotion.event}
-                </span>
-                <span className="text-muted-foreground text-sm">{promotion.date}</span>
-              </div>
-              
-              <h1 className="text-2xl md:text-3xl font-bold mb-3">{promotion.title}</h1>
-              <p className="text-muted-foreground mb-6">{promotion.description}</p>
-              
-              <div className="mb-6">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Bundle Price</p>
-                    <p className="text-2xl font-bold text-primary">{promotion.bundlePrice}</p>
-                  </div>
-                  <div className="bg-red-50 text-red-600 px-3 py-1 rounded-md text-sm font-medium">
-                    Save {promotion.savings}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                    {promotion.event}
+                  </span>
+                  <span className="text-muted-foreground text-sm">{promotion.date}</span>
+                </div>
+                
+                <h1 className="text-2xl md:text-3xl font-bold mb-3">{promotion.title}</h1>
+                <p className="text-muted-foreground mb-6">{promotion.description}</p>
+                
+                <div className="mb-6">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Bundle Price</p>
+                      <p className="text-2xl font-bold text-primary">{promotion.bundlePrice}</p>
+                    </div>
+                    <div className="bg-red-50 text-red-600 px-3 py-1 rounded-md text-sm font-medium">
+                      Save {promotion.savings}
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <Button 
-                className="w-full mb-4"
-                size="lg" 
-                onClick={handleAddBundleToCart}
-              >
-                <ShoppingBag className="mr-2 h-5 w-5" /> Add Bundle to Cart
-              </Button>
-              
-              <div className="bg-muted/40 rounded-lg p-4 mb-6">
-                <h3 className="font-medium mb-2 flex items-center">
-                  <Gift className="mr-2 h-4 w-4 text-primary" /> Significance
-                </h3>
-                <p className="text-sm">{promotion.significance}</p>
-              </div>
+                
+                <Button 
+                  className="w-full mb-4"
+                  size="lg" 
+                  onClick={handleAddBundleToCart}
+                >
+                  <ShoppingBag className="mr-2 h-5 w-5" /> Add Bundle to Cart
+                </Button>
+                
+                <div className="bg-muted/40 rounded-lg p-4 mb-6">
+                  <h3 className="font-medium mb-2 flex items-center">
+                    <Gift className="mr-2 h-4 w-4 text-primary" /> Significance
+                  </h3>
+                  <p className="text-sm">{promotion.significance}</p>
+                </div>
+              </motion.div>
             </div>
           </div>
           
           <Separator className="my-10" />
           
           {/* Bundle Products */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <h2 className="text-2xl font-bold mb-6">Bundle Products</h2>
             
             {promotion.products.length === 0 ? (
-              <p>No products available in this bundle yet.</p>
+              <p className="text-center py-8 bg-muted/30 rounded-lg">
+                No products available in this bundle yet. Check back later!
+              </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {promotion.products.map((product: any, i: number) => (
@@ -160,7 +192,7 @@ const PromotionDetail = () => {
                       <img 
                         src={product.image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff"} 
                         alt={product.name}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain transition-all hover:scale-105 duration-500"
                       />
                     </div>
                     
@@ -198,7 +230,7 @@ const PromotionDetail = () => {
                 ))}
               </div>
             )}
-          </div>
+          </motion.div>
           
           <div className="mt-10 text-center">
             <Button variant="outline" onClick={() => navigate("/promotions")}>

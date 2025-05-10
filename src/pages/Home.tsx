@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/toaster";
 import HeroSection from "@/components/home/HeroSection";
 import CategorySection from "@/components/home/CategorySection";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
@@ -84,7 +84,7 @@ const Home = () => {
       
       <CategorySection />
       
-      {/* Promo Slider - Added Before Featured Products */}
+      {/* Promo Slider - Improved carousel version */}
       <PromoSlider />
       
       <FeaturedProducts 
