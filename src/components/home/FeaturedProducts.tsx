@@ -1,9 +1,11 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ProductCard, { Product } from "./ProductCard";
 import { motion } from "framer-motion";
 import { useCart, CartItem } from "@/contexts/CartContext";
 import { featuredSneakers } from "@/data/products";
+import { useLoading } from "@/contexts/LoadingContext";
 
 interface FeaturedProductsProps {
   cartItems: number[];
@@ -14,8 +16,26 @@ interface FeaturedProductsProps {
 
 const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: FeaturedProductsProps) => {
   const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [isLoading, setIsLoading] = useState(true);
   const categories = ["All", "Running", "Basketball", "Casual", "Traditional", "Training"];
   const navigate = useNavigate();
+  const { showLoading, hideLoading } = useLoading();
+  
+  useEffect(() => {
+    // Show loading animation when component mounts
+    showLoading("Loading products...");
+    
+    // Simulate data loading with a timeout
+    const timer = setTimeout(() => {
+      hideLoading();
+      setIsLoading(false);
+    }, 2000);
+    
+    return () => {
+      clearTimeout(timer);
+      hideLoading();
+    };
+  }, [showLoading, hideLoading]);
   
   const handleAddToCart = (product: Product) => {
     addToCart({
@@ -28,6 +48,8 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
   };
   
   const handleProductClick = (id: number) => {
+    // Show loading animation before navigating
+    showLoading("Loading product details...");
     navigate(`/product/${id}`);
   };
   

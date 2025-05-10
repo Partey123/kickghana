@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 import { useCart } from "@/contexts/CartContext";
+import { useLoading } from "@/contexts/LoadingContext";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { calculateDeliveryFee } from "@/components/checkout/DeliveryFeeCalculator";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
@@ -13,6 +14,7 @@ import { createOrder, processPayment } from "@/components/checkout/PaymentProces
 
 const Checkout = () => {
   const { cartItems, subtotal, clearCart, totalItems } = useCart();
+  const { showLoading, hideLoading } = useLoading();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deliverySpeed, setDeliverySpeed] = useState<"standard" | "express" | "scheduled">("standard");
@@ -27,7 +29,7 @@ const Checkout = () => {
     const orderNumber = Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
     
     // Calculate total amount in pesewas (Ghana Cedis × 100)
-    const totalAmount = (parseFloat(subtotal.replace(/[^\d.]/g, "")) + deliveryFee) * 100;
+    const totalAmount = (parseFloat(subtotal.replace(/[^\d.]/g, "")) + deliveryFee);
     
     // Store order information in local storage before redirecting
     const order = createOrder(
@@ -56,7 +58,9 @@ const Checkout = () => {
       },
       () => {
         setIsSubmitting(false);
-      }
+      },
+      showLoading,
+      hideLoading
     );
   };
 

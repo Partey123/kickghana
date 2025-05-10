@@ -1,5 +1,5 @@
 
-// Enhanced product data with Ghanaian items
+// Enhanced product data with Ghanaian items and affordable test products
 export const featuredSneakers = [
   {
     id: 1,
@@ -64,5 +64,54 @@ export const featuredSneakers = [
     image: "https://i.etsystatic.com/11448039/r/il/4e30b1/967272990/il_fullxfull.967272990_qfum.jpg",
     category: "Traditional",
     isNew: false
+  },
+  // New affordable products for testing (₵5)
+  {
+    id: 9,
+    name: "Test Sandals Basic",
+    price: "₵5",
+    image: "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    category: "Casual",
+    isNew: true
+  },
+  {
+    id: 10,
+    name: "Test Runner Lite",
+    price: "₵5",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    category: "Running",
+    isNew: true
+  },
+  {
+    id: 11,
+    name: "Test Kente Flip",
+    price: "₵5",
+    image: "https://i.etsystatic.com/16896140/r/il/7e13b0/1569106395/il_570xN.1569106395_oku4.jpg",
+    category: "Traditional",
+    isNew: true
+  },
+  {
+    id: 12,
+    name: "Test Comfort Slip",
+    price: "₵5",
+    image: "https://images.unsplash.com/photo-1595950653613-ab42cf11542e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    category: "Casual",
+    isNew: true
+  },
+  {
+    id: 13,
+    name: "Test Sport Basic",
+    price: "₵5",
+    image: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    category: "Basketball",
+    isNew: true
+  },
+  {
+    id: 14,
+    name: "Test Training Shoe",
+    price: "₵5",
+    image: "https://images.unsplash.com/photo-1556048219-bb6978360b84?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    category: "Training",
+    isNew: true
   }
 ];

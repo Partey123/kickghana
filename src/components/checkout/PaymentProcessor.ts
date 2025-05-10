@@ -10,8 +10,15 @@ export const processPayment = (
   customerName: string,
   orders: any[],
   onSuccess: (reference: string, orderNumber: string) => void,
-  onCancel: () => void
+  onCancel: () => void,
+  showLoading?: (message: string) => void,
+  hideLoading?: () => void
 ) => {
+  // Show loading if available
+  if (showLoading) {
+    showLoading("Processing payment...");
+  }
+
   // First check if Paystack script is already loaded
   if (!window.PaystackPop) {
     const script = document.createElement('script');
@@ -24,6 +31,11 @@ export const processPayment = (
     };
     
     script.onerror = () => {
+      // Hide loading if available
+      if (hideLoading) {
+        hideLoading();
+      }
+
       toast({
         title: "Payment Error",
         description: "Failed to load payment system. Please try again.",
@@ -59,6 +71,11 @@ export const processPayment = (
       },
       callback_url: `${window.location.origin}/order-success/${orderNumber}`,
       onSuccess: (reference) => {
+        // Hide loading if available
+        if (hideLoading) {
+          hideLoading();
+        }
+
         // Update the order with payment reference
         const updatedOrders = orders.map((o: any) => {
           if (o.id === orderNumber) {
@@ -77,6 +94,11 @@ export const processPayment = (
         onSuccess(reference, orderNumber);
       },
       onCancel: () => {
+        // Hide loading if available
+        if (hideLoading) {
+          hideLoading();
+        }
+
         toast({
           title: "Payment cancelled",
           description: "Your payment was cancelled. Please try again.",
