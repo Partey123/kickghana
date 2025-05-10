@@ -30,12 +30,24 @@ const Index = () => {
                 Explore Collection
               </Button>
             </Link>
-            <Link to="/onboarding">
+            
+            <div className="w-full mt-4"></div>
+            
+            <Link to="/auth/signup">
               <Button 
                 variant="outline" 
                 className="border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 rounded-full px-8 py-6 text-lg font-medium"
               >
-                Get Started
+                Sign Up
+              </Button>
+            </Link>
+            
+            <Link to="/auth/login">
+              <Button 
+                variant="secondary" 
+                className="bg-white text-gray-800 hover:bg-white/90 rounded-full px-8 py-6 text-lg font-medium"
+              >
+                Log In
               </Button>
             </Link>
           </div>
