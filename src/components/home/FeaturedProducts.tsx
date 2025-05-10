@@ -16,26 +16,28 @@ interface FeaturedProductsProps {
 
 const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: FeaturedProductsProps) => {
   const [activeCategory, setActiveCategory] = useState<string>("All");
-  const [isLoading, setIsLoading] = useState(true);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const categories = ["All", "Running", "Basketball", "Casual", "Traditional", "Training"];
   const navigate = useNavigate();
   const { showLoading, hideLoading } = useLoading();
   
   useEffect(() => {
-    // Show loading animation when component mounts
-    showLoading("Loading products...");
-    
-    // Simulate data loading with a timeout
-    const timer = setTimeout(() => {
-      hideLoading();
-      setIsLoading(false);
-    }, 2000);
-    
-    return () => {
-      clearTimeout(timer);
-      hideLoading();
-    };
-  }, [showLoading, hideLoading]);
+    // Only show loading if data isn't loaded yet
+    if (!dataLoaded) {
+      showLoading("Loading products...");
+      
+      // Simulate data loading with a timeout
+      const timer = setTimeout(() => {
+        hideLoading();
+        setDataLoaded(true);
+      }, 1500); // Reduced timeout to 1.5 seconds
+      
+      return () => {
+        clearTimeout(timer);
+        hideLoading(); // Ensure hideLoading is called when component unmounts
+      };
+    }
+  }, [dataLoaded, showLoading, hideLoading]);
   
   const handleAddToCart = (product: Product) => {
     addToCart({

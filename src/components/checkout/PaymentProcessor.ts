@@ -19,6 +19,11 @@ export const processPayment = (
     showLoading("Processing payment...");
   }
 
+  // Add safety timeout
+  const loadingSafetyTimeout = setTimeout(() => {
+    if (hideLoading) hideLoading();
+  }, 10000);
+
   // First check if Paystack script is already loaded
   if (!window.PaystackPop) {
     const script = document.createElement('script');
@@ -27,11 +32,13 @@ export const processPayment = (
     
     script.onload = () => {
       // Once loaded, initialize payment
+      clearTimeout(loadingSafetyTimeout);
       initializePaystackPayment();
     };
     
     script.onerror = () => {
       // Hide loading if available
+      clearTimeout(loadingSafetyTimeout);
       if (hideLoading) {
         hideLoading();
       }
@@ -72,6 +79,7 @@ export const processPayment = (
       callback_url: `${window.location.origin}/order-success/${orderNumber}`,
       onSuccess: (reference) => {
         // Hide loading if available
+        clearTimeout(loadingSafetyTimeout);
         if (hideLoading) {
           hideLoading();
         }
@@ -95,6 +103,7 @@ export const processPayment = (
       },
       onCancel: () => {
         // Hide loading if available
+        clearTimeout(loadingSafetyTimeout);
         if (hideLoading) {
           hideLoading();
         }
