@@ -17,7 +17,7 @@ const Index = () => {
             Welcome to <span className="text-primary">KickGhana</span>
           </h1>
           
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 max-w-2xl mx-auto">
             Premium footwear with authentic Ghanaian style and craftsmanship.
             Discover our exclusive collection today.
           </p>
@@ -25,7 +25,7 @@ const Index = () => {
           <div className="flex flex-wrap justify-center gap-4 pt-6">
             <Link to="/home">
               <Button 
-                className="bg-primary text-secondary hover:bg-primary/90 rounded-full px-8 py-6 text-lg font-medium"
+                className="bg-primary text-gray-900 hover:bg-primary/90 rounded-full px-8 py-6 text-lg font-medium"
               >
                 Explore Collection
               </Button>
@@ -36,7 +36,7 @@ const Index = () => {
             <Link to="/auth/signup">
               <Button 
                 variant="outline" 
-                className="border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 rounded-full px-8 py-6 text-lg font-medium"
+                className="border-white/50 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 rounded-full px-8 py-6 text-lg font-medium"
               >
                 Sign Up
               </Button>
@@ -45,7 +45,7 @@ const Index = () => {
             <Link to="/auth/login">
               <Button 
                 variant="secondary" 
-                className="bg-white text-gray-800 hover:bg-white/90 rounded-full px-8 py-6 text-lg font-medium"
+                className="bg-white text-gray-900 hover:bg-white/90 rounded-full px-8 py-6 text-lg font-medium"
               >
                 Log In
               </Button>

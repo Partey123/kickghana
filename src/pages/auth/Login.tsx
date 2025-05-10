@@ -51,7 +51,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-xl p-8 shadow-lg border border-white/20">
+      <div className="w-full max-w-md bg-white/5 backdrop-blur-md rounded-xl p-8 shadow-lg border border-white/10">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-gray-200">Log in to your KickGhana account</p>
@@ -67,7 +67,7 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
-              className="bg-white/20 border-white/30 text-white placeholder:text-gray-400"
+              className="bg-white/90 border-white/30 text-gray-800 placeholder:text-gray-500"
             />
           </div>
           
@@ -81,12 +81,12 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
-                className="bg-white/20 border-white/30 text-white placeholder:text-gray-400 pr-10"
+                className="bg-white/90 border-white/30 text-gray-800 placeholder:text-gray-500 pr-10"
               />
               <button 
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -95,14 +95,14 @@ const Login = () => {
           
           <Button 
             type="submit"
-            className="w-full bg-primary text-secondary hover:bg-primary/90 py-6"
+            className="w-full bg-primary text-gray-900 hover:bg-primary/90 py-6 font-medium"
             disabled={isLoading}
           >
             {isLoading ? "Logging in..." : "Log In"}
           </Button>
           
-          <div className="text-center text-white">
-            <p>Don't have an account? <Link to="/auth/signup" className="text-primary hover:underline">Sign Up</Link></p>
+          <div className="text-center">
+            <p className="text-white">Don't have an account? <Link to="/auth/signup" className="text-primary hover:underline font-medium">Sign Up</Link></p>
           </div>
         </form>
       </div>

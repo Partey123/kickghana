@@ -5,61 +5,61 @@
 
 @layer base {
   :root {
-    --background: 220 15% 16%; /* Dark blue-gray background */
-    --foreground: 60 9.1% 97.8%; /* Light text color for better visibility */
+    --background: 222 47% 11%; /* Darker blue background for better contrast */
+    --foreground: 210 40% 98%; /* Lighter text color for better readability */
 
     --card: 0 0% 100%;
-    --card-foreground: 20 14.3% 4.1%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 20 14.3% 4.1%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 47.9 95.8% 53.1%; /* Gold */
-    --primary-foreground: 26 83.3% 14.1%; /* Dark Brown */
+    --primary: 45 93% 47%; /* Refined gold */
+    --primary-foreground: 222 47% 11%; /* Dark text on gold */
 
     --secondary: 0 0% 100%; /* White */
-    --secondary-foreground: 47.9 95.8% 53.1%; /* Gold text on white */
+    --secondary-foreground: 222 47% 11%; /* Dark text on white */
 
-    --muted: 30 20% 92%; /* Soft beige */
-    --muted-foreground: 26 83.3% 25%; /* Muted brown */
+    --muted: 30 20% 92%;
+    --muted-foreground: 222 47% 30%; /* Darker muted text */
 
-    --accent: 30 67% 94%; /* Pale amber */
-    --accent-foreground: 24 9.8% 10%;
+    --accent: 45 60% 92%; /* Light gold accent */
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 26 83.3% 14.1%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 222 47% 11%;
 
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 60 9.1% 97.8%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
 
-    --card: 20 14.3% 4.1%;
-    --card-foreground: 60 9.1% 97.8%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 20 14.3% 4.1%;
-    --popover-foreground: 60 9.1% 97.8%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 47.9 95.8% 53.1%; /* Gold */
-    --primary-foreground: 26 83.3% 14.1%; /* Dark Brown */
+    --primary: 45 93% 47%;
+    --primary-foreground: 222 47% 11%;
 
     --secondary: 12 6.5% 15.1%;
-    --secondary-foreground: 60 9.1% 97.8%;
+    --secondary-foreground: 210 40% 98%;
 
     --muted: 12 6.5% 15.1%;
     --muted-foreground: 24 5.4% 63.9%;
 
     --accent: 12 6.5% 15.1%;
-    --accent-foreground: 60 9.1% 97.8%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 60 9.1% 97.8%;
+    --destructive-foreground: 210 40% 98%;
 
     --border: 12 6.5% 15.1%;
     --input: 12 6.5% 15.1%;
@@ -94,16 +94,16 @@
   }
   
   p, span, div, a {
-    @apply text-white;
+    @apply text-white/90;
   }
   
   /* Form labels and inputs - ensure visibility */
   label {
-    @apply text-white !important;
+    @apply text-white/90 !important;
   }
   
   input, select, textarea {
-    @apply text-white bg-white/10 border-white/30 !important;
+    @apply text-gray-800 bg-white/90 border-white/30 placeholder:text-gray-500 !important;
   }
   
   /* Button styling */
@@ -112,7 +112,7 @@
   }
   
   .btn-secondary {
-    @apply bg-white text-secondary hover:bg-white/90 rounded-full px-6 py-3 font-medium transition-all duration-300 shadow-md hover:shadow-lg;
+    @apply bg-white text-gray-800 hover:bg-white/90 rounded-full px-6 py-3 font-medium transition-all duration-300 shadow-md hover:shadow-lg;
   }
   
   /* Card styling */
