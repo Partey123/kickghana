@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -51,15 +52,19 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md bg-white/5 backdrop-blur-md rounded-xl p-8 shadow-lg border border-white/10">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+      
+      <div className="w-full max-w-md bg-card/50 backdrop-blur-md rounded-xl p-8 shadow-lg border border-border">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-gray-200">Log in to your KickGhana account</p>
+          <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
+          <p className="text-muted-foreground">Log in to your KickGhana account</p>
         </div>
         
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-white">Email</Label>
+            <Label htmlFor="email">Email</Label>
             <Input 
               id="email"
               type="email"
@@ -67,12 +72,12 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
-              className="bg-white/90 border-white/30 text-gray-800 placeholder:text-gray-500"
+              className="bg-background/50 border-input"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-white">Password</Label>
+            <Label htmlFor="password">Password</Label>
             <div className="relative">
               <Input 
                 id="password"
@@ -81,12 +86,12 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
-                className="bg-white/90 border-white/30 text-gray-800 placeholder:text-gray-500 pr-10"
+                className="bg-background/50 border-input pr-10"
               />
               <button 
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -95,14 +100,14 @@ const Login = () => {
           
           <Button 
             type="submit"
-            className="w-full bg-primary text-gray-900 hover:bg-primary/90 py-6 font-medium"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-6 font-medium"
             disabled={isLoading}
           >
             {isLoading ? "Logging in..." : "Log In"}
           </Button>
           
           <div className="text-center">
-            <p className="text-white">Don't have an account? <Link to="/auth/signup" className="text-primary hover:underline font-medium">Sign Up</Link></p>
+            <p>Don't have an account? <Link to="/auth/signup" className="text-primary hover:underline font-medium">Sign Up</Link></p>
           </div>
         </form>
       </div>

@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   return (
@@ -13,11 +14,16 @@ const Index = () => {
           transition={{ duration: 0.7 }}
           className="space-y-6"
         >
-          <h1 className="text-5xl md:text-7xl font-bold text-white">
+          {/* Absolute positioned theme toggle for landing page */}
+          <div className="absolute top-8 right-8">
+            <ThemeToggle />
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-bold">
             Welcome to <span className="text-primary">KickGhana</span>
           </h1>
           
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
+          <p className="text-xl max-w-2xl mx-auto">
             Premium footwear with authentic Ghanaian style and craftsmanship.
             Discover our exclusive collection today.
           </p>
@@ -25,7 +31,7 @@ const Index = () => {
           <div className="flex flex-wrap justify-center gap-4 pt-6">
             <Link to="/home">
               <Button 
-                className="bg-primary text-gray-900 hover:bg-primary/90 rounded-full px-8 py-6 text-lg font-medium"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-6 text-lg font-medium"
               >
                 Explore Collection
               </Button>
@@ -36,7 +42,7 @@ const Index = () => {
             <Link to="/auth/signup">
               <Button 
                 variant="outline" 
-                className="border-white/50 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 rounded-full px-8 py-6 text-lg font-medium"
+                className="border-border bg-background/20 backdrop-blur-sm hover:bg-background/30 rounded-full px-8 py-6 text-lg font-medium"
               >
                 Sign Up
               </Button>
@@ -45,7 +51,7 @@ const Index = () => {
             <Link to="/auth/login">
               <Button 
                 variant="secondary" 
-                className="bg-white text-gray-900 hover:bg-white/90 rounded-full px-8 py-6 text-lg font-medium"
+                className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full px-8 py-6 text-lg font-medium"
               >
                 Log In
               </Button>
