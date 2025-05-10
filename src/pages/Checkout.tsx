@@ -11,11 +11,10 @@ import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/components/ui/use-toast";
+import { initializePayment } from "@/utils/paystack";
 
 // Import the refactored components
 import DeliveryInfoForm from "@/components/checkout/DeliveryInfoForm";
-import DeliveryOptions from "@/components/checkout/DeliveryOptions";
-import PaymentMethodForm from "@/components/checkout/PaymentMethodForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { calculateDeliveryFee } from "@/components/checkout/DeliveryFeeCalculator";
 
@@ -38,24 +37,9 @@ const checkoutSchema = z.object({
   }),
   
   // Alternative recipient fields (conditional)
-  recipientFirstName: z.string().optional().refine(val => {
-    if (z.string()._type === "other") {
-      return !!val && val.length >= 2;
-    }
-    return true;
-  }, { message: "Recipient first name must be at least 2 characters." }),
-  recipientLastName: z.string().optional().refine(val => {
-    if (z.string()._type === "other") {
-      return !!val && val.length >= 2;
-    }
-    return true;
-  }, { message: "Recipient last name must be at least 2 characters." }),
-  recipientPhone: z.string().optional().refine(val => {
-    if (z.string()._type === "other") {
-      return !!val && val.length >= 10;
-    }
-    return true;
-  }, { message: "Recipient phone must be at least 10 digits." }),
+  recipientFirstName: z.string().optional(),
+  recipientLastName: z.string().optional(),
+  recipientPhone: z.string().optional(),
   
   // Common address fields
   address: z.string().min(5, {
@@ -69,56 +53,8 @@ const checkoutSchema = z.object({
   }),
   deliveryNote: z.string().optional(),
   
-  // Delivery type
-  deliverySpeed: z.enum(["standard", "express", "scheduled"]),
-  deliveryDate: z.string().optional().refine(val => {
-    if (z.string()._type === "scheduled") {
-      return !!val;
-    }
-    return true;
-  }, { message: "Please select a delivery date." }),
-  
-  // Payment fields
-  paymentMethod: z.enum(["card", "mobileMoney"]),
-  
-  // Card fields - conditional validation based on payment method
-  cardNumber: z.string().optional().refine(val => {
-    if (z.string()._type === "card") {
-      return !!val && val.length >= 16;
-    }
-    return true;
-  }, { message: "Card number must be at least 16 digits." }),
-  cardName: z.string().optional().refine(val => {
-    if (z.string()._type === "card") {
-      return !!val && val.length >= 2;
-    }
-    return true;
-  }, { message: "Card holder name is required." }),
-  cardExpiry: z.string().optional().refine(val => {
-    if (z.string()._type === "card") {
-      return !!val && /^(0[1-9]|1[0-2])\/\d{2}$/.test(val);
-    }
-    return true;
-  }, { message: "Expiry date must be in MM/YY format." }),
-  cardCvv: z.string().optional().refine(val => {
-    if (z.string()._type === "card") {
-      return !!val && val.length === 3;
-    }
-    return true;
-  }, { message: "CVV must be 3 digits." }),
-  // Mobile Money fields - conditional validation
-  mobileNumber: z.string().optional().refine(val => {
-    if (z.string()._type === "mobileMoney") {
-      return !!val && val.length >= 10;
-    }
-    return true;
-  }, { message: "Mobile money number must be at least 10 digits." }),
-  mobileNetwork: z.enum(["mtn", "vodafone", "airtelTigo"]).optional().refine(val => {
-    if (z.string()._type === "mobileMoney") {
-      return !!val;
-    }
-    return true;
-  }, { message: "Please select a mobile network." }),
+  // Delivery type - simplified to only standard delivery
+  deliverySpeed: z.enum(["standard"]),
 });
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
@@ -127,17 +63,11 @@ const Checkout = () => {
   const { cartItems, subtotal, clearCart, totalItems } = useCart();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "mobileMoney">("card");
   const [deliveryType, setDeliveryType] = useState<"self" | "other">("self");
-  const [deliverySpeed, setDeliverySpeed] = useState<"standard" | "express" | "scheduled">("standard");
+  const [deliverySpeed] = useState<"standard">("standard");
   
   // Calculate delivery fee based on item count and delivery speed
   const deliveryFee = calculateDeliveryFee(totalItems, deliverySpeed);
-  
-  // Update delivery fee when cart items or delivery speed changes
-  useEffect(() => {
-    calculateDeliveryFee(totalItems, deliverySpeed);
-  }, [totalItems, deliverySpeed]);
   
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
@@ -155,92 +85,96 @@ const Checkout = () => {
       postalCode: "",
       deliveryNote: "",
       deliverySpeed: "standard",
-      deliveryDate: "",
-      paymentMethod: "card",
-      cardNumber: "",
-      cardName: "",
-      cardExpiry: "",
-      cardCvv: "",
-      mobileNumber: "",
-      mobileNetwork: undefined,
     },
   });
   
-  // Watch payment method and delivery type to update state
-  const selectedPaymentMethod = form.watch("paymentMethod");
+  // Watch delivery type to update state
   const selectedDeliveryType = form.watch("deliveryType");
-  const selectedDeliverySpeed = form.watch("deliverySpeed");
   
   // Update the state when form values change
   useEffect(() => {
-    setPaymentMethod(selectedPaymentMethod);
     setDeliveryType(selectedDeliveryType);
-    setDeliverySpeed(selectedDeliverySpeed);
-  }, [selectedPaymentMethod, selectedDeliveryType, selectedDeliverySpeed]);
+  }, [selectedDeliveryType]);
   
   const handleCheckout = (values: CheckoutFormValues) => {
     setIsSubmitting(true);
     
-    // Simulate checkout process
-    setTimeout(() => {
-      // Generate order number
-      const orderNumber = Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
-      
-      // Calculate estimated delivery date based on delivery speed
-      let estimatedDelivery = new Date();
-      if (values.deliverySpeed === "express") {
-        estimatedDelivery.setDate(estimatedDelivery.getDate() + 1); // Next day for express
-      } else if (values.deliverySpeed === "scheduled") {
-        estimatedDelivery = new Date(values.deliveryDate || "");
-      } else {
-        estimatedDelivery.setDate(estimatedDelivery.getDate() + 3); // 2-3 days for standard
-      }
-      
-      // Store order in local storage for tracking
-      const order = {
-        id: orderNumber,
-        date: new Date().toISOString(),
-        items: cartItems,
-        total: (parseFloat(subtotal.replace(/[^\d.]/g, "")) + deliveryFee).toFixed(2),
-        delivery: {
-          type: values.deliveryType,
-          recipient: values.deliveryType === "self" 
-            ? {
-                firstName: values.firstName,
-                lastName: values.lastName,
-                phone: values.phone,
-              }
-            : {
-                firstName: values.recipientFirstName,
-                lastName: values.recipientLastName,
-                phone: values.recipientPhone,
-              },
-          address: values.address,
-          city: values.city,
-          postalCode: values.postalCode,
-          note: values.deliveryNote,
-          speed: values.deliverySpeed,
-          fee: deliveryFee,
-        },
-        paymentMethod: values.paymentMethod,
-        status: "processing",
-        estimatedDelivery: estimatedDelivery.toISOString(),
-      };
-      
-      const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-      localStorage.setItem("orders", JSON.stringify([...existingOrders, order]));
-      
-      // Clear cart and navigate to success page
-      clearCart();
-      setIsSubmitting(false);
-      
-      toast({
-        title: "Order placed successfully",
-        description: `Your order #${orderNumber} has been placed successfully.`,
-      });
-      
-      navigate(`/order-success/${orderNumber}`);
-    }, 2000);
+    // Generate order number
+    const orderNumber = Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
+    
+    // Calculate total amount in pesewas (Ghana Cedis × 100)
+    const totalAmount = (parseFloat(subtotal.replace(/[^\d.]/g, "")) + deliveryFee) * 100;
+    
+    // Store order information in local storage before redirecting
+    const order = {
+      id: orderNumber,
+      date: new Date().toISOString(),
+      items: cartItems,
+      total: (parseFloat(subtotal.replace(/[^\d.]/g, "")) + deliveryFee).toFixed(2),
+      shipping: {
+        firstName: values.deliveryType === "self" ? values.firstName : values.recipientFirstName,
+        lastName: values.deliveryType === "self" ? values.lastName : values.recipientLastName,
+        address: values.address,
+        city: values.city,
+        postalCode: values.postalCode,
+        phone: values.deliveryType === "self" ? values.phone : values.recipientPhone,
+      },
+      status: "pending",
+      estimatedDelivery: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
+      payment_reference: "", // Will be updated after payment
+    };
+    
+    const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+    localStorage.setItem("orders", JSON.stringify([...existingOrders, order]));
+    
+    // Initialize Paystack payment
+    initializePayment({
+      email: values.email,
+      amount: Math.floor(totalAmount), // Remove decimal places
+      metadata: {
+        order_id: orderNumber,
+        custom_fields: [
+          {
+            display_name: "Customer Name",
+            variable_name: "customer_name",
+            value: `${values.firstName} ${values.lastName}`,
+          },
+        ],
+      },
+      callback_url: `${window.location.origin}/order-success/${orderNumber}`,
+      onSuccess: (reference) => {
+        // Update the order with payment reference
+        const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+        const updatedOrders = orders.map((o: any) => {
+          if (o.id === orderNumber) {
+            return { ...o, status: "processing", payment_reference: reference };
+          }
+          return o;
+        });
+        
+        localStorage.setItem("orders", JSON.stringify(updatedOrders));
+        
+        // Clear cart and navigate to success page
+        clearCart();
+        setIsSubmitting(false);
+        
+        toast({
+          title: "Payment successful",
+          description: `Your order #${orderNumber} has been placed successfully.`,
+        });
+        
+        navigate(`/order-success/${orderNumber}`);
+      },
+      onCancel: () => {
+        setIsSubmitting(false);
+        
+        toast({
+          title: "Payment cancelled",
+          description: "Your payment was cancelled. Please try again.",
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   if (cartItems.length === 0) {
@@ -253,12 +187,12 @@ const Checkout = () => {
       <Navbar cartItemsCount={totalItems} />
       
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-8">Checkout</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-8">Checkout</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Checkout Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white/90 rounded-xl p-6 shadow-md">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 shadow-md text-white">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleCheckout)} className="space-y-6">
                   {/* Delivery Information Component */}
@@ -268,17 +202,13 @@ const Checkout = () => {
                     setDeliveryType={setDeliveryType}
                   />
                   
-                  {/* Delivery Options Component */}
-                  <DeliveryOptions 
-                    form={form}
-                    deliverySpeed={deliverySpeed} 
-                  />
-                  
-                  {/* Payment Method Component */}
-                  <PaymentMethodForm 
-                    form={form}
-                    paymentMethod={paymentMethod} 
-                  />
+                  <div className="border-t pt-6 border-white/20">
+                    <h2 className="text-xl font-bold mb-4">Delivery & Payment Options</h2>
+                    <p className="mb-6">
+                      Your order will be delivered via standard shipping (3-5 business days) and payment will be
+                      processed securely through Paystack.
+                    </p>
+                  </div>
                   
                   <motion.div 
                     whileHover={{ scale: 1.02 }}
@@ -286,10 +216,10 @@ const Checkout = () => {
                   >
                     <Button 
                       type="submit" 
-                      className="w-full bg-primary text-secondary hover:bg-primary/90 py-6"
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-6"
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? "Processing..." : "Place Order"}
+                      {isSubmitting ? "Processing..." : "Proceed to Payment"}
                     </Button>
                   </motion.div>
                 </form>
