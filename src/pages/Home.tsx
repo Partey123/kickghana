@@ -12,7 +12,7 @@ import Footer from "@/components/home/Footer";
 import SearchModal from "@/components/home/SearchModal";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Home = () => {
   const { addToCart, totalItems, cartItems, addToWishlist, wishlist } = useCart();
@@ -43,24 +43,55 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background/80">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="min-h-screen bg-background/80"
+    >
       <Navbar cartItemsCount={totalItems} onCartClick={handleCartClick} />
       
-      <HeroSection />
-      
-      <CategorySection />
-      
-      {/* Promo Slider - Improved carousel version */}
-      <PromoSlider />
-      
-      <FeaturedProducts 
-        cartItems={cartItems.map(item => item.id)}
-        addToCart={addToCart}
-        wishlist={wishlist}
-        addToWishlist={addToWishlist}
-      />
-      
-      <CTASection />
+      <AnimatePresence>
+        <HeroSection />
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <CategorySection />
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          <PromoSlider />
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+        >
+          <FeaturedProducts 
+            cartItems={cartItems.map(item => item.id)}
+            addToCart={addToCart}
+            wishlist={wishlist}
+            addToWishlist={addToWishlist}
+          />
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+        >
+          <CTASection />
+        </motion.div>
+      </AnimatePresence>
       
       <Footer />
       
@@ -71,7 +102,7 @@ const Home = () => {
         setSearchTerm={setSearchTerm}
         handleSearch={handleSearch}
       />
-    </div>
+    </motion.div>
   );
 };
 
