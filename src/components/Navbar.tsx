@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Heart, Search, User, Menu, X, Gift } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -13,7 +14,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { cn } from "@/lib/utils";
 import { promotions } from "@/data/promotions";
 
 interface NavbarProps {
@@ -25,6 +25,8 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   
   // Handle scroll effect
   useEffect(() => {
@@ -47,6 +49,11 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
       onCartClick();
     }
   };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
+  };
   
   return (
     <header 
@@ -59,7 +66,7 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
+          <Link to="/home" className="flex items-center">
             <div className="relative">
               <h1 className="text-2xl font-bold transition-colors duration-300">
                 <span className="font-serif font-black">KICK</span>
@@ -69,9 +76,9 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
           </Link>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/home" className="font-medium transition-colors duration-300 hover:text-primary">Home</Link>
-            <Link to="/collections" className="font-medium transition-colors duration-300 hover:text-primary">Collections</Link>
+          <div className="hidden md:flex items-center space-x-2">
+            <Link to="/home" className="px-3 font-medium transition-colors duration-300 hover:text-primary">Home</Link>
+            <Link to="/collections" className="px-3 font-medium transition-colors duration-300 hover:text-primary">Collections</Link>
             
             {/* Promotions Menu */}
             <NavigationMenu>
@@ -116,10 +123,10 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
               </NavigationMenuList>
             </NavigationMenu>
             
-            <Link to="/men" className="font-medium transition-colors duration-300 hover:text-primary">Men</Link>
-            <Link to="/women" className="font-medium transition-colors duration-300 hover:text-primary">Women</Link>
-            <Link to="/accessories" className="font-medium transition-colors duration-300 hover:text-primary">Accessories</Link>
-            <Link to="/about" className="font-medium transition-colors duration-300 hover:text-primary">About</Link>
+            <Link to="/men" className="px-3 font-medium transition-colors duration-300 hover:text-primary">Men</Link>
+            <Link to="/women" className="px-3 font-medium transition-colors duration-300 hover:text-primary">Women</Link>
+            <Link to="/accessories" className="px-3 font-medium transition-colors duration-300 hover:text-primary">Accessories</Link>
+            <Link to="/about" className="px-3 font-medium transition-colors duration-300 hover:text-primary">About</Link>
           </div>
           
           {/* Desktop Icons */}
@@ -150,9 +157,31 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
               )}
             </Link>
             
-            <Link to="/profile" className="transition-colors duration-300 hover:text-primary">
-              <User size={20} strokeWidth={1.5} />
-            </Link>
+            {user ? (
+              <div className="relative group">
+                <Link to="/profile" className="transition-colors duration-300 hover:text-primary">
+                  <User size={20} strokeWidth={1.5} />
+                </Link>
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    My Profile
+                  </Link>
+                  <Link to="/wishlist" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    My Wishlist
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="w-full text-left block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link to="/auth/login" className="transition-colors duration-300 hover:text-primary">
+                <User size={20} strokeWidth={1.5} />
+              </Link>
+            )}
           </div>
           
           {/* Mobile menu button */}
@@ -271,14 +300,36 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
                 >
                   <Heart size={18} className="mr-2" strokeWidth={1.5} /> Wishlist
                 </Link>
-                <Link 
-                  to="/profile" 
-                  className="px-4 py-2 hover:text-primary hover:bg-background/10 rounded-md flex items-center"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <User size={18} className="mr-2" strokeWidth={1.5} /> Profile
-                </Link>
+                {user ? (
+                  <Link 
+                    to="/profile" 
+                    className="px-4 py-2 hover:text-primary hover:bg-background/10 rounded-md flex items-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <User size={18} className="mr-2" strokeWidth={1.5} /> Profile
+                  </Link>
+                ) : (
+                  <Link 
+                    to="/auth/login" 
+                    className="px-4 py-2 hover:text-primary hover:bg-background/10 rounded-md flex items-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <User size={18} className="mr-2" strokeWidth={1.5} /> Login
+                  </Link>
+                )}
               </div>
+              
+              {user && (
+                <button 
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full mt-2 text-left block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                >
+                  Sign Out
+                </button>
+              )}
               
               <div className="mt-4">
                 <div className="relative">

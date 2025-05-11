@@ -1,7 +1,7 @@
 
-import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
-import { useCart } from "@/contexts/CartContext";
+import { ReactNode, useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/use-toast";
 
 interface RouteGuardProps {
@@ -9,22 +9,26 @@ interface RouteGuardProps {
 }
 
 const RouteGuard = ({ children }: RouteGuardProps) => {
-  // In a real app, we would check for authentication here
-  // For now, we'll simulate this by checking if there's at least one item in the cart
-  const { totalItems } = useCart();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   
-  // This is a simplified logic for demonstration
-  // In a real app with auth, we would use something like: const isLoggedIn = useAuth().isAuthenticated;
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  useEffect(() => {
+    if (!loading && !user) {
+      toast({
+        title: "Access Denied",
+        description: "Please log in to access your profile",
+        variant: "destructive",
+      });
+      navigate("/auth/login", { replace: true });
+    }
+  }, [user, loading, navigate]);
   
-  if (!isLoggedIn) {
-    toast({
-      title: "Access Denied",
-      description: "Please log in to access your profile",
-      variant: "destructive",
-    });
-    
-    return <Navigate to="/" replace />;
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+  
+  if (!user) {
+    return null;
   }
   
   return <>{children}</>;

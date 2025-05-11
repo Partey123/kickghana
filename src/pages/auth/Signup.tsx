@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -19,6 +20,14 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showVerificationAlert, setShowVerificationAlert] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  useEffect(() => {
+    // If user is already authenticated, redirect them to home page
+    if (user) {
+      navigate('/home');
+    }
+  }, [user, navigate]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +70,7 @@ const Signup = () => {
           title: "Account created successfully",
           description: "Welcome to KickGhana!",
         });
-        navigate("/profile");
+        navigate("/home");
       }
     } catch (error) {
       toast({
@@ -159,7 +168,14 @@ const Signup = () => {
             className="w-full bg-primary text-secondary hover:bg-primary/90 py-6"
             disabled={isLoading || showVerificationAlert}
           >
-            {isLoading ? "Creating Account..." : "Sign Up"}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating Account...
+              </>
+            ) : (
+              "Sign Up"
+            )}
           </Button>
           
           <div className="text-center text-white">
