@@ -7,6 +7,7 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import DeliveryInfoForm from "@/components/checkout/DeliveryInfoForm";
 import DeliveryOptions from "@/components/checkout/DeliveryOptions";
+import PaymentMethodForm from "@/components/checkout/PaymentMethodForm";
 import { checkoutSchema, CheckoutFormValues, defaultFormValues } from "./CheckoutFormSchema";
 
 type CheckoutFormProps = {
@@ -18,6 +19,8 @@ type CheckoutFormProps = {
 
 const CheckoutForm = ({ onSubmit, isSubmitting, deliverySpeed, setDeliverySpeed }: CheckoutFormProps) => {
   const [deliveryType, setDeliveryType] = useState<"self" | "other">("self");
+  const [paymentType, setPaymentType] = useState<"online" | "onDelivery">("online");
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "mobileMoney" | "cashOnDelivery">("card");
   
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
@@ -27,13 +30,23 @@ const CheckoutForm = ({ onSubmit, isSubmitting, deliverySpeed, setDeliverySpeed 
     },
   });
   
-  // Watch delivery type to update state
+  // Watch changes
   const selectedDeliveryType = form.watch("deliveryType");
+  const selectedPaymentMethod = form.watch("paymentMethod");
+  const selectedPaymentType = form.watch("paymentType");
   
-  // Update the state when form values change
+  // Update states when form values change
   useEffect(() => {
     setDeliveryType(selectedDeliveryType);
   }, [selectedDeliveryType]);
+  
+  useEffect(() => {
+    setPaymentMethod(selectedPaymentMethod);
+  }, [selectedPaymentMethod]);
+  
+  useEffect(() => {
+    setPaymentType(selectedPaymentType);
+  }, [selectedPaymentType]);
   
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 shadow-md text-white">
@@ -53,12 +66,13 @@ const CheckoutForm = ({ onSubmit, isSubmitting, deliverySpeed, setDeliverySpeed 
             setDeliverySpeed={setDeliverySpeed}
           />
           
-          <div className="border-t pt-6 border-white/20">
-            <h2 className="text-xl font-bold mb-4">Payment Options</h2>
-            <p className="mb-6">
-              Your order will be processed securely through Paystack.
-            </p>
-          </div>
+          {/* Payment Method Form */}
+          <PaymentMethodForm
+            form={form}
+            paymentMethod={paymentMethod}
+            paymentType={paymentType}
+            setPaymentType={setPaymentType}
+          />
           
           <motion.div 
             whileHover={{ scale: 1.02 }}
@@ -69,7 +83,8 @@ const CheckoutForm = ({ onSubmit, isSubmitting, deliverySpeed, setDeliverySpeed 
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-6"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Processing..." : "Proceed to Payment"}
+              {isSubmitting ? "Processing..." : 
+                paymentType === "online" ? "Proceed to Payment" : "Complete Order"}
             </Button>
           </motion.div>
         </form>

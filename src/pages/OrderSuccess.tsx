@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Package, Truck, MapPin } from "lucide-react";
+import { CheckCircle, Package, Truck, MapPin, CreditCard, Cash } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Order {
@@ -21,6 +21,8 @@ interface Order {
     phone: string;
   };
   status: string;
+  paymentStatus?: string;
+  paymentMethod?: string;
   estimatedDelivery: string;
   payment_reference?: string;
 }
@@ -37,7 +39,7 @@ const OrderSuccess = () => {
     
     if (foundOrder) {
       // Update order status if coming from payment success
-      if (foundOrder.status === "pending") {
+      if (foundOrder.status === "pending" && foundOrder.paymentMethod !== "cashOnDelivery") {
         const urlParams = new URLSearchParams(window.location.search);
         const reference = urlParams.get("reference");
         
@@ -45,7 +47,7 @@ const OrderSuccess = () => {
           // Update the order with payment reference
           const updatedOrders = orders.map((o: any) => {
             if (o.id === orderId) {
-              return { ...o, status: "processing", payment_reference: reference };
+              return { ...o, status: "processing", payment_reference: reference, paymentStatus: "paid" };
             }
             return o;
           });
@@ -53,6 +55,7 @@ const OrderSuccess = () => {
           localStorage.setItem("orders", JSON.stringify(updatedOrders));
           foundOrder.status = "processing";
           foundOrder.payment_reference = reference;
+          foundOrder.paymentStatus = "paid";
         }
       }
       
@@ -65,6 +68,8 @@ const OrderSuccess = () => {
   if (!order) {
     return null;
   }
+  
+  const isCashOnDelivery = order.paymentMethod === "cashOnDelivery";
   
   return (
     <div className="min-h-screen bg-background/80">
@@ -104,6 +109,19 @@ const OrderSuccess = () => {
                 <p className="text-sm text-white/80">Date: {new Date(order.date).toLocaleDateString()}</p>
                 <p className="text-sm text-white/80">Status: <span className="text-primary font-medium">{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span></p>
                 <p className="text-sm text-white/80">Total: ₵{order.total}</p>
+                <div className="mt-2 flex items-center">
+                  {isCashOnDelivery ? (
+                    <>
+                      <Cash className="h-4 w-4 mr-2 text-amber-400" />
+                      <span className="text-sm text-white/80">Payment: <span className="text-amber-400 font-medium">Pay on Delivery</span></span>
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-4 w-4 mr-2 text-green-400" />
+                      <span className="text-sm text-white/80">Payment: <span className="text-green-400 font-medium">Paid</span></span>
+                    </>
+                  )}
+                </div>
                 {order.payment_reference && (
                   <p className="text-sm text-white/80">Payment Reference: {order.payment_reference}</p>
                 )}

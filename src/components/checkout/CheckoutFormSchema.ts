@@ -42,6 +42,16 @@ export const checkoutSchema = z.object({
   
   // Optional field for scheduled delivery date
   deliveryDate: z.string().optional(),
+  
+  // Payment related fields
+  paymentType: z.enum(["online", "onDelivery"]).default("online"),
+  paymentMethod: z.enum(["card", "mobileMoney", "cashOnDelivery"]).default("card"),
+  mobileNetwork: z.enum(["mtn", "vodafone", "airtelTigo"]).optional(),
+  mobileNumber: z.string().optional(),
+  cardNumber: z.string().optional(),
+  cardName: z.string().optional(),
+  cardExpiry: z.string().optional(),
+  cardCvv: z.string().optional(),
 });
 
 export type CheckoutFormValues = z.infer<typeof checkoutSchema>;
@@ -62,4 +72,12 @@ export const defaultFormValues = {
   deliveryNote: "",
   deliverySpeed: "standard" as const,
   deliveryDate: "",
+  paymentType: "online" as const,
+  paymentMethod: "card" as const,
+  mobileNetwork: "mtn" as const,
+  mobileNumber: "",
+  cardNumber: "",
+  cardName: "",
+  cardExpiry: "",
+  cardCvv: "",
 };

@@ -31,37 +31,88 @@ const Checkout = () => {
     // Calculate total amount in pesewas (Ghana Cedis × 100)
     const totalAmount = (parseFloat(subtotal.replace(/[^\d.]/g, "")) + deliveryFee);
     
-    // Store order information in local storage before redirecting
-    const order = createOrder(
-      orderNumber,
-      cartItems,
-      subtotal,
-      deliveryFee,
-      values,
-      values.deliveryType
-    );
+    // Check if payment type is online or on delivery
+    if (values.paymentType === "online") {
+      // Store order information in local storage before redirecting
+      const order = createOrder(
+        orderNumber,
+        cartItems,
+        subtotal,
+        deliveryFee,
+        values,
+        values.deliveryType
+      );
+      
+      // Get all orders to pass to the payment processor
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      
+      // Process the payment
+      processPayment(
+        values.email,
+        orderNumber,
+        totalAmount,
+        `${values.firstName} ${values.lastName}`,
+        orders,
+        (reference, orderNum) => {
+          clearCart();
+          setIsSubmitting(false);
+          navigate(`/order-success/${orderNum}`);
+        },
+        () => {
+          setIsSubmitting(false);
+        },
+        showLoading,
+        hideLoading
+      );
+    } else {
+      // For pay on delivery, create the order with pending payment status
+      const order = {
+        id: orderNumber,
+        date: new Date().toISOString(),
+        items: cartItems,
+        total: (parseFloat(subtotal.replace(/[^\d.]/g, "")) + deliveryFee).toFixed(2),
+        shipping: {
+          firstName: values.deliveryType === "self" ? values.firstName : values.recipientFirstName,
+          lastName: values.deliveryType === "self" ? values.lastName : values.recipientLastName,
+          address: values.address,
+          city: values.city,
+          postalCode: values.postalCode,
+          phone: values.deliveryType === "self" ? values.phone : values.recipientPhone || values.phone,
+        },
+        status: "processing",
+        paymentStatus: "pending",
+        paymentMethod: "cashOnDelivery",
+        estimatedDelivery: calculateEstimatedDelivery(deliverySpeed),
+      };
+      
+      // Save the order to local storage
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      orders.push(order);
+      localStorage.setItem("orders", JSON.stringify(orders));
+      
+      // Clear cart and navigate to success page
+      clearCart();
+      setIsSubmitting(false);
+      navigate(`/order-success/${orderNumber}`);
+    }
+  };
+  
+  // Calculate estimated delivery date based on delivery speed
+  const calculateEstimatedDelivery = (speed: "standard" | "express" | "scheduled") => {
+    const date = new Date();
     
-    // Get all orders to pass to the payment processor
-    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    if (speed === "express") {
+      // Next business day
+      date.setDate(date.getDate() + 1);
+    } else if (speed === "standard") {
+      // 3-5 business days
+      date.setDate(date.getDate() + 3);
+    } else {
+      // Scheduled (default to 5 days if no specific date)
+      date.setDate(date.getDate() + 5);
+    }
     
-    // Process the payment
-    processPayment(
-      values.email,
-      orderNumber,
-      totalAmount,
-      `${values.firstName} ${values.lastName}`,
-      orders,
-      (reference, orderNum) => {
-        clearCart();
-        setIsSubmitting(false);
-        navigate(`/order-success/${orderNum}`);
-      },
-      () => {
-        setIsSubmitting(false);
-      },
-      showLoading,
-      hideLoading
-    );
+    return date.toISOString();
   };
 
   if (cartItems.length === 0) {

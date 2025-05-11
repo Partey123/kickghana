@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Package, Truck, MapPin, ArrowLeft } from "lucide-react";
+import { CheckCircle, Package, Truck, MapPin, ArrowLeft, CreditCard, Cash } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Order {
@@ -20,6 +20,8 @@ interface Order {
     postalCode: string;
   };
   status: string;
+  paymentStatus?: string;
+  paymentMethod?: string;
   estimatedDelivery: string;
 }
 
@@ -58,7 +60,10 @@ const OrderTracking = () => {
   );
 
   // Define tracking steps
-  const steps = [
+  const isCashOnDelivery = order.paymentMethod === "cashOnDelivery";
+
+  // Different steps for different payment methods
+  const steps = isCashOnDelivery ? [
     { 
       title: "Order Placed", 
       date: new Date(order.date).toLocaleDateString(), 
@@ -72,9 +77,40 @@ const OrderTracking = () => {
       icon: <Package className="h-6 w-6" />
     },
     { 
-      title: "Shipped", 
-      date: new Date(new Date(order.date).getTime() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+      title: "On Route", 
+      date: new Date(new Date(order.date).getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString(),
       completed: progress >= 50,
+      icon: <Truck className="h-6 w-6" />
+    },
+    { 
+      title: "Delivered", 
+      date: new Date(order.estimatedDelivery).toLocaleDateString(),
+      completed: progress >= 90,
+      icon: <MapPin className="h-6 w-6" />
+    },
+    { 
+      title: "Payment Received", 
+      date: "Upon delivery",
+      completed: progress >= 100 && order.paymentStatus === "paid",
+      icon: <Cash className="h-6 w-6" />
+    }
+  ] : [
+    { 
+      title: "Order Placed", 
+      date: new Date(order.date).toLocaleDateString(), 
+      completed: true,
+      icon: <CheckCircle className="h-6 w-6" />
+    },
+    { 
+      title: "Processing", 
+      date: new Date(new Date(order.date).getTime() + 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+      completed: progress >= 33,
+      icon: <Package className="h-6 w-6" />
+    },
+    { 
+      title: "On Route", 
+      date: new Date(new Date(order.date).getTime() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+      completed: progress >= 66,
       icon: <Truck className="h-6 w-6" />
     },
     { 
@@ -111,6 +147,22 @@ const OrderTracking = () => {
             <div className="mt-4 md:mt-0">
               <p className="text-sm text-gray-500">Estimated Delivery</p>
               <p className="font-bold">{new Date(order.estimatedDelivery).toLocaleDateString()}</p>
+              {isCashOnDelivery && (
+                <div className="mt-2 flex items-center">
+                  <Cash className="h-4 w-4 mr-1 text-amber-600" />
+                  <span className="text-sm font-medium text-amber-600">
+                    Payment on Delivery
+                  </span>
+                </div>
+              )}
+              {!isCashOnDelivery && (
+                <div className="mt-2 flex items-center">
+                  <CreditCard className="h-4 w-4 mr-1 text-green-600" />
+                  <span className="text-sm font-medium text-green-600">
+                    Payment Completed
+                  </span>
+                </div>
+              )}
             </div>
           </div>
           
@@ -172,6 +224,16 @@ const OrderTracking = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total:</span>
                   <span className="font-bold">₵{order.total}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Payment Method:</span>
+                  <span>{isCashOnDelivery ? "Cash on Delivery" : "Online Payment"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Payment Status:</span>
+                  <span className={`${isCashOnDelivery && order.paymentStatus !== 'paid' ? "text-amber-600" : "text-green-600"} font-medium`}>
+                    {isCashOnDelivery && order.paymentStatus !== 'paid' ? "Pending" : "Paid"}
+                  </span>
                 </div>
               </div>
             </div>
