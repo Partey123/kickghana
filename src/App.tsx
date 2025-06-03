@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +27,7 @@ import PromotionDetail from "./pages/PromotionDetail";
 import Accessories from "./pages/Accessories";
 import Wishlist from "./pages/Wishlist";
 import Collections from "./pages/Collections";
+import ZapierConfig from "./pages/admin/ZapierConfig";
 import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
 
