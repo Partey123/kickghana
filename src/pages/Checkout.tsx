@@ -11,6 +11,7 @@ import { calculateDeliveryFee } from "@/components/checkout/DeliveryFeeCalculato
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import { CheckoutFormValues } from "@/components/checkout/CheckoutFormSchema";
 import { createOrder, processPayment } from "@/components/checkout/PaymentProcessor";
+import { sendOrderNotification } from "@/components/checkout/EmailNotification";
 
 const Checkout = () => {
   const { cartItems, subtotal, clearCart, totalItems } = useCart();
@@ -22,7 +23,7 @@ const Checkout = () => {
   // Calculate delivery fee based on item count and delivery speed
   const deliveryFee = calculateDeliveryFee(totalItems, deliverySpeed);
   
-  const handleCheckout = (values: CheckoutFormValues) => {
+  const handleCheckout = async (values: CheckoutFormValues) => {
     setIsSubmitting(true);
     
     // Generate order number
@@ -30,6 +31,34 @@ const Checkout = () => {
     
     // Calculate total amount in pesewas (Ghana Cedis × 100)
     const totalAmount = (parseFloat(subtotal.replace(/[^\d.]/g, "")) + deliveryFee);
+    
+    // Prepare checkout details for email notification
+    const checkoutDetails = {
+      orderNumber,
+      customerInfo: {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        address: values.address,
+        city: values.city,
+        postalCode: values.postalCode,
+      },
+      recipientInfo: values.deliveryType === "other" ? {
+        firstName: values.recipientFirstName,
+        lastName: values.recipientLastName,
+        phone: values.recipientPhone,
+      } : undefined,
+      items: cartItems,
+      total: subtotal,
+      deliveryFee,
+      paymentMethod: values.paymentMethod,
+      paymentType: values.paymentType,
+      deliveryType: values.deliveryType,
+    };
+
+    // Send email notification in the background
+    sendOrderNotification(checkoutDetails);
     
     // Check if payment type is online or on delivery
     if (values.paymentType === "online") {

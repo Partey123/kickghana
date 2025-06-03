@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -68,6 +67,7 @@ const App = () => (
                       <Route path="/accessories" element={<Accessories />} />
                       <Route path="/wishlist" element={<Wishlist />} />
                       <Route path="/collections" element={<Collections />} />
+                      <Route path="/admin/zapier" element={<ZapierConfig />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
