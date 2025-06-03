@@ -27,18 +27,17 @@ interface CheckoutDetails {
 
 export const sendOrderNotification = async (
   checkoutDetails: CheckoutDetails,
-  webhookUrl?: string
+  adminWebhookUrl?: string,
+  customerWebhookUrl?: string
 ) => {
-  // Get webhook URL from localStorage or use provided one
-  const zapierWebhookUrl = webhookUrl || localStorage.getItem("zapier_webhook_url") || "";
+  // Get webhook URLs from localStorage or use provided ones
+  const zapierAdminWebhookUrl = adminWebhookUrl || localStorage.getItem("zapier_admin_webhook_url") || "";
+  const zapierCustomerWebhookUrl = customerWebhookUrl || localStorage.getItem("zapier_customer_webhook_url") || "";
   
-  if (!zapierWebhookUrl) {
-    console.log("No Zapier webhook URL configured - skipping email notification");
-    return;
-  }
-
-  const emailData = {
-    subject: `New Order #${checkoutDetails.orderNumber} - SneakerHub`,
+  // Prepare admin email data (detailed order info for you)
+  const adminEmailData = {
+    type: "admin_notification",
+    subject: `🛒 New Order #${checkoutDetails.orderNumber} - SneakerHub`,
     orderNumber: checkoutDetails.orderNumber,
     timestamp: new Date().toISOString(),
     customer: {
@@ -70,24 +69,68 @@ export const sendOrderNotification = async (
     },
     deliveryType: checkoutDetails.deliveryType === "self" ? "Self Delivery" : "Deliver to Someone Else",
     websiteUrl: window.location.origin,
+    adminEmail: "poundsghst@gmail.com",
   };
 
-  try {
-    console.log("Sending order notification to Zapier:", emailData);
-    
-    await fetch(zapierWebhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      mode: "no-cors", // Handle CORS issues
-      body: JSON.stringify(emailData),
-    });
+  // Prepare customer email data (confirmation for customer)
+  const customerEmailData = {
+    type: "customer_notification",
+    subject: `Order Confirmation #${checkoutDetails.orderNumber} - SneakerHub`,
+    orderNumber: checkoutDetails.orderNumber,
+    timestamp: new Date().toISOString(),
+    customerName: `${checkoutDetails.customerInfo.firstName} ${checkoutDetails.customerInfo.lastName}`,
+    customerEmail: checkoutDetails.customerInfo.email,
+    orderTotal: (parseFloat(checkoutDetails.total.replace(/[^\d.]/g, "")) + checkoutDetails.deliveryFee).toFixed(2),
+    itemCount: checkoutDetails.items.reduce((sum, item) => sum + item.quantity, 0),
+    paymentStatus: checkoutDetails.paymentType === "onDelivery" ? "Pay on Delivery" : "Processing Payment",
+    deliveryAddress: `${checkoutDetails.customerInfo.address}, ${checkoutDetails.customerInfo.city}, ${checkoutDetails.customerInfo.postalCode}`,
+    websiteUrl: window.location.origin,
+    supportEmail: "support@sneakerhub.com",
+  };
 
-    console.log("Order notification sent successfully to Zapier");
-    
-  } catch (error) {
-    console.error("Error sending order notification:", error);
-    // Don't show error to user as this is a background process
+  // Send admin notification
+  if (zapierAdminWebhookUrl) {
+    try {
+      console.log("Sending admin notification to Zapier:", adminEmailData);
+      
+      await fetch(zapierAdminWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify(adminEmailData),
+      });
+
+      console.log("Admin notification sent successfully to Zapier");
+      
+    } catch (error) {
+      console.error("Error sending admin notification:", error);
+    }
+  } else {
+    console.log("No admin Zapier webhook URL configured - skipping admin notification");
+  }
+
+  // Send customer notification
+  if (zapierCustomerWebhookUrl) {
+    try {
+      console.log("Sending customer notification to Zapier:", customerEmailData);
+      
+      await fetch(zapierCustomerWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify(customerEmailData),
+      });
+
+      console.log("Customer notification sent successfully to Zapier");
+      
+    } catch (error) {
+      console.error("Error sending customer notification:", error);
+    }
+  } else {
+    console.log("No customer Zapier webhook URL configured - skipping customer notification");
   }
 };
