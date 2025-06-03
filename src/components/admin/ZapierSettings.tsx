@@ -5,92 +5,84 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ExternalLink, Zap, Mail, User } from "lucide-react";
+import { Zap, Mail } from "lucide-react";
 
 const ZapierSettings = () => {
-  const [adminWebhookUrl, setAdminWebhookUrl] = useState(
-    localStorage.getItem("zapier_admin_webhook_url") || ""
+  const [webhookUrl, setWebhookUrl] = useState(
+    localStorage.getItem("zapier_webhook_url") || ""
   );
-  const [customerWebhookUrl, setCustomerWebhookUrl] = useState(
-    localStorage.getItem("zapier_customer_webhook_url") || ""
-  );
-  const [isTestingAdmin, setIsTestingAdmin] = useState(false);
-  const [isTestingCustomer, setIsTestingCustomer] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
 
-  const handleSaveWebhooks = () => {
-    if (!adminWebhookUrl && !customerWebhookUrl) {
+  const handleSaveWebhook = () => {
+    if (!webhookUrl) {
       toast({
         title: "Error",
-        description: "Please enter at least one Zapier webhook URL",
+        description: "Please enter your Zapier webhook URL",
         variant: "destructive",
       });
       return;
     }
 
-    if (adminWebhookUrl) {
-      localStorage.setItem("zapier_admin_webhook_url", adminWebhookUrl);
-    }
-    if (customerWebhookUrl) {
-      localStorage.setItem("zapier_customer_webhook_url", customerWebhookUrl);
-    }
+    localStorage.setItem("zapier_webhook_url", webhookUrl);
     
     toast({
       title: "Success",
-      description: "Zapier webhook URLs saved successfully",
+      description: "Zapier webhook URL saved successfully",
     });
   };
 
-  const handleTestAdminWebhook = async () => {
-    if (!adminWebhookUrl) {
+  const handleTestWebhook = async () => {
+    if (!webhookUrl) {
       toast({
         title: "Error",
-        description: "Please enter your admin Zapier webhook URL first",
+        description: "Please enter your Zapier webhook URL first",
         variant: "destructive",
       });
       return;
     }
 
-    setIsTestingAdmin(true);
-    console.log("Testing admin Zapier webhook:", adminWebhookUrl);
+    setIsTesting(true);
+    console.log("Testing Zapier webhook:", webhookUrl);
 
     try {
       const testData = {
-        type: "admin_notification",
-        test: true,
-        subject: "🛒 Test Order #TEST-123456 - SneakerHub",
         orderNumber: "TEST-123456",
         timestamp: new Date().toISOString(),
-        customer: {
-          name: "Test Customer",
-          email: "test@example.com",
-          phone: "+233 123 456 789",
-          address: "Test Address, Test City, 12345",
-        },
-        orderDetails: {
-          items: [
-            {
-              name: "Test Sneaker",
-              quantity: 1,
-              price: "₵100",
-              color: "Red",
-              size: "42",
-            },
-          ],
-          subtotal: "₵100",
-          deliveryFee: 15,
-          total: "115.00",
-        },
-        paymentInfo: {
-          method: "card",
-          type: "online",
-          status: "Processing",
-        },
+        customerName: "John Doe",
+        customerEmail: "john.doe@example.com",
+        customerPhone: "+233 123 456 789",
+        customerAddress: "123 Test Street, Accra, 12345",
+        recipientName: null,
+        recipientPhone: null,
+        items: [
+          {
+            name: "Air Jordan 1 Retro",
+            quantity: 1,
+            price: "₵250",
+            color: "Red/Black",
+            size: "42",
+          },
+          {
+            name: "Nike Air Max 90",
+            quantity: 2,
+            price: "₵180",
+            color: "White/Blue",
+            size: "41",
+          },
+        ],
+        subtotal: "₵610",
+        deliveryFee: 15,
+        totalAmount: "625.00",
+        paymentMethod: "card",
+        paymentType: "online",
+        paymentStatus: "Processing Payment",
         deliveryType: "Self Delivery",
         websiteUrl: window.location.origin,
-        adminEmail: "poundsghst@gmail.com",
+        itemCount: 3,
+        testOrder: true,
       };
 
-      await fetch(adminWebhookUrl, {
+      await fetch(webhookUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -100,160 +92,68 @@ const ZapierSettings = () => {
       });
 
       toast({
-        title: "Admin Test Sent",
-        description: "Test admin notification sent successfully. Check your email at poundsghst@gmail.com",
+        title: "Test Sent Successfully",
+        description: "Test order data sent to Zapier. Check your Zap's history to confirm it was received.",
       });
     } catch (error) {
-      console.error("Error testing admin webhook:", error);
+      console.error("Error testing webhook:", error);
       toast({
         title: "Error",
-        description: "Failed to send test admin webhook. Please check the URL and try again.",
+        description: "Failed to send test webhook. Please check the URL and try again.",
         variant: "destructive",
       });
     } finally {
-      setIsTestingAdmin(false);
-    }
-  };
-
-  const handleTestCustomerWebhook = async () => {
-    if (!customerWebhookUrl) {
-      toast({
-        title: "Error",
-        description: "Please enter your customer Zapier webhook URL first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsTestingCustomer(true);
-    console.log("Testing customer Zapier webhook:", customerWebhookUrl);
-
-    try {
-      const testData = {
-        type: "customer_notification",
-        test: true,
-        subject: "Order Confirmation #TEST-123456 - SneakerHub",
-        orderNumber: "TEST-123456",
-        timestamp: new Date().toISOString(),
-        customerName: "Test Customer",
-        customerEmail: "test@example.com",
-        orderTotal: "115.00",
-        itemCount: 1,
-        paymentStatus: "Processing Payment",
-        deliveryAddress: "Test Address, Test City, 12345",
-        websiteUrl: window.location.origin,
-        supportEmail: "support@sneakerhub.com",
-      };
-
-      await fetch(customerWebhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "no-cors",
-        body: JSON.stringify(testData),
-      });
-
-      toast({
-        title: "Customer Test Sent",
-        description: "Test customer notification sent successfully. Check Zapier history for confirmation.",
-      });
-    } catch (error) {
-      console.error("Error testing customer webhook:", error);
-      toast({
-        title: "Error",
-        description: "Failed to send test customer webhook. Please check the URL and try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsTestingCustomer(false);
+      setIsTesting(false);
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Admin Webhook Card */}
+      {/* Main Webhook Configuration */}
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            Admin Email Notifications
+            Order Notifications
           </CardTitle>
           <CardDescription>
-            Configure Zapier to send order notifications to your admin email (poundsghst@gmail.com)
+            Configure Zapier to receive detailed order information when customers place orders
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="admin-webhook-url">Admin Zapier Webhook URL</Label>
+            <Label htmlFor="webhook-url">Zapier Webhook URL</Label>
             <Input
-              id="admin-webhook-url"
+              id="webhook-url"
               type="url"
               placeholder="https://hooks.zapier.com/hooks/catch/..."
-              value={adminWebhookUrl}
-              onChange={(e) => setAdminWebhookUrl(e.target.value)}
+              value={webhookUrl}
+              onChange={(e) => setWebhookUrl(e.target.value)}
             />
             <p className="text-sm text-muted-foreground">
-              This webhook will send detailed order information to poundsghst@gmail.com
+              This webhook will receive comprehensive order details including customer info, items, payment details, and delivery information
             </p>
           </div>
 
           <Button
             variant="outline"
-            onClick={handleTestAdminWebhook}
-            disabled={isTestingAdmin}
+            onClick={handleTestWebhook}
+            disabled={isTesting}
             className="w-full"
           >
-            {isTestingAdmin ? "Testing Admin Webhook..." : "Test Admin Webhook"}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Customer Webhook Card */}
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Customer Email Notifications
-          </CardTitle>
-          <CardDescription>
-            Configure Zapier to send order confirmations to customers
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="customer-webhook-url">Customer Zapier Webhook URL</Label>
-            <Input
-              id="customer-webhook-url"
-              type="url"
-              placeholder="https://hooks.zapier.com/hooks/catch/..."
-              value={customerWebhookUrl}
-              onChange={(e) => setCustomerWebhookUrl(e.target.value)}
-            />
-            <p className="text-sm text-muted-foreground">
-              This webhook will send order confirmations to customers' email addresses
-            </p>
-          </div>
-
-          <Button
-            variant="outline"
-            onClick={handleTestCustomerWebhook}
-            disabled={isTestingCustomer}
-            className="w-full"
-          >
-            {isTestingCustomer ? "Testing Customer Webhook..." : "Test Customer Webhook"}
+            {isTesting ? "Testing Webhook..." : "Test Webhook"}
           </Button>
         </CardContent>
       </Card>
 
       {/* Save Button */}
       <div className="flex justify-center">
-        <Button onClick={handleSaveWebhooks} className="w-full max-w-2xl">
-          Save All Webhook URLs
+        <Button onClick={handleSaveWebhook} className="w-full max-w-2xl">
+          Save Webhook URL
         </Button>
       </div>
 
-      {/* Instructions */}
+      {/* Setup Instructions */}
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -264,26 +164,21 @@ const ZapierSettings = () => {
         <CardContent>
           <div className="space-y-4">
             <div>
-              <h4 className="font-medium mb-2">For Admin Notifications:</h4>
-              <ol className="text-sm space-y-1 list-decimal list-inside">
-                <li>Create a Zap with "Webhooks by Zapier" trigger</li>
-                <li>Set Gmail action to send to poundsghst@gmail.com</li>
-                <li>Use webhook data for detailed order information</li>
-              </ol>
-            </div>
-            
-            <div>
-              <h4 className="font-medium mb-2">For Customer Notifications:</h4>
-              <ol className="text-sm space-y-1 list-decimal list-inside">
-                <li>Create another Zap with "Webhooks by Zapier" trigger</li>
-                <li>Set Gmail action to send to {{customerEmail}}</li>
-                <li>Use webhook data for order confirmation details</li>
+              <h4 className="font-medium mb-2">How to Set Up Your Zap:</h4>
+              <ol className="text-sm space-y-2 list-decimal list-inside">
+                <li>Go to Zapier and create a new Zap</li>
+                <li>Choose "Webhooks by Zapier" as your trigger</li>
+                <li>Select "Catch Hook" as the trigger event</li>
+                <li>Copy the webhook URL and paste it above</li>
+                <li>Choose your action (Email, Slack, Google Sheets, etc.)</li>
+                <li>Map the webhook data to your action fields</li>
+                <li>Test your Zap to make sure it works</li>
               </ol>
             </div>
             
             <div className="bg-muted/50 p-3 rounded-lg">
               <p className="text-sm">
-                <strong>Pro Tip:</strong> You can use the provided webhook URL for both admin and customer notifications, or create separate webhooks for better organization.
+                <strong>Available Data Fields:</strong> orderNumber, customerName, customerEmail, customerPhone, customerAddress, items, subtotal, deliveryFee, totalAmount, paymentMethod, paymentStatus, deliveryType, itemCount, and more.
               </p>
             </div>
           </div>
