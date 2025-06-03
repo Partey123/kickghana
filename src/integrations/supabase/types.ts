@@ -253,6 +253,113 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          address: Json | null
+          created_at: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: Json | null
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: Json | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      promotion_rules: {
+        Row: {
+          created_at: string | null
+          id: string
+          promotion_id: string | null
+          type: Database["public"]["Enums"]["rule_type"]
+          value: Json
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          promotion_id?: string | null
+          type: Database["public"]["Enums"]["rule_type"]
+          value: Json
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          promotion_id?: string | null
+          type?: Database["public"]["Enums"]["rule_type"]
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotion_rules_promotion_id_fkey"
+            columns: ["promotion_id"]
+            isOneToOne: false
+            referencedRelation: "promotions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promotions: {
+        Row: {
+          code: string | null
+          created_at: string | null
+          description: string | null
+          ends_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          starts_at: string
+          type: Database["public"]["Enums"]["promotion_type"]
+          updated_at: string | null
+          usage_count: number | null
+          usage_limit: number | null
+          value: number
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string | null
+          description?: string | null
+          ends_at: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          starts_at: string
+          type: Database["public"]["Enums"]["promotion_type"]
+          updated_at?: string | null
+          usage_count?: number | null
+          usage_limit?: number | null
+          value: number
+        }
+        Update: {
+          code?: string | null
+          created_at?: string | null
+          description?: string | null
+          ends_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          starts_at?: string
+          type?: Database["public"]["Enums"]["promotion_type"]
+          updated_at?: string | null
+          usage_count?: number | null
+          usage_limit?: number | null
+          value?: number
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           comment: string | null
@@ -297,6 +404,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_settings: {
+        Row: {
+          created_at: string
+          general_settings: Json
+          id: string
+          notification_settings: Json
+          security_settings: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          general_settings?: Json
+          id?: string
+          notification_settings?: Json
+          security_settings?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          general_settings?: Json
+          id?: string
+          notification_settings?: Json
+          security_settings?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       users: {
         Row: {
@@ -372,7 +509,17 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      promotion_type:
+        | "percentage"
+        | "fixed_amount"
+        | "buy_x_get_y"
+        | "free_shipping"
+      rule_type:
+        | "minimum_purchase"
+        | "specific_products"
+        | "specific_categories"
+        | "first_time_customer"
+        | "specific_customers"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -487,6 +634,20 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      promotion_type: [
+        "percentage",
+        "fixed_amount",
+        "buy_x_get_y",
+        "free_shipping",
+      ],
+      rule_type: [
+        "minimum_purchase",
+        "specific_products",
+        "specific_categories",
+        "first_time_customer",
+        "specific_customers",
+      ],
+    },
   },
 } as const

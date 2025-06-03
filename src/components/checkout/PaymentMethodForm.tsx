@@ -2,7 +2,7 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CreditCard, Phone, Cash } from "lucide-react";
+import { CreditCard, Phone, DollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 type PaymentMethodFormProps = {
@@ -55,7 +55,7 @@ const PaymentMethodForm = ({ form, paymentMethod, paymentType, setPaymentType }:
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center">
-                          <Cash className="mr-2 h-4 w-4 text-secondary" />
+                          <DollarSign className="mr-2 h-4 w-4 text-secondary" />
                           <CardTitle className="text-base">Pay on Delivery</CardTitle>
                         </div>
                         <CardDescription>Pay when your order arrives</CardDescription>
@@ -247,7 +247,7 @@ const PaymentMethodForm = ({ form, paymentMethod, paymentType, setPaymentType }:
       {paymentType === "onDelivery" && (
         <div className="mt-4 p-4 bg-white/10 rounded-lg">
           <div className="flex items-center mb-3">
-            <Cash className="h-5 w-5 mr-2 text-primary" />
+            <DollarSign className="h-5 w-5 mr-2 text-primary" />
             <span className="font-medium text-white">Pay on Delivery Details</span>
           </div>
           <p className="text-sm text-white/80 mb-4">

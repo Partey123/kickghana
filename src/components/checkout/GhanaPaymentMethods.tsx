@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
-import { Phone, CreditCard, Package } from "lucide-react";
+import { Phone, CreditCard, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface GhanaPaymentMethodsProps {
@@ -107,7 +107,7 @@ export function GhanaPaymentMethods({ onSelect }: GhanaPaymentMethodsProps) {
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="cod" id="cod" />
             <Label htmlFor="cod" className="flex items-center gap-2">
-              <Package size={18} />
+              <DollarSign size={18} />
               Cash on Delivery
             </Label>
           </div>

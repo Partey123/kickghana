@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Package, Truck, MapPin, CreditCard, Cash } from "lucide-react";
+import { CheckCircle, Package, Truck, MapPin, CreditCard, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Order {
@@ -112,7 +111,7 @@ const OrderSuccess = () => {
                 <div className="mt-2 flex items-center">
                   {isCashOnDelivery ? (
                     <>
-                      <Cash className="h-4 w-4 mr-2 text-amber-400" />
+                      <DollarSign className="h-4 w-4 mr-2 text-amber-400" />
                       <span className="text-sm text-white/80">Payment: <span className="text-amber-400 font-medium">Pay on Delivery</span></span>
                     </>
                   ) : (
