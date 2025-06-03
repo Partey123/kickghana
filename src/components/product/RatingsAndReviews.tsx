@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -78,7 +79,7 @@ export function RatingsAndReviews({ productId, initialReviews = [] }: RatingsAnd
       id: `review-${Date.now()}`,
       productId,
       userId: user.id,
-      userName: user.displayName || "Anonymous",
+      userName: user.user_metadata?.full_name || user.email?.split('@')[0] || "Anonymous",
       rating: newReview.rating,
       comment: newReview.comment,
       date: new Date().toISOString(),

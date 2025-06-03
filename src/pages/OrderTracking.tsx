@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Package, Truck, MapPin, ArrowLeft, CreditCard, Cash } from "lucide-react";
+import { CheckCircle, Package, Truck, MapPin, ArrowLeft, CreditCard, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Order {
@@ -92,7 +91,7 @@ const OrderTracking = () => {
       title: "Payment Received", 
       date: "Upon delivery",
       completed: progress >= 100 && order.paymentStatus === "paid",
-      icon: <Cash className="h-6 w-6" />
+      icon: <DollarSign className="h-6 w-6" />
     }
   ] : [
     { 
@@ -149,7 +148,7 @@ const OrderTracking = () => {
               <p className="font-bold">{new Date(order.estimatedDelivery).toLocaleDateString()}</p>
               {isCashOnDelivery && (
                 <div className="mt-2 flex items-center">
-                  <Cash className="h-4 w-4 mr-1 text-amber-600" />
+                  <DollarSign className="h-4 w-4 mr-1 text-amber-600" />
                   <span className="text-sm font-medium text-amber-600">
                     Payment on Delivery
                   </span>

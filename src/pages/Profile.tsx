@@ -34,13 +34,13 @@ const Profile = () => {
       id: "ORD-2025-1432",
       date: "May 7, 2025",
       total: "₵1,450",
-      status: "Delivered",
+      status: "Delivered" as const,
     },
     {
       id: "ORD-2025-1398",
       date: "April 23, 2025",
       total: "₵850",
-      status: "Processing",
+      status: "Processing" as const,
     }
   ];
 
