@@ -4,6 +4,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useSupabaseWishlist } from "@/hooks/useSupabaseWishlist";
+import { useAuth } from "@/contexts/AuthContext";
 import { featuredSneakers } from "@/data/products";
 
 interface WishlistTabProps {
@@ -13,7 +15,28 @@ interface WishlistTabProps {
 
 const WishlistTab = ({ wishlistIds, onAddToCart }: WishlistTabProps) => {
   const navigate = useNavigate();
-  const wishlistItems = wishlistIds.map(id => featuredSneakers.find(p => p.id === id)).filter(Boolean);
+  const { user } = useAuth();
+  const { wishlistItems, loading } = useSupabaseWishlist();
+
+  // Use Supabase data if user is logged in, otherwise fall back to local data
+  const wishlistProducts = user 
+    ? wishlistItems.map(item => ({
+        id: parseInt(item.product?.id || '0'),
+        name: item.product?.name || '',
+        price: `₵${item.product?.price || 0}`,
+        image: item.product?.image_url || '/sneaker1.png'
+      }))
+    : wishlistIds.map(id => featuredSneakers.find(p => p.id === id)).filter(Boolean);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="py-8">
+          <div className="text-center">Loading wishlist...</div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <motion.div
@@ -27,9 +50,9 @@ const WishlistTab = ({ wishlistIds, onAddToCart }: WishlistTabProps) => {
           <CardDescription>Items you've saved for later</CardDescription>
         </CardHeader>
         <CardContent>
-          {wishlistItems.length > 0 ? (
+          {wishlistProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {wishlistItems.map((product, index) => (
+              {wishlistProducts.map((product, index) => (
                 <motion.div 
                   key={`${product?.id}-${index}`}
                   initial={{ opacity: 0, scale: 0.9 }}

@@ -3,57 +3,57 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSupabaseWishlist } from "@/hooks/useSupabaseWishlist";
 import { featuredSneakers } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Trash, Heart } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { accessories } from "@/data/promotions";
 
 const Wishlist = () => {
+  const { user } = useAuth();
   const { wishlist, addToWishlist, addToCart, cartItems } = useCart();
-  const [wishlistItems, setWishlistItems] = useState<any[]>([]);
+  const { wishlistItems, loading, toggleWishlist } = useSupabaseWishlist();
+  const [displayItems, setDisplayItems] = useState<any[]>([]);
   
   useEffect(() => {
-    // Get wishlist items from both featured sneakers and accessories
-    const sneakerItems = wishlist
-      .map(id => {
-        const sneaker = featuredSneakers.find(item => item.id === id);
-        if (sneaker) {
-          return {
-            ...sneaker,
-            type: 'sneaker'
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-      
-    const accessoryItems = wishlist
-      .filter(id => id >= 2000)  // Accessories have IDs >= 2000
-      .map(id => {
-        // Find a random accessory since we don't have exact matches
-        const randomIndex = Math.floor(Math.random() * accessories.length);
-        const accessory = accessories[randomIndex];
-        if (accessory) {
-          return {
-            id,
-            name: accessory.name,
-            price: accessory.price,
-            image: accessory.image || "https://images.unsplash.com/photo-1585241645927-c7a8e5840c42",
-            type: 'accessory'
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-      
-    setWishlistItems([...sneakerItems, ...accessoryItems] as any[]);
-  }, [wishlist]);
+    if (user) {
+      // Use Supabase wishlist for logged-in users
+      const supabaseItems = wishlistItems.map(item => ({
+        id: parseInt(item.product?.id || '0'),
+        name: item.product?.name || '',
+        price: `₵${item.product?.price || 0}`,
+        image: item.product?.image_url || '/sneaker1.png',
+        type: 'sneaker'
+      }));
+      setDisplayItems(supabaseItems);
+    } else {
+      // Use local wishlist for guest users
+      const sneakerItems = wishlist
+        .map(id => {
+          const sneaker = featuredSneakers.find(item => item.id === id);
+          if (sneaker) {
+            return {
+              ...sneaker,
+              type: 'sneaker'
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
+      setDisplayItems(sneakerItems as any[]);
+    }
+  }, [wishlist, wishlistItems, user]);
   
-  const handleRemoveFromWishlist = (id: number) => {
-    addToWishlist(id);
+  const handleRemoveFromWishlist = async (id: number) => {
+    if (user) {
+      await toggleWishlist(id.toString());
+    } else {
+      addToWishlist(id);
+    }
+    
     toast({
       title: "Item removed",
       description: "The item has been removed from your wishlist",
@@ -78,6 +78,18 @@ const Wishlist = () => {
   const isInCart = (id: number) => {
     return cartItems.some(item => item.id === id);
   };
+
+  if (loading && user) {
+    return (
+      <div className="min-h-screen bg-background/80">
+        <Navbar />
+        <div className="container mx-auto px-4 py-24">
+          <div className="text-center py-20">Loading wishlist...</div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen bg-background/80">
@@ -86,7 +98,7 @@ const Wishlist = () => {
       <div className="container mx-auto px-4 py-24">
         <h1 className="text-3xl md:text-4xl font-bold mt-8 mb-8 text-center">My Wishlist</h1>
         
-        {wishlistItems.length === 0 ? (
+        {displayItems.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center">
               <Heart size={32} className="text-muted-foreground" />
@@ -99,7 +111,7 @@ const Wishlist = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {wishlistItems.map((item, i) => (
+            {displayItems.map((item, i) => (
               <motion.div 
                 key={`${item.id}-${i}`}
                 initial={{ opacity: 0, y: 20 }}
