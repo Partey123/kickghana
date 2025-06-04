@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -121,16 +122,12 @@ const ProductDetail = () => {
   
   const incrementQuantity = () => setQuantity(prev => prev + 1);
   const decrementQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
-  
-  const handleCartClick = () => {
-    navigate("/cart");
-  };
 
   // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50/80 to-amber-100/80">
-        <Navbar cartItemsCount={totalItems} onCartClick={handleCartClick} />
+        <Navbar />
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
@@ -147,7 +144,7 @@ const ProductDetail = () => {
   if (!product) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50/80 to-amber-100/80">
-        <Navbar cartItemsCount={totalItems} onCartClick={handleCartClick} />
+        <Navbar />
         <div className="container mx-auto px-4 py-8">
           <Button 
             variant="ghost" 
@@ -181,7 +178,7 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50/80 to-amber-100/80">
-      <Navbar cartItemsCount={totalItems} onCartClick={handleCartClick} />
+      <Navbar />
       
       <div className="container mx-auto px-4 py-8">
         <Button 

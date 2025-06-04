@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -122,7 +123,7 @@ const OrderTracking = () => {
 
   return (
     <div className="min-h-screen bg-background/80">
-      <Navbar cartItemsCount={0} />
+      <Navbar />
       
       <div className="max-w-4xl mx-auto px-4 py-16">
         <Button 
