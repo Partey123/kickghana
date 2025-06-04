@@ -27,7 +27,7 @@ import PromotionDetail from "./pages/PromotionDetail";
 import Accessories from "./pages/Accessories";
 import Wishlist from "./pages/Wishlist";
 import Collections from "./pages/Collections";
-import ZapierConfig from "./pages/admin/ZapierConfig";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
 
@@ -69,7 +69,7 @@ const App = () => (
                       <Route path="/accessories" element={<Accessories />} />
                       <Route path="/wishlist" element={<Wishlist />} />
                       <Route path="/collections" element={<Collections />} />
-                      <Route path="/admin/zapier" element={<ZapierConfig />} />
+                      <Route path="/admin/dashboard" element={<AdminDashboard />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>

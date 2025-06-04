@@ -1,24 +1,24 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
-import ZapierSettings from "@/components/admin/ZapierSettings";
+import AdminDashboard from "@/components/admin/AdminDashboard";
 
-const ZapierConfig = () => {
+const AdminDashboardPage = () => {
   return (
     <div className="min-h-screen bg-background/80">
       <Navbar cartItemsCount={0} />
       
-      <div className="max-w-4xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Email Notifications Setup
+            Admin Dashboard
           </h1>
           <p className="text-white/80 max-w-2xl mx-auto">
-            Configure Zapier to automatically send order notifications to your email when customers place orders.
+            Monitor and manage all orders, customer information, and store analytics in real-time.
           </p>
         </div>
         
-        <ZapierSettings />
+        <AdminDashboard />
       </div>
       
       <Footer />
@@ -26,4 +26,4 @@ const ZapierConfig = () => {
   );
 };
 
-export default ZapierConfig;
+export default AdminDashboardPage;
