@@ -17,10 +17,26 @@ interface FeaturedProductsProps {
 const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: FeaturedProductsProps) => {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [products, setProducts] = useState<Product[]>(featuredSneakers);
   const categories = ["All", "Running", "Basketball", "Casual", "Traditional", "Training"];
   const navigate = useNavigate();
   const { showLoading, hideLoading } = useLoading();
   
+  useEffect(() => {
+    loadProducts();
+    
+    // Listen for product updates from admin dashboard
+    const handleProductsUpdate = (event: CustomEvent) => {
+      setProducts(event.detail);
+    };
+    
+    window.addEventListener('productsUpdated', handleProductsUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('productsUpdated', handleProductsUpdate as EventListener);
+    };
+  }, []);
+
   useEffect(() => {
     // Only show loading if data isn't loaded yet
     if (!dataLoaded) {
@@ -38,6 +54,25 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
       };
     }
   }, [dataLoaded, showLoading, hideLoading]);
+
+  const loadProducts = () => {
+    // Check for updated products from admin dashboard
+    const updatedProducts = localStorage.getItem("app_products");
+    if (updatedProducts) {
+      try {
+        const parsedProducts = JSON.parse(updatedProducts);
+        setProducts(parsedProducts);
+      } catch (error) {
+        console.error("Error parsing updated products:", error);
+        setProducts(featuredSneakers);
+      }
+    } else {
+      // Load custom products and combine with featured sneakers
+      const customProducts = JSON.parse(localStorage.getItem("admin_products") || "[]");
+      const allProducts = [...featuredSneakers, ...customProducts];
+      setProducts(allProducts);
+    }
+  };
   
   const handleAddToCart = (product: Product) => {
     addToCart({
@@ -56,8 +91,8 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
   };
   
   const filteredProducts = activeCategory === "All" 
-    ? featuredSneakers 
-    : featuredSneakers.filter(product => product.category === activeCategory);
+    ? products 
+    : products.filter(product => product.category === activeCategory);
 
   return (
     <section id="featured-products" className="py-20 px-4 md:px-8">

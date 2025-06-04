@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,16 +60,32 @@ const ProductsManagement = () => {
   });
 
   useEffect(() => {
-    const localProducts = JSON.parse(localStorage.getItem("admin_products") || "[]");
-    const allProducts = [...featuredSneakers, ...localProducts];
+    loadProducts();
+  }, []);
+
+  const loadProducts = () => {
+    // Load custom products from localStorage
+    const customProducts = JSON.parse(localStorage.getItem("admin_products") || "[]");
     
-    const productsWithStock = allProducts.map(product => ({
+    // Combine with featured sneakers and ensure all have stock property
+    const allProducts = [...featuredSneakers, ...customProducts].map(product => ({
       ...product,
       stock: product.stock || Math.floor(Math.random() * 50) + 10
     }));
     
-    setProducts(productsWithStock);
-  }, []);
+    setProducts(allProducts);
+    
+    // Update the main products data that the app uses
+    updateMainProductsData(allProducts);
+  };
+
+  const updateMainProductsData = (updatedProducts: Product[]) => {
+    // Update the products data that the main app uses
+    localStorage.setItem("app_products", JSON.stringify(updatedProducts));
+    
+    // Trigger a custom event to notify other parts of the app about product updates
+    window.dispatchEvent(new CustomEvent('productsUpdated', { detail: updatedProducts }));
+  };
 
   const saveProduct = () => {
     if (!newProduct.name || !newProduct.price || !newProduct.category) {
@@ -84,38 +99,43 @@ const ProductsManagement = () => {
 
     const productToSave: Product = {
       ...newProduct,
-      id: Date.now(),
+      id: isEditingProduct && selectedProduct ? selectedProduct.id : Date.now(),
       colors: newProduct.colors ? newProduct.colors.split(',').map(c => c.trim()) : [],
       sizes: newProduct.sizes ? newProduct.sizes.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s)) : [],
     };
 
+    let updatedProducts: Product[];
+
     if (isEditingProduct && selectedProduct) {
-      const updatedProducts = products.map(p => 
-        p.id === selectedProduct.id ? { ...productToSave, id: selectedProduct.id } : p
+      // Update existing product
+      updatedProducts = products.map(p => 
+        p.id === selectedProduct.id ? productToSave : p
       );
-      setProducts(updatedProducts);
-      
-      const customProducts = updatedProducts.filter(p => !featuredSneakers.find(fp => fp.id === p.id));
-      localStorage.setItem("admin_products", JSON.stringify(customProducts));
       
       toast({
         title: "Product Updated",
-        description: "Product has been successfully updated",
+        description: "Product has been successfully updated and will reflect across the app",
       });
     } else {
-      const updatedProducts = [...products, productToSave];
-      setProducts(updatedProducts);
-      
-      const customProducts = JSON.parse(localStorage.getItem("admin_products") || "[]");
-      customProducts.push(productToSave);
-      localStorage.setItem("admin_products", JSON.stringify(customProducts));
+      // Add new product
+      updatedProducts = [...products, productToSave];
       
       toast({
         title: "Product Added",
-        description: "New product has been successfully added",
+        description: "New product has been added and is now available in the app",
       });
     }
 
+    setProducts(updatedProducts);
+    
+    // Save custom products (excluding original featured sneakers)
+    const customProducts = updatedProducts.filter(p => !featuredSneakers.find(fp => fp.id === p.id));
+    localStorage.setItem("admin_products", JSON.stringify(customProducts));
+    
+    // Update main app products data
+    updateMainProductsData(updatedProducts);
+
+    // Reset form
     setNewProduct({
       name: "",
       price: "",
@@ -136,12 +156,16 @@ const ProductsManagement = () => {
     const updatedProducts = products.filter(p => p.id !== productId);
     setProducts(updatedProducts);
     
+    // Save custom products
     const customProducts = updatedProducts.filter(p => !featuredSneakers.find(fp => fp.id === p.id));
     localStorage.setItem("admin_products", JSON.stringify(customProducts));
     
+    // Update main app products data
+    updateMainProductsData(updatedProducts);
+    
     toast({
       title: "Product Deleted",
-      description: "Product has been successfully deleted",
+      description: "Product has been removed from the app",
     });
     
     if (selectedProduct?.id === productId) {
@@ -155,8 +179,12 @@ const ProductsManagement = () => {
     );
     setProducts(updatedProducts);
     
+    // Save custom products
     const customProducts = updatedProducts.filter(p => !featuredSneakers.find(fp => fp.id === p.id));
     localStorage.setItem("admin_products", JSON.stringify(customProducts));
+    
+    // Update main app products data
+    updateMainProductsData(updatedProducts);
     
     toast({
       title: "Stock Updated",
@@ -166,9 +194,15 @@ const ProductsManagement = () => {
 
   const editProduct = (product: Product) => {
     setNewProduct({
-      ...product,
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      description: product.description || "",
+      features: product.features || "",
       colors: Array.isArray(product.colors) ? product.colors.join(', ') : '',
       sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : '',
+      stock: product.stock || 0,
+      image: product.image
     });
     setSelectedProduct(product);
     setIsEditingProduct(true);
