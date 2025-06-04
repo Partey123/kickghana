@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useCart, CartItem } from "@/contexts/CartContext";
 import { featuredSneakers } from "@/data/products";
 import { useLoading } from "@/contexts/LoadingContext";
+import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 
 interface FeaturedProductsProps {
   cartItems: number[];
@@ -21,6 +22,7 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
   const categories = ["All", "Running", "Basketball", "Casual", "Traditional", "Training"];
   const navigate = useNavigate();
   const { showLoading, hideLoading } = useLoading();
+  const { products: supabaseProducts, loading: supabaseLoading } = useSupabaseProducts();
   
   useEffect(() => {
     loadProducts();
@@ -54,6 +56,30 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
       };
     }
   }, [dataLoaded, showLoading, hideLoading]);
+
+  useEffect(() => {
+    // Convert Supabase products to local format when available
+    if (supabaseProducts.length > 0) {
+      const convertedProducts: Product[] = supabaseProducts.map(product => ({
+        id: parseInt(product.id),
+        name: product.name,
+        price: `GHS ${product.price}`,
+        image: product.image_url || '/sneaker1.png',
+        category: product.category?.name || 'General',
+        colors: product.colors || ['Default'],
+        sizes: product.sizes || ['One Size'],
+        description: product.description,
+        features: product.features || [],
+        rating: product.rating || 4.5,
+        reviews: product.reviews_count || 0,
+        stock: product.stock,
+        isNew: false
+      }));
+      
+      setProducts(convertedProducts);
+      setDataLoaded(true);
+    }
+  }, [supabaseProducts]);
 
   const loadProducts = () => {
     // Check for updated products from admin dashboard

@@ -1,36 +1,28 @@
 
-import { ReactNode, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "@/components/ui/use-toast";
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface RouteGuardProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 const RouteGuard = ({ children }: RouteGuardProps) => {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    if (!loading && !user) {
-      toast({
-        title: "Access Denied",
-        description: "Please log in to access your profile",
-        variant: "destructive",
-      });
-      navigate("/auth/login", { replace: true });
-    }
-  }, [user, loading, navigate]);
-  
+  const location = useLocation();
+
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-50/80 to-amber-100/80 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-600"></div>
+      </div>
+    );
   }
-  
+
   if (!user) {
-    return null;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  
+
   return <>{children}</>;
 };
 

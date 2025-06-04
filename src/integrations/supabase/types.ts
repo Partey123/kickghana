@@ -194,16 +194,21 @@ export type Database = {
       products: {
         Row: {
           category_id: string | null
+          colors: string[] | null
           created_at: string | null
           description: string
           event_relevance: string[] | null
           example_product: string | null
           features: string[] | null
           id: string
+          image_url: string | null
           images: string[] | null
           is_active: boolean | null
           name: string
           price: number
+          rating: number | null
+          reviews_count: number | null
+          sizes: string[] | null
           slug: string
           stock: number
           updated_at: string | null
@@ -211,16 +216,21 @@ export type Database = {
         }
         Insert: {
           category_id?: string | null
+          colors?: string[] | null
           created_at?: string | null
           description: string
           event_relevance?: string[] | null
           example_product?: string | null
           features?: string[] | null
           id?: string
+          image_url?: string | null
           images?: string[] | null
           is_active?: boolean | null
           name: string
           price: number
+          rating?: number | null
+          reviews_count?: number | null
+          sizes?: string[] | null
           slug: string
           stock?: number
           updated_at?: string | null
@@ -228,16 +238,21 @@ export type Database = {
         }
         Update: {
           category_id?: string | null
+          colors?: string[] | null
           created_at?: string | null
           description?: string
           event_relevance?: string[] | null
           example_product?: string | null
           features?: string[] | null
           id?: string
+          image_url?: string | null
           images?: string[] | null
           is_active?: boolean | null
           name?: string
           price?: number
+          rating?: number | null
+          reviews_count?: number | null
+          sizes?: string[] | null
           slug?: string
           stock?: number
           updated_at?: string | null
