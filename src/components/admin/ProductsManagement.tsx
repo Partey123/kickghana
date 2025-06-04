@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { Plus, Edit, Package, AlertTriangle, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "@/components/ui/use-toast";
@@ -28,6 +29,18 @@ interface Product {
   stock?: number;
 }
 
+interface NewProductForm {
+  name: string;
+  price: string;
+  category: string;
+  description: string;
+  features: string;
+  colors: string;
+  sizes: string;
+  stock: number;
+  image: string;
+}
+
 const ProductsManagement = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -35,27 +48,25 @@ const ProductsManagement = () => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [isEditingProduct, setIsEditingProduct] = useState(false);
-  const [newProduct, setNewProduct] = useState<Partial<Product>>({
+  const [newProduct, setNewProduct] = useState<NewProductForm>({
     name: "",
     price: "",
     category: "",
     description: "",
     features: "",
-    colors: [],
-    sizes: [],
+    colors: "",
+    sizes: "",
     stock: 0,
     image: ""
   });
 
   useEffect(() => {
-    // Load products from static data and localStorage
     const localProducts = JSON.parse(localStorage.getItem("admin_products") || "[]");
     const allProducts = [...featuredSneakers, ...localProducts];
     
-    // Add stock information to products that don't have it
     const productsWithStock = allProducts.map(product => ({
       ...product,
-      stock: product.stock || Math.floor(Math.random() * 50) + 10 // Random stock for demo
+      stock: product.stock || Math.floor(Math.random() * 50) + 10
     }));
     
     setProducts(productsWithStock);
@@ -71,25 +82,19 @@ const ProductsManagement = () => {
       return;
     }
 
-    const productToSave = {
+    const productToSave: Product = {
       ...newProduct,
       id: Date.now(),
-      colors: typeof newProduct.colors === 'string' 
-        ? newProduct.colors.split(',').map(c => c.trim()) 
-        : newProduct.colors || [],
-      sizes: typeof newProduct.sizes === 'string' 
-        ? newProduct.sizes.split(',').map(s => parseInt(s.trim())) 
-        : newProduct.sizes || [],
-    } as Product;
+      colors: newProduct.colors ? newProduct.colors.split(',').map(c => c.trim()) : [],
+      sizes: newProduct.sizes ? newProduct.sizes.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s)) : [],
+    };
 
     if (isEditingProduct && selectedProduct) {
-      // Update existing product
       const updatedProducts = products.map(p => 
         p.id === selectedProduct.id ? { ...productToSave, id: selectedProduct.id } : p
       );
       setProducts(updatedProducts);
       
-      // Save to localStorage (only custom products)
       const customProducts = updatedProducts.filter(p => !featuredSneakers.find(fp => fp.id === p.id));
       localStorage.setItem("admin_products", JSON.stringify(customProducts));
       
@@ -98,11 +103,9 @@ const ProductsManagement = () => {
         description: "Product has been successfully updated",
       });
     } else {
-      // Add new product
       const updatedProducts = [...products, productToSave];
       setProducts(updatedProducts);
       
-      // Save to localStorage
       const customProducts = JSON.parse(localStorage.getItem("admin_products") || "[]");
       customProducts.push(productToSave);
       localStorage.setItem("admin_products", JSON.stringify(customProducts));
@@ -113,15 +116,14 @@ const ProductsManagement = () => {
       });
     }
 
-    // Reset form
     setNewProduct({
       name: "",
       price: "",
       category: "",
       description: "",
       features: "",
-      colors: [],
-      sizes: [],
+      colors: "",
+      sizes: "",
       stock: 0,
       image: ""
     });
@@ -134,7 +136,6 @@ const ProductsManagement = () => {
     const updatedProducts = products.filter(p => p.id !== productId);
     setProducts(updatedProducts);
     
-    // Update localStorage
     const customProducts = updatedProducts.filter(p => !featuredSneakers.find(fp => fp.id === p.id));
     localStorage.setItem("admin_products", JSON.stringify(customProducts));
     
@@ -154,7 +155,6 @@ const ProductsManagement = () => {
     );
     setProducts(updatedProducts);
     
-    // Update localStorage for custom products
     const customProducts = updatedProducts.filter(p => !featuredSneakers.find(fp => fp.id === p.id));
     localStorage.setItem("admin_products", JSON.stringify(customProducts));
     
@@ -167,8 +167,8 @@ const ProductsManagement = () => {
   const editProduct = (product: Product) => {
     setNewProduct({
       ...product,
-      colors: Array.isArray(product.colors) ? product.colors.join(', ') : product.colors,
-      sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : product.sizes,
+      colors: Array.isArray(product.colors) ? product.colors.join(', ') : '',
+      sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : '',
     });
     setSelectedProduct(product);
     setIsEditingProduct(true);
@@ -258,8 +258,8 @@ const ProductsManagement = () => {
                       category: "",
                       description: "",
                       features: "",
-                      colors: [],
-                      sizes: [],
+                      colors: "",
+                      sizes: "",
                       stock: 0,
                       image: ""
                     });

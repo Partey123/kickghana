@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Package, DollarSign, TrendingUp, Bell, Users, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -37,16 +38,14 @@ const DashboardOverview = () => {
 
   useEffect(() => {
     loadDashboardData();
-    const interval = setInterval(loadDashboardData, 30000); // Refresh every 30 seconds
+    const interval = setInterval(loadDashboardData, 30000);
     return () => clearInterval(interval);
   }, []);
 
   const loadDashboardData = () => {
-    // Load orders from localStorage
     const adminOrders = JSON.parse(localStorage.getItem("admin_orders") || "[]");
     const regularOrders = JSON.parse(localStorage.getItem("orders") || "[]");
     
-    // Combine and deduplicate orders
     const allOrders = [...adminOrders, ...regularOrders];
     const uniqueOrders = allOrders.filter((order, index, self) => 
       index === self.findIndex(o => o.id === order.id || o.orderNumber === order.orderNumber)
@@ -54,7 +53,6 @@ const DashboardOverview = () => {
     
     setRecentOrders(uniqueOrders.slice(0, 5));
     
-    // Calculate stats
     const today = new Date().toDateString();
     const todayOrders = uniqueOrders.filter(order => 
       new Date(order.timestamp || order.date || order.created_at || "").toDateString() === today
@@ -68,7 +66,6 @@ const DashboardOverview = () => {
       order.status === "pending" || order.status === "processing"
     ).length;
 
-    // Get unique customers
     const uniqueCustomers = new Set(uniqueOrders.map(order => order.customerEmail)).size;
     
     setStats({
@@ -77,7 +74,7 @@ const DashboardOverview = () => {
       pendingOrders,
       todayOrders: todayOrders.length,
       totalCustomers: uniqueCustomers,
-      lowStockProducts: 3, // This would come from products data
+      lowStockProducts: 3,
     });
   };
 

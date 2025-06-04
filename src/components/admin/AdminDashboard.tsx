@@ -1,13 +1,5 @@
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Eye, Users, DollarSign, TrendingUp, Bell, Plus, Edit, Settings } from "lucide-react";
-import { motion } from "framer-motion";
 import OrdersManagement from "./OrdersManagement";
 import ProductsManagement from "./ProductsManagement";
 import DashboardOverview from "./DashboardOverview";
