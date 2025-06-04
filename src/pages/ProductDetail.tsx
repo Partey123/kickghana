@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -18,7 +17,7 @@ interface Product {
   image: string;
   category: string;
   colors?: string[];
-  sizes?: string[] | number[];
+  sizes?: (string | number)[];
   description?: string;
   features?: string[] | string;
   rating?: number;
@@ -71,7 +70,7 @@ const ProductDetail = () => {
           setSelectedColor(foundProduct.colors[0]);
         }
         if (foundProduct.sizes && foundProduct.sizes.length > 0) {
-          setSelectedSize(foundProduct.sizes[0].toString());
+          setSelectedSize(String(foundProduct.sizes[0]));
         }
       } else {
         // If product not found, fallback to first product or show error
@@ -173,7 +172,7 @@ const ProductDetail = () => {
   const displayProduct = {
     ...product,
     colors: Array.isArray(product.colors) ? product.colors : (product.colors ? [product.colors] : ["Default"]),
-    sizes: Array.isArray(product.sizes) ? product.sizes.map(s => s.toString()) : (product.sizes ? [product.sizes.toString()] : ["One Size"]),
+    sizes: Array.isArray(product.sizes) ? product.sizes.map(s => String(s)) : (product.sizes ? [String(product.sizes)] : ["One Size"]),
     features: Array.isArray(product.features) ? product.features : (product.features ? product.features.split(',').map(f => f.trim()) : ["Premium quality", "Comfortable fit", "Durable construction"]),
     rating: product.rating || 4.5,
     reviews: product.reviews || 0,
@@ -285,8 +284,8 @@ const ProductDetail = () => {
                   {displayProduct.sizes.map((size, index) => (
                     <button
                       key={index}
-                      onClick={() => setSelectedSize(size.toString())}
-                      className={`w-16 h-12 flex items-center justify-center rounded-md border ${selectedSize === size.toString() ? 'border-amber-600 bg-amber-50 font-medium' : 'border-gray-300'}`}
+                      onClick={() => setSelectedSize(size)}
+                      className={`w-16 h-12 flex items-center justify-center rounded-md border ${selectedSize === size ? 'border-amber-600 bg-amber-50 font-medium' : 'border-gray-300'}`}
                     >
                       {size}
                     </button>
