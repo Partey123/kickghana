@@ -6,7 +6,7 @@ import AdminDashboard from "@/components/admin/AdminDashboard";
 const AdminDashboardPage = () => {
   return (
     <div className="min-h-screen bg-background/80">
-      <Navbar cartItemsCount={0} />
+      <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="text-center mb-8">

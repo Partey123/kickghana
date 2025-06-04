@@ -15,7 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AnimatePresence, motion } from "framer-motion";
 
 const Home = () => {
-  const { addToCart, totalItems, cartItems, addToWishlist, wishlist } = useCart();
+  const { addToCart, cartItems, addToWishlist, wishlist } = useCart();
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearchModal, setShowSearchModal] = useState(false);
   const navigate = useNavigate();
@@ -28,10 +28,6 @@ const Home = () => {
       description: `Searching for "${searchTerm}"`,
     });
     setShowSearchModal(false);
-  };
-  
-  const handleCartClick = () => {
-    navigate("/cart");
   };
 
   const handleLogout = async () => {
@@ -50,7 +46,7 @@ const Home = () => {
       transition={{ duration: 0.3 }}
       className="min-h-screen bg-background/80"
     >
-      <Navbar cartItemsCount={totalItems} onCartClick={handleCartClick} />
+      <Navbar />
       
       <AnimatePresence>
         <HeroSection />

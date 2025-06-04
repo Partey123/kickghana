@@ -118,10 +118,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-[#1A1F2C]/5">
-      <Navbar 
-        cartItemsCount={0} 
-        onCartClick={() => navigate("/cart")}
-      />
+      <Navbar />
       
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <ProfileHeader name={userData.name} />
