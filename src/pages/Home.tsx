@@ -12,7 +12,7 @@ import Footer from "@/components/home/Footer";
 import SearchModal from "@/components/home/SearchModal";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 const Home = () => {
   const { addToCart, cartItems, addToWishlist, wishlist } = useCart();
@@ -48,46 +48,48 @@ const Home = () => {
     >
       <Navbar />
       
-      <AnimatePresence>
-        <HeroSection />
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <CategorySection />
-        </motion.div>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          <PromoSlider />
-        </motion.div>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
-          <FeaturedProducts 
-            cartItems={cartItems.map(item => item.id)}
-            addToCart={addToCart}
-            wishlist={wishlist}
-            addToWishlist={addToWishlist}
-          />
-        </motion.div>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-        >
-          <CTASection />
-        </motion.div>
-      </AnimatePresence>
+      <HeroSection />
+      
+      <motion.div
+        key="category-section"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        <CategorySection />
+      </motion.div>
+      
+      <motion.div
+        key="promo-slider"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+      >
+        <PromoSlider />
+      </motion.div>
+      
+      <motion.div
+        key="featured-products"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
+        <FeaturedProducts 
+          cartItems={cartItems.map(item => item.id)}
+          addToCart={addToCart}
+          wishlist={wishlist}
+          addToWishlist={addToWishlist}
+        />
+      </motion.div>
+      
+      <motion.div
+        key="cta-section"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
+      >
+        <CTASection />
+      </motion.div>
       
       <Footer />
       
