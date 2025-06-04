@@ -33,8 +33,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user } = useAuth();
   const [localCartItems, setLocalCartItems] = useState<CartItem[]>([]);
   const [localWishlist, setLocalWishlist] = useState<number[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
-  const [subtotal, setSubtotal] = useState("₵0");
 
   // Supabase hooks
   const { 
@@ -75,6 +73,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const cartItems = user ? convertSupabaseCartItems() : localCartItems;
   const wishlist = user ? convertSupabaseWishlist() : localWishlist;
 
+  // Calculate total items
+  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  // Calculate subtotal
+  const subtotal = (() => {
+    const total = cartItems.reduce((sum, item) => {
+      const priceNumeric = parseFloat(item.price.replace(/[^\d.]/g, ""));
+      return sum + (priceNumeric * item.quantity);
+    }, 0);
+    return `₵${total.toFixed(2)}`;
+  })();
+
   useEffect(() => {
     // Load local cart and wishlist from localStorage on initial load
     const savedCart = localStorage.getItem("cart");
@@ -96,24 +106,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
   }, []);
-
+  
   useEffect(() => {
     // Save local cart to localStorage whenever it changes (only if not logged in)
     if (!user) {
       localStorage.setItem("cart", JSON.stringify(localCartItems));
     }
-    
-    // Calculate total items and subtotal
-    const currentCartItems = user ? convertSupabaseCartItems() : localCartItems;
-    const itemCount = currentCartItems.reduce((total, item) => total + item.quantity, 0);
-    setTotalItems(itemCount);
-    
-    const total = currentCartItems.reduce((sum, item) => {
-      const priceNumeric = parseFloat(item.price.replace(/[^\d.]/g, ""));
-      return sum + (priceNumeric * item.quantity);
-    }, 0);
-    setSubtotal(`₵${total.toFixed(2)}`);
-  }, [localCartItems, supabaseCartItems, user]);
+  }, [localCartItems, user]);
   
   useEffect(() => {
     // Save local wishlist to localStorage whenever it changes (only if not logged in)
@@ -220,8 +219,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await toggleSupabaseWishlist(id.toString());
       const isCurrentlyInWishlist = isInSupabaseWishlist(id.toString());
       toast({
-        title: isCurrentlyInWishlist ? "Added to wishlist" : "Removed from wishlist",
-        description: isCurrentlyInWishlist ? "Item has been added to your wishlist" : "Item has been removed from your wishlist",
+        title: isCurrentlyInWishlist ? "Removed from wishlist" : "Added to wishlist",
+        description: isCurrentlyInWishlist ? "Item has been removed from your wishlist" : "Item has been added to your wishlist",
       });
     } else {
       setLocalWishlist(prevWishlist => {

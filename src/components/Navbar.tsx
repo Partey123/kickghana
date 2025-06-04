@@ -3,18 +3,15 @@ import React, { useState } from 'react';
 import { Search, ShoppingCart, User, Menu, X, Heart, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 
-interface NavbarProps {
-  cartItemsCount?: number;
-  onCartClick?: () => void;
-}
-
-const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
+const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { totalItems } = useCart();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -38,8 +35,12 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
     if (user) {
       setIsUserMenuOpen(!isUserMenuOpen);
     } else {
-      navigate('/login');
+      navigate('/auth/login');
     }
+  };
+
+  const handleCartClick = () => {
+    navigate('/cart');
   };
 
   return (
@@ -92,12 +93,12 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
               variant="ghost" 
               size="icon" 
               className="text-gray-700 hover:text-amber-600 relative"
-              onClick={onCartClick}
+              onClick={handleCartClick}
             >
               <ShoppingCart size={20} />
-              {cartItemsCount > 0 && (
+              {totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemsCount}
+                  {totalItems}
                 </span>
               )}
             </Button>
@@ -191,12 +192,12 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
                   variant="ghost" 
                   size="icon" 
                   className="text-gray-700 relative"
-                  onClick={onCartClick}
+                  onClick={handleCartClick}
                 >
                   <ShoppingCart size={20} />
-                  {cartItemsCount > 0 && (
+                  {totalItems > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {cartItemsCount}
+                      {totalItems}
                     </span>
                   )}
                 </Button>
@@ -225,7 +226,7 @@ const Navbar = ({ cartItemsCount = 0, onCartClick }: NavbarProps) => {
                     variant="ghost" 
                     size="icon" 
                     className="text-gray-700"
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate('/auth/login')}
                   >
                     <User size={20} />
                   </Button>

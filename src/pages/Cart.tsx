@@ -21,7 +21,7 @@ const Cart = () => {
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-background/80">
-        <Navbar cartItemsCount={0} />
+        <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-20 text-center">
           <div className="bg-white/90 rounded-xl p-12 shadow-md">
             <ShoppingBag size={64} className="mx-auto text-primary mb-4" />
@@ -42,7 +42,7 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-background/80">
-      <Navbar cartItemsCount={totalItems} />
+      <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 py-12">
         <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-8">Your Cart</h1>
@@ -65,7 +65,7 @@ const Cart = () => {
                   
                   return (
                     <motion.div 
-                      key={`${item.id}-${item.color}-${item.size}`}
+                      key={`${item.id}-${item.color || 'default'}-${item.size || 'default'}-${index}`}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
