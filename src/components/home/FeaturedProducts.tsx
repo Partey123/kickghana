@@ -7,12 +7,13 @@ import { useCart, CartItem } from "@/contexts/CartContext";
 import { featuredSneakers } from "@/data/products";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
+import { toast } from "@/components/ui/use-toast";
 
 interface FeaturedProductsProps {
-  cartItems: number[];
-  wishlist: number[];
+  cartItems: (number | string)[];
+  wishlist: (number | string)[];
   addToCart: (item: CartItem) => void;
-  addToWishlist: (id: number) => void;
+  addToWishlist: (id: number | string) => void;
 }
 
 const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: FeaturedProductsProps) => {
@@ -61,7 +62,7 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
     // Convert Supabase products to local format when available
     if (supabaseProducts.length > 0) {
       const convertedProducts: Product[] = supabaseProducts.map(product => ({
-        id: parseInt(product.id),
+        id: product.id,
         name: product.name,
         price: `GHS ${product.price}`,
         image: product.image_url || '/sneaker1.png',
@@ -76,6 +77,7 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
         isNew: false
       }));
       
+      console.log('Converted Supabase products:', convertedProducts);
       setProducts(convertedProducts);
       setDataLoaded(true);
     }
@@ -101,6 +103,7 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
   };
   
   const handleAddToCart = (product: Product) => {
+    console.log('Adding product to cart:', product);
     addToCart({
       id: product.id,
       name: product.name,
@@ -108,12 +111,28 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
       image: product.image,
       quantity: 1
     });
+    
+    toast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+    });
   };
   
-  const handleProductClick = (id: number) => {
+  const handleProductClick = (id: number | string) => {
     // Show loading animation before navigating
     showLoading("Loading product details...");
     navigate(`/product/${id}`);
+  };
+  
+  const handleAddToWishlist = (id: number | string) => {
+    console.log('Adding to wishlist:', id);
+    addToWishlist(id);
+    
+    const product = products.find(p => p.id === id);
+    toast({
+      title: "Added to Wishlist",
+      description: `${product?.name || 'Product'} has been added to your wishlist.`,
+    });
   };
   
   const filteredProducts = activeCategory === "All" 
@@ -160,7 +179,7 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
               <ProductCard 
                 product={sneaker} 
                 onAddToCart={() => handleAddToCart(sneaker)}
-                onAddToWishlist={() => addToWishlist(sneaker.id)}
+                onAddToWishlist={() => handleAddToWishlist(sneaker.id)}
                 isInWishlist={wishlist.includes(sneaker.id)}
                 onProductClick={() => handleProductClick(sneaker.id)}
               />

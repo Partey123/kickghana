@@ -1,12 +1,12 @@
 
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
-import { useAuth } from "./AuthContext";
-import { useSupabaseCart } from "@/hooks/useSupabaseCart";
-import { useSupabaseWishlist } from "@/hooks/useSupabaseWishlist";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useAuth } from './AuthContext';
+import { useSupabaseCart } from '@/hooks/useSupabaseCart';
+import { useSupabaseWishlist } from '@/hooks/useSupabaseWishlist';
+import { toast } from '@/components/ui/use-toast';
 
 export interface CartItem {
-  id: number;
+  id: number | string;
   name: string;
   price: string;
   image: string;
@@ -17,185 +17,152 @@ export interface CartItem {
 
 interface CartContextType {
   cartItems: CartItem[];
+  wishlist: (number | string)[];
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  removeFromCart: (id: number | string) => void;
+  updateQuantity: (id: number | string, quantity: number) => void;
   clearCart: () => void;
-  totalItems: number;
+  addToWishlist: (id: number | string) => void;
+  removeFromWishlist: (id: number | string) => void;
   subtotal: string;
-  wishlist: number[];
-  addToWishlist: (id: number) => void;
+  totalItems: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
+export const CartProvider = ({ children }: { children: ReactNode }) => {
+  // Local state for when user is not authenticated
   const [localCartItems, setLocalCartItems] = useState<CartItem[]>([]);
-  const [localWishlist, setLocalWishlist] = useState<number[]>([]);
-
-  // Supabase hooks
+  const [localWishlist, setLocalWishlist] = useState<(number | string)[]>([]);
+  
+  const { user } = useAuth();
+  
+  // Supabase hooks for authenticated users
   const { 
     cartItems: supabaseCartItems, 
-    addToCart: addToSupabaseCart, 
+    addToCart: addToSupabaseCart,
     removeFromCart: removeFromSupabaseCart,
     updateQuantity: updateSupabaseQuantity,
     clearCart: clearSupabaseCart,
     loading: cartLoading 
   } = useSupabaseCart();
-
+  
   const { 
-    wishlistItems: supabaseWishlistItems,
-    toggleWishlist: toggleSupabaseWishlist,
-    isInWishlist: isInSupabaseWishlist,
+    wishlist: supabaseWishlist,
+    addToWishlist: addToSupabaseWishlist,
+    removeFromWishlist: removeFromSupabaseWishlist,
     loading: wishlistLoading 
   } = useSupabaseWishlist();
 
-  // Convert Supabase cart items to local format
-  const convertSupabaseCartItems = (): CartItem[] => {
-    return supabaseCartItems.map(item => ({
-      id: parseInt(item.product?.id || '0'),
-      name: item.product?.name || '',
-      price: `₵${item.product?.price || 0}`,
-      image: item.product?.image_url || '/sneaker1.png',
-      quantity: item.quantity,
-      color: item.color || undefined,
-      size: item.size || undefined
-    }));
-  };
-
-  // Convert Supabase wishlist items to local format
-  const convertSupabaseWishlist = (): number[] => {
-    return supabaseWishlistItems.map(item => parseInt(item.product?.id || '0'));
-  };
-
-  // Get current cart items (Supabase if logged in, local if not)
-  const cartItems = user ? convertSupabaseCartItems() : localCartItems;
-  const wishlist = user ? convertSupabaseWishlist() : localWishlist;
-
-  // Calculate total items
-  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
-
-  // Calculate subtotal
-  const subtotal = (() => {
-    const total = cartItems.reduce((sum, item) => {
-      const priceNumeric = parseFloat(item.price.replace(/[^\d.]/g, ""));
-      return sum + (priceNumeric * item.quantity);
-    }, 0);
-    return `₵${total.toFixed(2)}`;
-  })();
-
+  // Load local data on mount
   useEffect(() => {
-    // Load local cart and wishlist from localStorage on initial load
-    const savedCart = localStorage.getItem("cart");
-    const savedWishlist = localStorage.getItem("wishlist");
+    const savedCart = localStorage.getItem('cart');
+    const savedWishlist = localStorage.getItem('wishlist');
     
     if (savedCart) {
       try {
         setLocalCartItems(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("Failed to parse cart from localStorage", e);
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
       }
     }
     
     if (savedWishlist) {
       try {
         setLocalWishlist(JSON.parse(savedWishlist));
-      } catch (e) {
-        console.error("Failed to parse wishlist from localStorage", e);
+      } catch (error) {
+        console.error('Error loading wishlist from localStorage:', error);
       }
     }
   }, []);
-  
+
+  // Save local data to localStorage
   useEffect(() => {
-    // Save local cart to localStorage whenever it changes (only if not logged in)
     if (!user) {
-      localStorage.setItem("cart", JSON.stringify(localCartItems));
+      localStorage.setItem('cart', JSON.stringify(localCartItems));
     }
   }, [localCartItems, user]);
-  
+
   useEffect(() => {
-    // Save local wishlist to localStorage whenever it changes (only if not logged in)
     if (!user) {
-      localStorage.setItem("wishlist", JSON.stringify(localWishlist));
+      localStorage.setItem('wishlist', JSON.stringify(localWishlist));
     }
   }, [localWishlist, user]);
 
+  // Determine which data to use based on authentication status
+  const cartItems = user ? supabaseCartItems : localCartItems;
+  const wishlist = user ? supabaseWishlist : localWishlist;
+
   const addToCart = async (item: CartItem) => {
+    console.log('Adding to cart:', item, 'User:', user);
+    
     if (user) {
-      // Use Supabase for logged-in users
-      await addToSupabaseCart(
-        item.id.toString(), 
-        item.quantity, 
-        item.color, 
-        item.size
-      );
-      toast({
-        title: "Added to cart",
-        description: `${item.name} has been added to your cart`,
-      });
+      try {
+        await addToSupabaseCart(item);
+      } catch (error) {
+        console.error('Error adding to Supabase cart:', error);
+        toast({
+          title: "Error",
+          description: "Failed to add item to cart. Please try again.",
+          variant: "destructive",
+        });
+      }
     } else {
-      // Use local storage for guest users
-      setLocalCartItems(prevItems => {
-        const existingItemIndex = prevItems.findIndex(i => 
-          i.id === item.id && 
-          ((!i.color && !item.color) || i.color === item.color) && 
-          ((!i.size && !item.size) || i.size === item.size)
-        );
+      // Local storage logic
+      setLocalCartItems(prev => {
+        const existingItem = prev.find(cartItem => cartItem.id === item.id);
         
-        if (existingItemIndex > -1) {
-          const updatedItems = [...prevItems];
-          updatedItems[existingItemIndex].quantity += item.quantity;
-          toast({
-            title: "Cart updated",
-            description: `${item.name} quantity updated in your cart`,
-          });
-          return updatedItems;
+        if (existingItem) {
+          return prev.map(cartItem =>
+            cartItem.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
+              : cartItem
+          );
         } else {
-          toast({
-            title: "Added to cart",
-            description: `${item.name} has been added to your cart`,
-          });
-          return [...prevItems, item];
+          return [...prev, item];
         }
       });
     }
   };
 
-  const removeFromCart = async (id: number) => {
+  const removeFromCart = async (id: number | string) => {
     if (user) {
-      // Find the Supabase cart item ID
-      const supabaseItem = supabaseCartItems.find(item => 
-        parseInt(item.product?.id || '0') === id
-      );
-      if (supabaseItem) {
-        await removeFromSupabaseCart(supabaseItem.id);
+      try {
+        await removeFromSupabaseCart(id);
+      } catch (error) {
+        console.error('Error removing from Supabase cart:', error);
+        toast({
+          title: "Error",
+          description: "Failed to remove item from cart. Please try again.",
+          variant: "destructive",
+        });
       }
     } else {
-      setLocalCartItems(prevItems => {
-        const updatedItems = prevItems.filter(item => item.id !== id);
-        return updatedItems;
-      });
+      setLocalCartItems(prev => prev.filter(item => item.id !== id));
     }
-    
-    toast({
-      title: "Removed from cart",
-      description: "Item has been removed from your cart",
-    });
   };
 
-  const updateQuantity = async (id: number, quantity: number) => {
+  const updateQuantity = async (id: number | string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(id);
+      return;
+    }
+
     if (user) {
-      const supabaseItem = supabaseCartItems.find(item => 
-        parseInt(item.product?.id || '0') === id
-      );
-      if (supabaseItem) {
-        await updateSupabaseQuantity(supabaseItem.id, quantity);
+      try {
+        await updateSupabaseQuantity(id, quantity);
+      } catch (error) {
+        console.error('Error updating Supabase cart quantity:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update quantity. Please try again.",
+          variant: "destructive",
+        });
       }
     } else {
-      setLocalCartItems(prevItems => 
-        prevItems.map(item => 
-          item.id === id ? { ...item, quantity: quantity } : item
+      setLocalCartItems(prev =>
+        prev.map(item =>
+          item.id === id ? { ...item, quantity } : item
         )
       );
     }
@@ -203,56 +170,83 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearCart = async () => {
     if (user) {
-      await clearSupabaseCart();
+      try {
+        await clearSupabaseCart();
+      } catch (error) {
+        console.error('Error clearing Supabase cart:', error);
+        toast({
+          title: "Error",
+          description: "Failed to clear cart. Please try again.",
+          variant: "destructive",
+        });
+      }
     } else {
       setLocalCartItems([]);
     }
-    
-    toast({
-      title: "Cart cleared",
-      description: "All items have been removed from your cart",
-    });
   };
-  
-  const addToWishlist = async (id: number) => {
+
+  const addToWishlist = async (id: number | string) => {
+    console.log('Adding to wishlist:', id, 'User:', user);
+    
     if (user) {
-      await toggleSupabaseWishlist(id.toString());
-      const isCurrentlyInWishlist = isInSupabaseWishlist(id.toString());
-      toast({
-        title: isCurrentlyInWishlist ? "Removed from wishlist" : "Added to wishlist",
-        description: isCurrentlyInWishlist ? "Item has been removed from your wishlist" : "Item has been added to your wishlist",
-      });
+      try {
+        await addToSupabaseWishlist(id);
+      } catch (error) {
+        console.error('Error adding to Supabase wishlist:', error);
+        toast({
+          title: "Error",
+          description: "Failed to add item to wishlist. Please try again.",
+          variant: "destructive",
+        });
+      }
     } else {
-      setLocalWishlist(prevWishlist => {
-        if (prevWishlist.includes(id)) {
-          toast({
-            title: "Removed from wishlist",
-            description: "Item has been removed from your wishlist",
-          });
-          return prevWishlist.filter(itemId => itemId !== id);
-        } else {
-          toast({
-            title: "Added to wishlist",
-            description: "Item has been added to your wishlist",
-          });
-          return [...prevWishlist, id];
-        }
-      });
+      setLocalWishlist(prev => 
+        prev.includes(id) ? prev : [...prev, id]
+      );
     }
   };
 
+  const removeFromWishlist = async (id: number | string) => {
+    if (user) {
+      try {
+        await removeFromSupabaseWishlist(id);
+      } catch (error) {
+        console.error('Error removing from Supabase wishlist:', error);
+        toast({
+          title: "Error",
+          description: "Failed to remove item from wishlist. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setLocalWishlist(prev => prev.filter(itemId => itemId !== id));
+    }
+  };
+
+  const subtotal = cartItems
+    .reduce((total, item) => {
+      const price = parseFloat(item.price.replace(/[^\d.]/g, ''));
+      return total + (price * item.quantity);
+    }, 0)
+    .toFixed(2);
+
+  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  const value: CartContextType = {
+    cartItems,
+    wishlist,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    addToWishlist,
+    removeFromWishlist,
+    subtotal: `GHS ${subtotal}`,
+    totalItems,
+  };
+
   return (
-    <CartContext.Provider value={{
-      cartItems,
-      addToCart,
-      removeFromCart,
-      updateQuantity,
-      clearCart,
-      totalItems,
-      subtotal,
-      wishlist,
-      addToWishlist
-    }}>
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );
@@ -261,7 +255,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider");
+    throw new Error('useCart must be used within a CartProvider');
   }
   return context;
 };

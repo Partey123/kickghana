@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { featuredSneakers } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
-import ProductCard from "@/components/home/ProductCard";
+import ProductCard, { Product } from "@/components/home/ProductCard";
 import { ArrowDown, Filter } from "lucide-react";
+import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
+import { toast } from "@/components/ui/use-toast";
 import {
   Sheet,
   SheetContent,
@@ -30,10 +32,35 @@ const Collections = () => {
   const { addToCart, wishlist, addToWishlist } = useCart();
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [sort, setSort] = useState<string>("none");
+  const [products, setProducts] = useState<Product[]>(featuredSneakers);
+  const { products: supabaseProducts, loading: supabaseLoading } = useSupabaseProducts();
   
   const categories = ["All", "Running", "Basketball", "Casual", "Traditional", "Training"];
   
-  const handleAddToCart = (product: any) => {
+  useEffect(() => {
+    // Convert Supabase products to local format when available
+    if (supabaseProducts.length > 0) {
+      const convertedProducts: Product[] = supabaseProducts.map(product => ({
+        id: product.id,
+        name: product.name,
+        price: `GHS ${product.price}`,
+        image: product.image_url || '/sneaker1.png',
+        category: product.category?.name || 'General',
+        colors: product.colors || ['Default'],
+        sizes: product.sizes || ['One Size'],
+        description: product.description,
+        features: product.features || [],
+        rating: product.rating || 4.5,
+        reviews: product.reviews_count || 0,
+        stock: product.stock,
+        isNew: false
+      }));
+      
+      setProducts(convertedProducts);
+    }
+  }, [supabaseProducts]);
+  
+  const handleAddToCart = (product: Product) => {
     addToCart({
       id: product.id,
       name: product.name,
@@ -41,15 +68,30 @@ const Collections = () => {
       image: product.image,
       quantity: 1
     });
+    
+    toast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+    });
   };
   
-  const handleProductClick = (id: number) => {
+  const handleProductClick = (id: number | string) => {
     navigate(`/product/${id}`);
+  };
+
+  const handleAddToWishlist = (id: number | string) => {
+    addToWishlist(id);
+    
+    const product = products.find(p => p.id === id);
+    toast({
+      title: "Added to Wishlist",
+      description: `${product?.name || 'Product'} has been added to your wishlist.`,
+    });
   };
   
   const filteredProducts = activeCategory === "All" 
-    ? featuredSneakers 
-    : featuredSneakers.filter(product => product.category === activeCategory);
+    ? products 
+    : products.filter(product => product.category === activeCategory);
   
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sort === "price-asc") {
@@ -181,7 +223,7 @@ const Collections = () => {
               <ProductCard 
                 product={product} 
                 onAddToCart={() => handleAddToCart(product)}
-                onAddToWishlist={() => addToWishlist(product.id)}
+                onAddToWishlist={() => handleAddToWishlist(product.id)}
                 isInWishlist={wishlist.includes(product.id)}
                 onProductClick={() => handleProductClick(product.id)}
               />

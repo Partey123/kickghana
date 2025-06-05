@@ -5,19 +5,26 @@ import { Heart, ShoppingBag, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 
 export interface Product {
-  id: number;
+  id: number | string;
   name: string;
   price: string;
   image: string;
   category: string;
+  colors?: string[];
+  sizes?: string[];
+  description?: string;
+  features?: string[];
+  rating?: number;
+  reviews?: number;
+  stock?: number;
   isNew?: boolean;
 }
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart: (id: number) => void;
-  onAddToWishlist: (id: number) => void;
-  onProductClick: (id: number) => void;
+  onAddToCart: (id: number | string) => void;
+  onAddToWishlist: (id: number | string) => void;
+  onProductClick: (id: number | string) => void;
   isInWishlist: boolean;
 }
 
