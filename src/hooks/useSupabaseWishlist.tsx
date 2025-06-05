@@ -3,14 +3,26 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
+export interface WishlistItem {
+  id: string;
+  product?: {
+    id: string;
+    name: string;
+    price: number;
+    image_url: string;
+  };
+}
+
 export const useSupabaseWishlist = () => {
   const [wishlist, setWishlist] = useState<(number | string)[]>([]);
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   const fetchWishlist = async () => {
     if (!user) {
       setWishlist([]);
+      setWishlistItems([]);
       setLoading(false);
       return;
     }
@@ -19,16 +31,37 @@ export const useSupabaseWishlist = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('wishlists')
-        .select('product_id')
+        .select(`
+          id,
+          product_id,
+          products (
+            id,
+            name,
+            price,
+            image_url
+          )
+        `)
         .eq('user_id', user.id);
 
       if (error) throw error;
 
       const productIds = (data || []).map(item => item.product_id).filter(Boolean);
+      const wishlistItemsData = (data || []).map(item => ({
+        id: item.id,
+        product: item.products ? {
+          id: (item.products as any).id,
+          name: (item.products as any).name,
+          price: (item.products as any).price,
+          image_url: (item.products as any).image_url
+        } : undefined
+      }));
+      
       setWishlist(productIds);
+      setWishlistItems(wishlistItemsData);
     } catch (error) {
       console.error('Error fetching wishlist:', error);
       setWishlist([]);
+      setWishlistItems([]);
     } finally {
       setLoading(false);
     }
@@ -89,11 +122,21 @@ export const useSupabaseWishlist = () => {
     }
   };
 
+  const toggleWishlist = async (productId: number | string) => {
+    if (wishlist.includes(productId)) {
+      await removeFromWishlist(productId);
+    } else {
+      await addToWishlist(productId);
+    }
+  };
+
   return {
     wishlist,
+    wishlistItems,
     loading,
     addToWishlist,
     removeFromWishlist,
+    toggleWishlist,
     refetch: fetchWishlist
   };
 };

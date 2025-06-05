@@ -1,3 +1,4 @@
+
 // Enhanced product data with Ghanaian items and detailed product information
 export const featuredSneakers = [
   // Keep the Traditional Ahenema with updated price
@@ -21,7 +22,7 @@ export const featuredSneakers = [
     description: "A versatile running shoe with responsive cushioning, perfect for daily runs in Accra or Kumasi.",
     features: "Zoom Air unit in forefoot, React foam midsole, breathable mesh upper, rubber outsole with waffle pattern.",
     colors: ["Black/White", "Blue/Orange", "Red/Black"],
-    sizes: [40, 41, 42, 43, 44, 45]
+    sizes: ["40", "41", "42", "43", "44", "45"]
   },
   {
     id: 102,
@@ -33,7 +34,7 @@ export const featuredSneakers = [
     description: "Premium running sneaker with energy-returning cushioning, popular on Shopwice for long-distance runners.",
     features: "Boost midsole, Primeknit upper, Continental rubber outsole, Torsion system for stability.",
     colors: ["Black", "White/Grey", "Green/Black"],
-    sizes: [39, 40, 41, 42, 43, 44, 45]
+    sizes: ["39", "40", "41", "42", "43", "44", "45"]
   },
   {
     id: 103,
@@ -45,7 +46,7 @@ export const featuredSneakers = [
     description: "Lightweight running shoe for speed, available on Jumia Ghana, great for Ghana's warm climate.",
     features: "Nitro foam midsole, PUMAGrip outsole, breathable mesh upper, reflective accents.",
     colors: ["Black/Yellow", "White/Blue", "Red/White"],
-    sizes: [40, 41, 42, 43, 44]
+    sizes: ["40", "41", "42", "43", "44"]
   },
   {
     id: 104,
@@ -57,7 +58,7 @@ export const featuredSneakers = [
     description: "Stability-focused sneaker for overpronators, ideal for long runs in Tamale or Cape Coast.",
     features: "Gel cushioning, FlyteFoam Blast midsole, engineered mesh upper, AHAR outsole.",
     colors: ["Black/Red", "Blue/White", "Grey/Green"],
-    sizes: [40, 41, 42, 43, 44, 45]
+    sizes: ["40", "41", "42", "43", "44", "45"]
   },
   {
     id: 105,
@@ -69,7 +70,7 @@ export const featuredSneakers = [
     description: "Plush running shoe for comfort, found on Shopwice, suited for Accra's roads.",
     features: "Fresh Foam X midsole, Hypoknit upper, blown rubber outsole, laser-engraved support.",
     colors: ["Black", "White/Blue", "Orange/Black"],
-    sizes: [39, 40, 41, 42, 43, 44]
+    sizes: ["39", "40", "41", "42", "43", "44"]
   },
   
   // Basketball Sneakers
@@ -83,7 +84,7 @@ export const featuredSneakers = [
     description: "Budget-friendly basketball sneaker, available on Tonaton, ideal for versatile players in Accra.",
     features: "Cushioned midsole, wide forefoot (124.5 mm), high torsional rigidity, rubber outsole with traction pattern.",
     colors: ["Black/White", "Blue/Red", "Green/Black"],
-    sizes: [41, 42, 43, 44, 45, 46]
+    sizes: ["41", "42", "43", "44", "45", "46"]
   },
   {
     id: 202,
@@ -95,7 +96,7 @@ export const featuredSneakers = [
     description: "Donovan Mitchell's signature shoe, found on Shopwice, great for explosive guards.",
     features: "Lightstrike cushioning, TPU heel clip, herringbone traction outsole, breathable mesh upper.",
     colors: ["Black/Orange", "White/Blue", "Red/Black"],
-    sizes: [40, 41, 42, 43, 44, 45]
+    sizes: ["40", "41", "42", "43", "44", "45"]
   },
   {
     id: 203,
@@ -107,7 +108,7 @@ export const featuredSneakers = [
     description: "Iconic basketball sneaker, sold on Tonaton, blends style and performance.",
     features: "Air cushioning, leather upper, high-top ankle support, rubber outsole.",
     colors: ["Black/Red", "White/Blue", "Green/White"],
-    sizes: [41, 42, 43, 44, 45]
+    sizes: ["41", "42", "43", "44", "45"]
   },
   
   // Casual Sneakers
@@ -121,7 +122,7 @@ export const featuredSneakers = [
     description: "Classic sneaker, widely available on Jumia Ghana, a staple for streetwear.",
     features: "Air cushioning, leather upper, durable rubber outsole, low-profile design.",
     colors: ["White", "Black", "Red/White"],
-    sizes: [40, 41, 42, 43, 44, 45]
+    sizes: ["40", "41", "42", "43", "44", "45"]
   },
   {
     id: 302,
@@ -133,7 +134,7 @@ export const featuredSneakers = [
     description: "Iconic sneaker with shell toe, on Shopwice, perfect for casual outfits.",
     features: "Leather upper, rubber toe cap, EVA midsole, herringbone outsole.",
     colors: ["White/Black", "Black/White", "Blue/White"],
-    sizes: [39, 40, 41, 42, 43, 44]
+    sizes: ["39", "40", "41", "42", "43", "44"]
   },
   {
     id: 303,
@@ -145,7 +146,7 @@ export const featuredSneakers = [
     description: "Skate-inspired sneaker, available on Tonaton, popular among Ghanaian youth.",
     features: "Canvas and suede upper, waffle rubber outsole, padded collar, vulcanized sole.",
     colors: ["Black/White", "Navy", "Red/Black"],
-    sizes: [40, 41, 42, 43, 44]
+    sizes: ["40", "41", "42", "43", "44"]
   },
   
   // Traditional Sneakers (Additions beyond the single kept item)
@@ -159,7 +160,7 @@ export const featuredSneakers = [
     description: "Custom sneaker with Kente fabric, sold on Tonaton, ideal for Independence Day.",
     features: "Air cushioning, Kente fabric panels, leather upper, rubber outsole.",
     colors: ["Black/Kente", "Red/Kente", "Blue/Kente"],
-    sizes: [40, 41, 42, 43, 44]
+    sizes: ["40", "41", "42", "43", "44"]
   },
   {
     id: 402,
@@ -171,7 +172,7 @@ export const featuredSneakers = [
     description: "Slip-on sneaker with Adinkra symbols, available on Jiji, for cultural events.",
     features: "Canvas upper with Adinkra prints, elastic side accents, waffle outsole, padded insole.",
     colors: ["Black/Adinkra", "White/Adinkra", "Green/Adinkra"],
-    sizes: [39, 40, 41, 42, 43]
+    sizes: ["39", "40", "41", "42", "43"]
   },
   
   // Training Sneakers
@@ -185,7 +186,7 @@ export const featuredSneakers = [
     description: "Versatile training shoe, on Jumia Ghana, ideal for weightlifting and HIIT in Accra gyms.",
     features: "Hyperlift plate, Zoom Air unit, breathable mesh upper, grippy rubber outsole.",
     colors: ["Black/White", "Blue/Red", "Grey/Green"],
-    sizes: [40, 41, 42, 43, 44, 45]
+    sizes: ["40", "41", "42", "43", "44", "45"]
   },
   {
     id: 502,
@@ -197,7 +198,7 @@ export const featuredSneakers = [
     description: "Weightlifting sneaker, on Shopwice, for serious gym-goers in Kumasi.",
     features: "Wedge midsole, canvas upper, hook-and-loop strap, high-density outsole.",
     colors: ["Black", "White/Blue", "Red/Black"],
-    sizes: [40, 41, 42, 43, 44]
+    sizes: ["40", "41", "42", "43", "44"]
   },
   
   // Test Products for ₵5
@@ -211,7 +212,7 @@ export const featuredSneakers = [
     description: "Test product for payment processing.",
     features: "Test features for development purposes.",
     colors: ["Black", "White"],
-    sizes: [40, 41, 42]
+    sizes: ["40", "41", "42"]
   },
   {
     id: 602,
@@ -223,7 +224,7 @@ export const featuredSneakers = [
     description: "Test product for payment processing.",
     features: "Test features for development purposes.",
     colors: ["Black", "White"],
-    sizes: [41, 42, 43]
+    sizes: ["41", "42", "43"]
   },
   {
     id: 603,
@@ -235,7 +236,7 @@ export const featuredSneakers = [
     description: "Test product for payment processing.",
     features: "Test features for development purposes.",
     colors: ["Black", "White"],
-    sizes: [40, 41, 42]
+    sizes: ["40", "41", "42"]
   },
   {
     id: 604,
@@ -247,6 +248,6 @@ export const featuredSneakers = [
     description: "Test product for payment processing.",
     features: "Test features for development purposes.",
     colors: ["Black", "White"],
-    sizes: [40, 41, 42]
+    sizes: ["40", "41", "42"]
   }
 ];

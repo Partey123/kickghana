@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -89,7 +88,7 @@ const Profile = () => {
     }
   }, [user, navigate]);
 
-  const handleAddToCart = (productId: number) => {
+  const handleAddToCart = (productId: number | string) => {
     const product = wishlist.find(id => id === productId);
     if (product) {
       addToCart({
@@ -149,8 +148,8 @@ const Profile = () => {
           
           <TabsContent value="wishlist">
             <WishlistTab 
-              wishlistIds={wishlist}
-              onAddToCart={handleAddToCart}
+              wishlistIds={wishlist as number[]}
+              onAddToCart={(productId: number) => handleAddToCart(productId)}
             />
           </TabsContent>
         </Tabs>

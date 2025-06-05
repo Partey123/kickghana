@@ -69,7 +69,7 @@ export const useSupabaseCart = () => {
         .from('cart_items')
         .select('*')
         .eq('user_id', user.id)
-        .eq('product_id', item.id);
+        .eq('product_id', item.id.toString());
 
       if (fetchError) throw fetchError;
 
