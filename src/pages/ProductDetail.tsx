@@ -31,7 +31,6 @@ const ProductDetail = () => {
         return;
       }
 
-      setLoading(true);
       console.log('Loading product with ID:', id);
 
       try {
@@ -39,8 +38,8 @@ const ProductDetail = () => {
         const supabaseProduct = await fetchProductById(id);
         if (supabaseProduct) {
           const convertedProduct = convertSupabaseProduct(supabaseProduct);
-          setProduct(convertedProduct);
           console.log('Loaded Supabase product:', convertedProduct);
+          setProduct(convertedProduct);
           setLoading(false);
           hideLoading();
           return;
@@ -63,8 +62,8 @@ const ProductDetail = () => {
         const localProduct = allLocalProducts.find(p => String(p.id) === String(id));
         if (localProduct) {
           const convertedProduct = convertLocalProduct(localProduct);
-          setProduct(convertedProduct);
           console.log('Loaded local product:', convertedProduct);
+          setProduct(convertedProduct);
         } else {
           console.log('Product not found with ID:', id);
         }
@@ -77,7 +76,7 @@ const ProductDetail = () => {
     };
 
     loadProduct();
-  }, [id, fetchProductById, hideLoading]);
+  }, [id]); // Remove fetchProductById and hideLoading from dependencies to prevent infinite loop
 
   if (loading) {
     return (
@@ -149,7 +148,6 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* Reviews Section */}
         <div className="mt-16">
           <RatingsAndReviews productId={product.supabaseId || product.id} />
         </div>
