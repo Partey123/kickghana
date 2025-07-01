@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { featuredSneakers } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
-import ProductCard, { Product } from "@/components/home/ProductCard";
+import ProductCard from "@/components/home/ProductCard";
 import { ArrowDown, Filter } from "lucide-react";
 import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 import { toast } from "@/components/ui/use-toast";
+import { UnifiedProduct, convertSupabaseProduct, convertLocalProduct } from "@/types/product";
 import {
   Sheet,
   SheetContent,
@@ -32,40 +33,29 @@ const Collections = () => {
   const { addToCart, wishlist, addToWishlist } = useCart();
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [sort, setSort] = useState<string>("none");
-  const [products, setProducts] = useState<Product[]>(featuredSneakers);
+  const [products, setProducts] = useState<UnifiedProduct[]>([]);
   const { products: supabaseProducts, loading: supabaseLoading } = useSupabaseProducts();
   
   const categories = ["All", "Running", "Basketball", "Casual", "Traditional", "Training"];
   
   useEffect(() => {
-    // Convert Supabase products to local format when available
+    // Convert Supabase products to unified format when available
     if (supabaseProducts.length > 0) {
-      const convertedProducts: Product[] = supabaseProducts.map(product => ({
-        id: product.id,
-        name: product.name,
-        price: `GHS ${product.price}`,
-        image: product.image_url || '/sneaker1.png',
-        category: product.category?.name || 'General',
-        colors: product.colors || ['Default'],
-        sizes: product.sizes || ['One Size'],
-        description: product.description,
-        features: product.features || [],
-        rating: product.rating || 4.5,
-        reviews: product.reviews_count || 0,
-        stock: product.stock,
-        isNew: false
-      }));
-      
+      const convertedProducts = supabaseProducts.map(convertSupabaseProduct);
       setProducts(convertedProducts);
+    } else {
+      // Fallback to local products
+      const localProducts = featuredSneakers.map(convertLocalProduct);
+      setProducts(localProducts);
     }
   }, [supabaseProducts]);
   
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: UnifiedProduct) => {
     addToCart({
-      id: product.id,
+      id: product.supabaseId || product.id,
       name: product.name,
-      price: product.price,
-      image: product.image,
+      price: typeof product.price === 'number' ? `GHS ${product.price}` : product.price,
+      image: product.image_url || product.image,
       quantity: 1
     });
     
@@ -82,7 +72,7 @@ const Collections = () => {
   const handleAddToWishlist = (id: number | string) => {
     addToWishlist(id);
     
-    const product = products.find(p => p.id === id);
+    const product = products.find(p => (p.supabaseId || p.id) === id);
     toast({
       title: "Added to Wishlist",
       description: `${product?.name || 'Product'} has been added to your wishlist.`,
@@ -96,12 +86,12 @@ const Collections = () => {
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sort === "price-asc") {
       // Extract numeric price from price string and compare
-      const aPrice = parseFloat(a.price.replace(/[^\d.]/g, ""));
-      const bPrice = parseFloat(b.price.replace(/[^\d.]/g, ""));
+      const aPrice = parseFloat(String(a.price).replace(/[^\d.]/g, ""));
+      const bPrice = parseFloat(String(b.price).replace(/[^\d.]/g, ""));
       return aPrice - bPrice;
     } else if (sort === "price-desc") {
-      const aPrice = parseFloat(a.price.replace(/[^\d.]/g, ""));
-      const bPrice = parseFloat(b.price.replace(/[^\d.]/g, ""));
+      const aPrice = parseFloat(String(a.price).replace(/[^\d.]/g, ""));
+      const bPrice = parseFloat(String(b.price).replace(/[^\d.]/g, ""));
       return bPrice - aPrice;
     } else if (sort === "name-asc") {
       return a.name.localeCompare(b.name);
@@ -215,7 +205,7 @@ const Collections = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
           {sortedProducts.map((product, i) => (
             <motion.div
-              key={product.id}
+              key={product.supabaseId || product.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: i * 0.05 }}
@@ -223,9 +213,9 @@ const Collections = () => {
               <ProductCard 
                 product={product} 
                 onAddToCart={() => handleAddToCart(product)}
-                onAddToWishlist={() => handleAddToWishlist(product.id)}
-                isInWishlist={wishlist.includes(product.id)}
-                onProductClick={() => handleProductClick(product.id)}
+                onAddToWishlist={() => handleAddToWishlist(product.supabaseId || product.id)}
+                isInWishlist={wishlist.includes(product.supabaseId || product.id)}
+                onProductClick={() => handleProductClick(product.supabaseId || product.id)}
               />
             </motion.div>
           ))}
