@@ -19,7 +19,7 @@ import { toast } from "@/components/ui/use-toast";
 
 export interface Review {
   id: string;
-  productId: number;
+  productId: string | number;
   userId: string;
   userName: string;
   rating: number;
@@ -30,7 +30,7 @@ export interface Review {
 }
 
 interface RatingsAndReviewsProps {
-  productId: number;
+  productId: string | number;
   initialReviews?: Review[];
 }
 

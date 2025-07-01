@@ -432,7 +432,7 @@ const ProductDetail = () => {
 
         {/* Reviews Section */}
         <div className="mt-16">
-          <RatingsAndReviews productId={String(product.supabaseId || product.id)} />
+          <RatingsAndReviews productId={product.supabaseId || product.id} />
         </div>
       </div>
       
