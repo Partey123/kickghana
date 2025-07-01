@@ -31,11 +31,23 @@ interface ProductCardProps {
 const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, isInWishlist }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
+  const handleProductClick = () => {
+    console.log('ProductCard: Navigating to product with ID:', product.id);
+    onProductClick(product.id);
+  };
+
+  const handleViewClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('ProductCard: View button clicked for product ID:', product.id);
+    onProductClick(product.id);
+  };
+
   return (
     <div 
-      className="group"
+      className="group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleProductClick}
     >
       <div className="relative rounded-2xl overflow-hidden bg-gray-50/80 aspect-square">
         {/* Product Image */}
@@ -74,7 +86,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, is
               size="icon"
               variant="secondary"
               className="rounded-full bg-white text-secondary hover:bg-primary hover:text-secondary h-10 w-10"
-              onClick={() => onProductClick(product.id)}
+              onClick={handleViewClick}
             >
               <Eye size={18} />
             </Button>
@@ -118,7 +130,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, is
       <div className="mt-4 text-center">
         <h3 
           className="font-medium text-secondary truncate cursor-pointer hover:text-primary transition-colors"
-          onClick={() => onProductClick(product.id)}
+          onClick={handleProductClick}
         >
           {product.name}
         </h3>

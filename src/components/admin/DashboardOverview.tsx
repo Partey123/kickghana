@@ -94,89 +94,89 @@ const DashboardOverview = () => {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <Card>
+          <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-black">Total Orders</CardTitle>
+              <Package className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalOrders}</div>
-              <p className="text-xs text-muted-foreground">All time orders</p>
+              <div className="text-2xl font-bold text-black">{stats.totalOrders}</div>
+              <p className="text-xs text-gray-600">All time orders</p>
             </CardContent>
           </Card>
         </motion.div>
         
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <Card>
+          <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-black">Total Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₵{stats.totalRevenue.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground">Total sales</p>
+              <div className="text-2xl font-bold text-black">₵{stats.totalRevenue.toFixed(2)}</div>
+              <p className="text-xs text-gray-600">Total sales</p>
             </CardContent>
           </Card>
         </motion.div>
         
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <Card>
+          <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
-              <Bell className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-black">Pending Orders</CardTitle>
+              <Bell className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingOrders}</div>
-              <p className="text-xs text-muted-foreground">Needs attention</p>
+              <div className="text-2xl font-bold text-black">{stats.pendingOrders}</div>
+              <p className="text-xs text-gray-600">Needs attention</p>
             </CardContent>
           </Card>
         </motion.div>
         
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-          <Card>
+          <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today's Orders</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-black">Today's Orders</CardTitle>
+              <TrendingUp className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.todayOrders}</div>
-              <p className="text-xs text-muted-foreground">Orders today</p>
+              <div className="text-2xl font-bold text-black">{stats.todayOrders}</div>
+              <p className="text-xs text-gray-600">Orders today</p>
             </CardContent>
           </Card>
         </motion.div>
         
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-          <Card>
+          <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-black">Total Customers</CardTitle>
+              <Users className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalCustomers}</div>
-              <p className="text-xs text-muted-foreground">Unique customers</p>
+              <div className="text-2xl font-bold text-black">{stats.totalCustomers}</div>
+              <p className="text-xs text-gray-600">Unique customers</p>
             </CardContent>
           </Card>
         </motion.div>
         
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
-          <Card>
+          <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Low Stock Alert</CardTitle>
-              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-black">Low Stock Alert</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.lowStockProducts}</div>
-              <p className="text-xs text-muted-foreground">Products low in stock</p>
+              <div className="text-2xl font-bold text-black">{stats.lowStockProducts}</div>
+              <p className="text-xs text-gray-600">Products low in stock</p>
             </CardContent>
           </Card>
         </motion.div>
       </div>
 
       {/* Recent Orders */}
-      <Card>
+      <Card className="bg-white">
         <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
-          <CardDescription>Latest 5 orders from your store</CardDescription>
+          <CardTitle className="text-black">Recent Orders</CardTitle>
+          <CardDescription className="text-gray-600">Latest 5 orders from your store</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -186,17 +186,17 @@ const DashboardOverview = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 bg-white"
               >
                 <div className="space-y-1">
-                  <p className="font-medium">#{order.orderNumber || order.id}</p>
-                  <p className="text-sm text-muted-foreground">{order.customerName}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="font-medium text-black">#{order.orderNumber || order.id}</p>
+                  <p className="text-sm text-gray-700">{order.customerName}</p>
+                  <p className="text-xs text-gray-600">
                     {new Date(order.timestamp || "").toLocaleString()}
                   </p>
                 </div>
                 <div className="text-right space-y-1">
-                  <p className="font-medium">₵{order.totalAmount}</p>
+                  <p className="font-medium text-black">₵{order.totalAmount}</p>
                   <Badge className={`${getStatusColor(order.status)} text-white`}>
                     {order.status}
                   </Badge>
@@ -205,7 +205,7 @@ const DashboardOverview = () => {
             ))}
             
             {recentOrders.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-gray-600">
                 No orders found
               </div>
             )}

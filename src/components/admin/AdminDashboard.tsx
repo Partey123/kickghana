@@ -8,10 +8,10 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Dashboard Overview</TabsTrigger>
-          <TabsTrigger value="orders">Orders Management</TabsTrigger>
-          <TabsTrigger value="products">Products & Inventory</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-white">
+          <TabsTrigger value="overview" className="text-black data-[state=active]:text-black data-[state=active]:bg-gray-100">Dashboard Overview</TabsTrigger>
+          <TabsTrigger value="orders" className="text-black data-[state=active]:text-black data-[state=active]:bg-gray-100">Orders Management</TabsTrigger>
+          <TabsTrigger value="products" className="text-black data-[state=active]:text-black data-[state=active]:bg-gray-100">Products & Inventory</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-6">
