@@ -74,3 +74,6 @@ export const products: Product[] = [
     sizes: ["7", "8", "9", "10", "11", "12"]
   }
 ];
+
+// Export alias for backward compatibility
+export const featuredSneakers = products;
