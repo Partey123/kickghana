@@ -3,28 +3,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, Eye } from "lucide-react";
 import { motion } from "framer-motion";
-
-export interface Product {
-  id: number | string;
-  name: string;
-  price: string;
-  image: string;
-  category: string;
-  colors?: string[];
-  sizes?: string[];
-  description?: string;
-  features?: string[];
-  rating?: number;
-  reviews?: number;
-  stock?: number;
-  isNew?: boolean;
-}
+import { UnifiedProduct } from "@/types/product";
 
 interface ProductCardProps {
-  product: Product;
-  onAddToCart: (id: number | string) => void;
-  onAddToWishlist: (id: number | string) => void;
-  onProductClick: (id: number | string) => void;
+  product: UnifiedProduct;
+  onAddToCart: (id: string | number) => void;
+  onAddToWishlist: (id: string | number) => void;
+  onProductClick: (id: string | number) => void;
   isInWishlist: boolean;
 }
 
@@ -32,15 +17,21 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, is
   const [isHovered, setIsHovered] = useState(false);
 
   const handleProductClick = () => {
-    console.log('ProductCard: Navigating to product with ID:', product.id);
-    onProductClick(product.id);
+    // Use supabaseId if available (for Supabase products), otherwise use regular id
+    const productId = product.supabaseId || product.id;
+    console.log('ProductCard: Navigating to product with ID:', productId);
+    onProductClick(productId);
   };
 
   const handleViewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('ProductCard: View button clicked for product ID:', product.id);
-    onProductClick(product.id);
+    const productId = product.supabaseId || product.id;
+    console.log('ProductCard: View button clicked for product ID:', productId);
+    onProductClick(productId);
   };
+
+  // Ensure price is displayed correctly
+  const displayPrice = typeof product.price === 'number' ? `GHS ${product.price}` : product.price;
 
   return (
     <div 
@@ -52,7 +43,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, is
       <div className="relative rounded-2xl overflow-hidden bg-gray-50/80 aspect-square">
         {/* Product Image */}
         <img 
-          src={product.image} 
+          src={product.image_url || product.image} 
           alt={product.name} 
           className="w-full h-full object-contain transition-transform duration-700 transform group-hover:scale-110"
         />
@@ -73,7 +64,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, is
               className="rounded-full bg-white text-secondary hover:bg-primary hover:text-secondary h-10 w-10"
               onClick={(e) => {
                 e.stopPropagation();
-                onAddToWishlist(product.id);
+                onAddToWishlist(product.supabaseId || product.id);
               }}
             >
               <Heart 
@@ -97,7 +88,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, is
               className="rounded-full bg-white text-secondary hover:bg-primary hover:text-secondary h-10 w-10"
               onClick={(e) => {
                 e.stopPropagation();
-                onAddToCart(product.id);
+                onAddToCart(product.supabaseId || product.id);
               }}
             >
               <ShoppingBag size={18} />
@@ -110,7 +101,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, is
           <Button 
             onClick={(e) => {
               e.stopPropagation();
-              onAddToCart(product.id);
+              onAddToCart(product.supabaseId || product.id);
             }}
             className="w-full bg-primary text-secondary hover:bg-primary/90 rounded-full"
           >
@@ -135,7 +126,7 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, is
           {product.name}
         </h3>
         <span className="block mt-1 font-semibold text-primary">
-          {product.price}
+          {displayPrice}
         </span>
       </div>
     </div>

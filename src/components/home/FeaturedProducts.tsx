@@ -1,13 +1,14 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import ProductCard, { Product } from "./ProductCard";
+import ProductCard from "./ProductCard";
 import { motion } from "framer-motion";
 import { useCart, CartItem } from "@/contexts/CartContext";
 import { featuredSneakers } from "@/data/products";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 import { toast } from "@/components/ui/use-toast";
+import { UnifiedProduct, convertSupabaseProduct, convertLocalProduct } from "@/types/product";
 
 interface FeaturedProductsProps {
   cartItems: (number | string)[];
@@ -19,7 +20,7 @@ interface FeaturedProductsProps {
 const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: FeaturedProductsProps) => {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [dataLoaded, setDataLoaded] = useState(false);
-  const [products, setProducts] = useState<Product[]>(featuredSneakers);
+  const [products, setProducts] = useState<UnifiedProduct[]>([]);
   const categories = ["All", "Running", "Basketball", "Casual", "Traditional", "Training"];
   const navigate = useNavigate();
   const { showLoading, hideLoading } = useLoading();
@@ -30,7 +31,8 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
     
     // Listen for product updates from admin dashboard
     const handleProductsUpdate = (event: CustomEvent) => {
-      setProducts(event.detail);
+      const updatedProducts = event.detail.map(convertLocalProduct);
+      setProducts(updatedProducts);
     };
     
     window.addEventListener('productsUpdated', handleProductsUpdate as EventListener);
@@ -49,34 +51,19 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
       const timer = setTimeout(() => {
         hideLoading();
         setDataLoaded(true);
-      }, 1500); // Reduced timeout to 1.5 seconds
+      }, 1500);
       
       return () => {
         clearTimeout(timer);
-        hideLoading(); // Ensure hideLoading is called when component unmounts
+        hideLoading();
       };
     }
   }, [dataLoaded, showLoading, hideLoading]);
 
   useEffect(() => {
-    // Convert Supabase products to local format when available
+    // Convert Supabase products to unified format when available
     if (supabaseProducts.length > 0) {
-      const convertedProducts: Product[] = supabaseProducts.map(product => ({
-        id: product.id,
-        name: product.name,
-        price: `GHS ${product.price}`,
-        image: product.image_url || '/sneaker1.png',
-        category: product.category?.name || 'General',
-        colors: product.colors || ['Default'],
-        sizes: product.sizes || ['One Size'],
-        description: product.description,
-        features: product.features || [],
-        rating: product.rating || 4.5,
-        reviews: product.reviews_count || 0,
-        stock: product.stock,
-        isNew: false
-      }));
-      
+      const convertedProducts = supabaseProducts.map(convertSupabaseProduct);
       console.log('Converted Supabase products:', convertedProducts);
       setProducts(convertedProducts);
       setDataLoaded(true);
@@ -89,26 +76,29 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
     if (updatedProducts) {
       try {
         const parsedProducts = JSON.parse(updatedProducts);
-        setProducts(parsedProducts);
+        const convertedProducts = parsedProducts.map(convertLocalProduct);
+        setProducts(convertedProducts);
       } catch (error) {
         console.error("Error parsing updated products:", error);
-        setProducts(featuredSneakers);
+        const fallbackProducts = featuredSneakers.map(convertLocalProduct);
+        setProducts(fallbackProducts);
       }
     } else {
       // Load custom products and combine with featured sneakers
       const customProducts = JSON.parse(localStorage.getItem("admin_products") || "[]");
-      const allProducts = [...featuredSneakers, ...customProducts];
-      setProducts(allProducts);
+      const allLocalProducts = [...featuredSneakers, ...customProducts];
+      const convertedProducts = allLocalProducts.map(convertLocalProduct);
+      setProducts(convertedProducts);
     }
   };
   
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: UnifiedProduct) => {
     console.log('Adding product to cart:', product);
     addToCart({
-      id: product.id,
+      id: product.supabaseId || product.id,
       name: product.name,
-      price: product.price,
-      image: product.image,
+      price: typeof product.price === 'number' ? `GHS ${product.price}` : product.price,
+      image: product.image_url || product.image,
       quantity: 1
     });
     
@@ -118,17 +108,17 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
     });
   };
   
-  const handleProductClick = (id: number | string) => {
+  const handleProductClick = (id: string | number) => {
     // Show loading animation before navigating
     showLoading("Loading product details...");
     navigate(`/product/${id}`);
   };
   
-  const handleAddToWishlist = (id: number | string) => {
+  const handleAddToWishlist = (id: string | number) => {
     console.log('Adding to wishlist:', id);
     addToWishlist(id);
     
-    const product = products.find(p => p.id === id);
+    const product = products.find(p => (p.supabaseId || p.id) === id);
     toast({
       title: "Added to Wishlist",
       description: `${product?.name || 'Product'} has been added to your wishlist.`,
@@ -168,20 +158,20 @@ const FeaturedProducts = ({ cartItems, wishlist, addToCart, addToWishlist }: Fea
         
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {filteredProducts.map((sneaker, i) => (
+          {filteredProducts.map((product, i) => (
             <motion.div
-              key={sneaker.id}
+              key={product.supabaseId || product.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
               viewport={{ once: true }}
             >
               <ProductCard 
-                product={sneaker} 
-                onAddToCart={() => handleAddToCart(sneaker)}
-                onAddToWishlist={() => handleAddToWishlist(sneaker.id)}
-                isInWishlist={wishlist.includes(sneaker.id)}
-                onProductClick={() => handleProductClick(sneaker.id)}
+                product={product} 
+                onAddToCart={() => handleAddToCart(product)}
+                onAddToWishlist={() => handleAddToWishlist(product.supabaseId || product.id)}
+                isInWishlist={wishlist.includes(product.supabaseId || product.id)}
+                onProductClick={() => handleProductClick(product.supabaseId || product.id)}
               />
             </motion.div>
           ))}

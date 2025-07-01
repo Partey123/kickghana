@@ -33,9 +33,51 @@ export const useSupabaseProducts = () => {
     }
   };
 
+  const fetchProductById = async (id: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          category:categories(*)
+        `)
+        .eq('id', id)
+        .eq('is_active', true)
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('Error fetching product by ID:', err);
+      return null;
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
+
+    // Set up real-time subscription for product changes
+    const channel = supabase
+      .channel('products-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'products' },
+        () => {
+          console.log('Products changed, refetching...');
+          fetchProducts();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  return { products, loading, error, refetch: fetchProducts };
+  return { 
+    products, 
+    loading, 
+    error, 
+    refetch: fetchProducts,
+    fetchProductById 
+  };
 };

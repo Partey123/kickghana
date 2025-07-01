@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -9,63 +8,88 @@ import { toast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { useCart } from "@/contexts/CartContext";
 import { featuredSneakers } from "@/data/products";
-
-// Define the Product interface to match our data structure
-interface Product {
-  id: number;
-  name: string;
-  price: string;
-  image: string;
-  category: string;
-  colors?: string[];
-  sizes?: (string | number)[];
-  description?: string;
-  features?: string[] | string;
-  rating?: number;
-  reviews?: number;
-  stock?: number;
-  isNew?: boolean;
-}
+import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
+import { UnifiedProduct, convertSupabaseProduct, convertLocalProduct } from "@/types/product";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart, addToWishlist, wishlist, totalItems } = useCart();
+  const { addToCart, addToWishlist, wishlist } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [isInWishlist, setIsInWishlist] = useState(false);
-  const [product, setProduct] = useState<Product | null>(null);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [product, setProduct] = useState<UnifiedProduct | null>(null);
+  const [allProducts, setAllProducts] = useState<UnifiedProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const { fetchProductById } = useSupabaseProducts();
   
   useEffect(() => {
-    loadProducts();
+    loadProduct();
   }, [id]);
 
-  const loadProducts = () => {
+  const loadProduct = async () => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // First try to get product from Supabase
+      const supabaseProduct = await fetchProductById(id);
+      
+      if (supabaseProduct) {
+        const convertedProduct = convertSupabaseProduct(supabaseProduct);
+        setProduct(convertedProduct);
+        setIsInWishlist(wishlist.includes(convertedProduct.supabaseId || convertedProduct.id));
+        
+        // Set default selections if available
+        if (convertedProduct.colors && convertedProduct.colors.length > 0) {
+          setSelectedColor(convertedProduct.colors[0]);
+        }
+        if (convertedProduct.sizes && convertedProduct.sizes.length > 0) {
+          setSelectedSize(String(convertedProduct.sizes[0]));
+        }
+      } else {
+        // Fallback to local products
+        loadLocalProducts();
+      }
+    } catch (error) {
+      console.error("Error loading product:", error);
+      loadLocalProducts();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadLocalProducts = () => {
     try {
       // Load products from admin dashboard
       const updatedProducts = localStorage.getItem("app_products");
-      let products: Product[] = [];
+      let localProducts: any[] = [];
       
       if (updatedProducts) {
-        products = JSON.parse(updatedProducts);
+        localProducts = JSON.parse(updatedProducts);
       } else {
         // Fallback to custom products + featured sneakers
         const customProducts = JSON.parse(localStorage.getItem("admin_products") || "[]");
-        products = [...featuredSneakers, ...customProducts];
+        localProducts = [...featuredSneakers, ...customProducts];
       }
       
-      setAllProducts(products);
+      const convertedProducts = localProducts.map(convertLocalProduct);
+      setAllProducts(convertedProducts);
       
-      // Find the specific product by ID
-      const foundProduct = products.find(p => p.id.toString() === id);
+      // Find the specific product by ID (handle both string and number IDs)
+      const foundProduct = convertedProducts.find(p => 
+        p.id.toString() === id?.toString()
+      );
       
       if (foundProduct) {
         setProduct(foundProduct);
-        // Check if product is in wishlist
         setIsInWishlist(wishlist.includes(foundProduct.id));
+        
         // Set default selections if available
         if (foundProduct.colors && foundProduct.colors.length > 0) {
           setSelectedColor(foundProduct.colors[0]);
@@ -74,20 +98,18 @@ const ProductDetail = () => {
           setSelectedSize(String(foundProduct.sizes[0]));
         }
       } else {
-        // If product not found, fallback to first product or show error
         console.warn(`Product with ID ${id} not found`);
-        if (products.length > 0) {
-          setProduct(products[0]);
+        if (convertedProducts.length > 0) {
+          setProduct(convertedProducts[0]);
         }
       }
     } catch (error) {
-      console.error("Error loading products:", error);
-      // Fallback to featured sneakers
-      setAllProducts(featuredSneakers);
-      const fallbackProduct = featuredSneakers.find(p => p.id.toString() === id) || featuredSneakers[0];
+      console.error("Error loading local products:", error);
+      // Final fallback to featured sneakers
+      const fallbackProducts = featuredSneakers.map(convertLocalProduct);
+      setAllProducts(fallbackProducts);
+      const fallbackProduct = fallbackProducts.find(p => p.id.toString() === id?.toString()) || fallbackProducts[0];
       setProduct(fallbackProduct);
-    } finally {
-      setLoading(false);
     }
   };
   
@@ -104,10 +126,10 @@ const ProductDetail = () => {
     }
     
     addToCart({
-      id: product.id,
+      id: product.supabaseId || product.id,
       name: product.name,
-      price: product.price,
-      image: product.image,
+      price: typeof product.price === 'number' ? `GHS ${product.price}` : product.price,
+      image: product.image_url || product.image,
       quantity: quantity,
       color: selectedColor,
       size: selectedSize
@@ -117,7 +139,7 @@ const ProductDetail = () => {
   const handleToggleWishlist = () => {
     if (!product) return;
     setIsInWishlist(!isInWishlist);
-    addToWishlist(product.id);
+    addToWishlist(product.supabaseId || product.id);
   };
   
   const incrementQuantity = () => setQuantity(prev => prev + 1);
@@ -173,7 +195,8 @@ const ProductDetail = () => {
     features: Array.isArray(product.features) ? product.features : (product.features ? product.features.split(',').map(f => f.trim()) : ["Premium quality", "Comfortable fit", "Durable construction"]),
     rating: product.rating || 4.5,
     reviews: product.reviews || 0,
-    description: product.description || "High-quality footwear designed for comfort and style."
+    description: product.description || "High-quality footwear designed for comfort and style.",
+    price: typeof product.price === 'number' ? `GHS ${product.price}` : product.price
   };
 
   return (
@@ -199,7 +222,7 @@ const ProductDetail = () => {
               className="aspect-square flex items-center justify-center overflow-hidden relative"
             >
               <motion.img 
-                src={product.image} 
+                src={product.image_url || product.image} 
                 alt={product.name} 
                 className="max-h-[400px] object-contain"
                 whileHover={{ scale: 1.05, rotate: 5 }}
@@ -241,7 +264,7 @@ const ProductDetail = () => {
                 <span className="ml-2 text-gray-600">{displayProduct.rating} ({displayProduct.reviews} reviews)</span>
               </div>
               
-              <p className="text-4xl font-bold text-red-900 mb-6">{product.price}</p>
+              <p className="text-4xl font-bold text-red-900 mb-6">{displayProduct.price}</p>
               
               <p className="text-gray-600 mb-6">{displayProduct.description}</p>
               
@@ -438,44 +461,46 @@ const ProductDetail = () => {
         </div>
         
         {/* Related Products */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">You May Also Like</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {allProducts
-              .filter(p => p.id.toString() !== id && p.category === product.category)
-              .slice(0, 3)
-              .map(relatedProduct => (
-                <motion.div
-                  key={relatedProduct.id}
-                  whileHover={{ y: -5 }}
-                  className="bg-white/90 rounded-lg overflow-hidden shadow-md cursor-pointer"
-                  onClick={() => navigate(`/product/${relatedProduct.id}`)}
-                >
-                  <div className="bg-gradient-to-b from-amber-50/80 to-amber-100/80 p-4">
-                    <div className="aspect-square flex items-center justify-center">
-                      <img 
-                        src={relatedProduct.image} 
-                        alt={relatedProduct.name} 
-                        className="h-40 object-contain"
-                      />
+        {allProducts.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">You May Also Like</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {allProducts
+                .filter(p => (p.supabaseId || p.id).toString() !== id?.toString() && p.category === product.category)
+                .slice(0, 3)
+                .map(relatedProduct => (
+                  <motion.div
+                    key={relatedProduct.supabaseId || relatedProduct.id}
+                    whileHover={{ y: -5 }}
+                    className="bg-white/90 rounded-lg overflow-hidden shadow-md cursor-pointer"
+                    onClick={() => navigate(`/product/${relatedProduct.supabaseId || relatedProduct.id}`)}
+                  >
+                    <div className="bg-gradient-to-b from-amber-50/80 to-amber-100/80 p-4">
+                      <div className="aspect-square flex items-center justify-center">
+                        <img 
+                          src={relatedProduct.image_url || relatedProduct.image} 
+                          alt={relatedProduct.name} 
+                          className="h-40 object-contain"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-1 rounded">
-                      {relatedProduct.category}
-                    </span>
-                    <h3 className="mt-2 font-semibold text-gray-800">{relatedProduct.name}</h3>
-                    <p className="font-bold text-red-900">{relatedProduct.price}</p>
-                    {relatedProduct.stock !== undefined && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        {relatedProduct.stock > 0 ? `${relatedProduct.stock} in stock` : 'Out of stock'}
-                      </p>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
+                    <div className="p-4">
+                      <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-1 rounded">
+                        {relatedProduct.category}
+                      </span>
+                      <h3 className="mt-2 font-semibold text-gray-800">{relatedProduct.name}</h3>
+                      <p className="font-bold text-red-900">{typeof relatedProduct.price === 'number' ? `GHS ${relatedProduct.price}` : relatedProduct.price}</p>
+                      {relatedProduct.stock !== undefined && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {relatedProduct.stock > 0 ? `${relatedProduct.stock} in stock` : 'Out of stock'}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
       
       {/* Footer */}
