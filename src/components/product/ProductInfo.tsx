@@ -30,7 +30,9 @@ export const ProductInfo = ({ product }: ProductInfoProps) => {
       name: product.name,
       price: displayPrice,
       image: product.image_url || product.image,
-      quantity: quantity
+      quantity: quantity,
+      color: selectedColor || undefined,
+      size: selectedSize || undefined
     });
     
     toast({

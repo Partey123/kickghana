@@ -64,12 +64,14 @@ export const useSupabaseCart = () => {
     if (!user) return;
 
     try {
-      // Check if item already exists in cart
+      // Check if item already exists in cart with same options
       const { data: existingItems, error: fetchError } = await supabase
         .from('cart_items')
         .select('*')
         .eq('user_id', user.id)
-        .eq('product_id', item.id.toString());
+        .eq('product_id', item.id.toString())
+        .eq('color', item.color || null)
+        .eq('size', item.size || null);
 
       if (fetchError) throw fetchError;
 
@@ -79,9 +81,7 @@ export const useSupabaseCart = () => {
         const { error: updateError } = await supabase
           .from('cart_items')
           .update({ 
-            quantity: existingItem.quantity + item.quantity,
-            color: item.color,
-            size: item.size 
+            quantity: existingItem.quantity + item.quantity
           })
           .eq('id', existingItem.id);
 
@@ -146,6 +146,29 @@ export const useSupabaseCart = () => {
     }
   };
 
+  const updateCartItemOptions = async (productId: number | string, options: { color?: string; size?: string }) => {
+    if (!user) return;
+
+    try {
+      const updateData: any = {};
+      if (options.color !== undefined) updateData.color = options.color;
+      if (options.size !== undefined) updateData.size = options.size;
+
+      const { error } = await supabase
+        .from('cart_items')
+        .update(updateData)
+        .eq('user_id', user.id)
+        .eq('product_id', productId.toString());
+
+      if (error) throw error;
+
+      await fetchCartItems();
+    } catch (error) {
+      console.error('Error updating cart item options:', error);
+      throw error;
+    }
+  };
+
   const clearCart = async () => {
     if (!user) return;
 
@@ -170,6 +193,7 @@ export const useSupabaseCart = () => {
     addToCart,
     removeFromCart,
     updateQuantity,
+    updateCartItemOptions,
     clearCart,
     refetch: fetchCartItems
   };

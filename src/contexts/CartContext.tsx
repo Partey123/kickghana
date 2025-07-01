@@ -21,6 +21,7 @@ interface CartContextType {
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: number | string) => void;
   updateQuantity: (id: number | string, quantity: number) => void;
+  updateCartItemOptions: (id: number | string, options: { color?: string; size?: string }) => void;
   clearCart: () => void;
   addToWishlist: (id: number | string) => void;
   removeFromWishlist: (id: number | string) => void;
@@ -43,6 +44,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     addToCart: addToSupabaseCart,
     removeFromCart: removeFromSupabaseCart,
     updateQuantity: updateSupabaseQuantity,
+    updateCartItemOptions: updateSupabaseCartItemOptions,
     clearCart: clearSupabaseCart,
     loading: cartLoading 
   } = useSupabaseCart();
@@ -110,11 +112,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } else {
       // Local storage logic
       setLocalCartItems(prev => {
-        const existingItem = prev.find(cartItem => cartItem.id === item.id);
+        const existingItem = prev.find(cartItem => 
+          cartItem.id === item.id && 
+          cartItem.color === item.color && 
+          cartItem.size === item.size
+        );
         
         if (existingItem) {
           return prev.map(cartItem =>
-            cartItem.id === item.id
+            cartItem.id === item.id && 
+            cartItem.color === item.color && 
+            cartItem.size === item.size
               ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
               : cartItem
           );
@@ -163,6 +171,27 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       setLocalCartItems(prev =>
         prev.map(item =>
           item.id === id ? { ...item, quantity } : item
+        )
+      );
+    }
+  };
+
+  const updateCartItemOptions = async (id: number | string, options: { color?: string; size?: string }) => {
+    if (user) {
+      try {
+        await updateSupabaseCartItemOptions(id, options);
+      } catch (error) {
+        console.error('Error updating Supabase cart item options:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update item options. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setLocalCartItems(prev =>
+        prev.map(item =>
+          item.id === id ? { ...item, ...options } : item
         )
       );
     }
@@ -238,6 +267,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     addToCart,
     removeFromCart,
     updateQuantity,
+    updateCartItemOptions,
     clearCart,
     addToWishlist,
     removeFromWishlist,
