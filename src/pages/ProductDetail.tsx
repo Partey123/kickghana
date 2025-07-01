@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -367,7 +366,7 @@ const ProductDetail = () => {
             {/* Stock Info */}
             {product.stock !== undefined && (
               <div>
-                {product.stock > 0 ? (
+                {typeof product.stock === 'number' && product.stock > 0 ? (
                   <Badge variant="secondary" className="bg-green-100 text-green-800">
                     {product.stock} in stock
                   </Badge>
@@ -383,7 +382,7 @@ const ProductDetail = () => {
                 <Button 
                   onClick={handleAddToCart}
                   className="flex-1 gap-2"
-                  disabled={product.stock === 0}
+                  disabled={typeof product.stock === 'number' && product.stock === 0}
                 >
                   <ShoppingBag size={18} />
                   Add to Cart

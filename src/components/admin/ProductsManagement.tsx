@@ -131,8 +131,12 @@ const ProductsManagement = () => {
     }
 
     try {
+      // Generate slug from product name
+      const slug = newProduct.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      
       const productData = {
         name: newProduct.name,
+        slug: slug,
         price: parseFloat(newProduct.price),
         category_id: newProduct.category_id,
         description: newProduct.description,
@@ -163,7 +167,7 @@ const ProductsManagement = () => {
         // Add new product
         result = await supabase
           .from('products')
-          .insert([productData])
+          .insert(productData)
           .select();
         
         toast({
