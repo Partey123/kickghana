@@ -6,7 +6,7 @@ import { toast } from "@/components/ui/use-toast";
 import HeroSection from "@/components/home/HeroSection";
 import CategorySection from "@/components/home/CategorySection";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
-import PromoSlider from "@/components/home/PromoSlider";
+import HotDealsSlider from "@/components/home/HotDealsSlider";
 import CTASection from "@/components/home/CTASection";
 import Footer from "@/components/home/Footer";
 import SearchModal from "@/components/home/SearchModal";
@@ -60,12 +60,12 @@ const Home = () => {
       </motion.div>
       
       <motion.div
-        key="promo-slider"
+        key="hot-deals-slider"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.5 }}
       >
-        <PromoSlider />
+        <HotDealsSlider />
       </motion.div>
       
       <motion.div

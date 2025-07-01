@@ -24,8 +24,6 @@ const Checkout = lazy(() => import("./pages/Checkout"));
 const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
 const OrderTracking = lazy(() => import("./pages/OrderTracking"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
-const Promotions = lazy(() => import("./pages/Promotions"));
-const PromotionDetail = lazy(() => import("./pages/PromotionDetail"));
 const Accessories = lazy(() => import("./pages/Accessories"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const Login = lazy(() => import("./pages/auth/Login"));
@@ -51,8 +49,6 @@ const App = () => {
                     <Route path="/collections" element={<Collections />} />
                     <Route path="/product/:id" element={<ProductDetail />} />
                     <Route path="/accessories" element={<Accessories />} />
-                    <Route path="/promotions" element={<Promotions />} />
-                    <Route path="/promotion/:id" element={<PromotionDetail />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/onboarding" element={<Onboarding />} />
