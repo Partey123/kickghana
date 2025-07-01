@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<UnifiedProduct | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState<number>(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const { products: supabaseProducts, fetchProductById } = useSupabaseProducts();
@@ -109,7 +110,7 @@ const ProductDetail = () => {
       name: product.name,
       price: typeof product.price === 'number' ? `GHS ${product.price}` : product.price,
       image: product.image_url || product.image,
-      quantity
+      quantity: Number(quantity)
     });
     
     toast({
