@@ -49,7 +49,7 @@ const CheckoutForm = ({ onSubmit, isSubmitting, deliverySpeed, setDeliverySpeed 
   }, [selectedPaymentType]);
   
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 shadow-md text-white">
+    <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Delivery Information Component */}

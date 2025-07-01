@@ -1,40 +1,69 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Plus, Minus, Trash2, ShoppingBag, ArrowLeft, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
-import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
-import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, subtotal, totalItems } = useCart();
+  const [isRemoving, setIsRemoving] = useState<number | string | null>(null);
   const navigate = useNavigate();
-  
-  const handleQuantityChange = (id: number, newQuantity: number) => {
-    if (newQuantity >= 1) {
-      updateQuantity(id, newQuantity);
+
+  const handleRemoveItem = async (id: number | string) => {
+    setIsRemoving(id);
+    setTimeout(() => {
+      removeFromCart(id);
+      setIsRemoving(null);
+    }, 300);
+  };
+
+  const handleUpdateQuantity = (id: number | string, quantity: number) => {
+    if (quantity < 1) {
+      handleRemoveItem(id);
+    } else {
+      updateQuantity(id, quantity);
     }
+  };
+
+  const calculateItemTotal = (price: string, quantity: number) => {
+    const numericPrice = parseFloat(price.replace(/[^\d.]/g, ""));
+    return (numericPrice * quantity).toFixed(2);
   };
 
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-background/80">
         <Navbar />
-        <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-          <div className="bg-white/90 rounded-xl p-12 shadow-md">
-            <ShoppingBag size={64} className="mx-auto text-primary mb-4" />
-            <h1 className="text-3xl font-bold text-secondary mb-4">Your cart is empty</h1>
-            <p className="text-gray-600 mb-8">Looks like you haven't added any items to your cart yet.</p>
-            <Button 
-              onClick={() => navigate("/home")}
-              className="bg-primary text-secondary px-8 py-6 rounded-full text-lg"
-            >
-              Continue Shopping
-            </Button>
+        
+        <div className="max-w-4xl mx-auto px-4 py-16">
+          <div className="text-center">
+            <ShoppingBag size={80} className="mx-auto text-gray-400 mb-6" />
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
+            <p className="text-gray-600 mb-8">Add some items to your cart to get started</p>
+            <div className="flex gap-4 justify-center">
+              <Button 
+                onClick={() => navigate("/home")}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Home size={20} />
+                Home
+              </Button>
+              <Button 
+                onClick={() => navigate("/collections")}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                Shop Now
+              </Button>
+            </div>
           </div>
         </div>
+        
         <Footer />
       </div>
     );
@@ -45,133 +74,156 @@ const Cart = () => {
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-8">Your Cart</h1>
+        <div className="flex items-center gap-4 mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/collections")}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft size={20} />
+            Continue Shopping
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/home")}
+            className="flex items-center gap-2"
+          >
+            <Home size={20} />
+            Home
+          </Button>
+        </div>
+
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
           <div className="lg:col-span-2">
-            <div className="bg-white/90 rounded-xl p-6 shadow-md">
-              <div className="hidden md:grid md:grid-cols-12 gap-4 border-b pb-4 text-sm font-medium text-gray-500">
-                <div className="md:col-span-6">Product</div>
-                <div className="md:col-span-2 text-center">Price</div>
-                <div className="md:col-span-2 text-center">Quantity</div>
-                <div className="md:col-span-2 text-center">Total</div>
-              </div>
-              
-              <div className="space-y-4 mt-4">
-                {cartItems.map((item, index) => {
-                  const priceValue = parseFloat(item.price.replace(/[^\d.]/g, ""));
-                  const totalPrice = priceValue * item.quantity;
-                  
-                  return (
-                    <motion.div 
-                      key={`${item.id}-${item.color || 'default'}-${item.size || 'default'}-${index}`}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="grid grid-cols-1 md:grid-cols-12 gap-4 py-4 border-b"
-                    >
-                      {/* Product */}
-                      <div className="md:col-span-6 flex gap-3">
-                        <div className="w-20 h-20 bg-gray-100 rounded-md overflow-hidden">
-                          <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+            <div className="space-y-4">
+              {cartItems.map((item) => (
+                <motion.div
+                  key={`${item.id}-${item.color}-${item.size}`}
+                  layout
+                  initial={{ opacity: 1, scale: 1 }}
+                  animate={{ 
+                    opacity: isRemoving === item.id ? 0 : 1,
+                    scale: isRemoving === item.id ? 0.9 : 1 
+                  }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card className="bg-white/95 backdrop-blur-sm shadow-md">
+                    <CardContent className="p-6">
+                      <div className="flex gap-6">
+                        <div className="w-24 h-24 bg-gray-100 rounded-md overflow-hidden">
+                          <img 
+                            src={item.image} 
+                            alt={item.name}
+                            className="w-full h-full object-contain"
+                          />
                         </div>
-                        <div>
-                          <h3 className="font-medium text-secondary">{item.name}</h3>
-                          {item.color && <p className="text-sm text-gray-500">Color: {item.color}</p>}
-                          {item.size && <p className="text-sm text-gray-500">Size: {item.size}</p>}
-                          <button 
-                            onClick={() => removeFromCart(item.id)}
-                            className="text-red-500 text-sm flex items-center mt-1 md:hidden"
-                          >
-                            <Trash2 size={14} className="mr-1" /> Remove
-                          </button>
+                        
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
+                          
+                          <div className="flex gap-2 mb-3">
+                            {item.color && (
+                              <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                                {item.color}
+                              </Badge>
+                            )}
+                            {item.size && (
+                              <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                                Size {item.size}
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center border rounded-md">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Minus size={14} />
+                              </Button>
+                              <span className="px-3 py-1 text-gray-900">{item.quantity}</span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Plus size={14} />
+                              </Button>
+                            </div>
+                            
+                            <div className="text-right">
+                              <p className="font-semibold text-gray-900">
+                                GHS {calculateItemTotal(item.price, item.quantity)}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                {item.price} each
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      
-                      {/* Price */}
-                      <div className="md:col-span-2 flex md:justify-center items-center">
-                        <span className="text-sm md:text-base font-medium">{item.price}</span>
-                      </div>
-                      
-                      {/* Quantity */}
-                      <div className="md:col-span-2 flex md:justify-center items-center">
-                        <div className="flex items-center border border-gray-200 rounded">
-                          <button 
-                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)} 
-                            className="px-2 py-1 text-gray-600 hover:bg-gray-100"
-                          >
-                            <Minus size={14} />
-                          </button>
-                          <span className="px-3 py-1">{item.quantity}</span>
-                          <button 
-                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                            className="px-2 py-1 text-gray-600 hover:bg-gray-100" 
-                          >
-                            <Plus size={14} />
-                          </button>
-                        </div>
-                      </div>
-                      
-                      {/* Total */}
-                      <div className="md:col-span-2 flex justify-between md:justify-center items-center">
-                        <span className="font-medium md:hidden">Total:</span>
-                        <span className="font-medium text-primary">₵{totalPrice.toFixed(2)}</span>
-                        <button 
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-red-500 hidden md:flex items-center ml-4"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
             </div>
           </div>
           
-          {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white/90 rounded-xl p-6 shadow-md">
-              <h2 className="text-xl font-bold mb-4 text-secondary">Order Summary</h2>
-              
-              <div className="space-y-3 border-b pb-4">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal:</span>
-                  <span className="font-medium">{subtotal}</span>
+            <Card className="bg-white/95 backdrop-blur-sm shadow-md sticky top-4">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Items ({totalItems})</span>
+                    <span>{subtotal}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Shipping</span>
+                    <span>Calculated at checkout</span>
+                  </div>
+                  <div className="border-t pt-3">
+                    <div className="flex justify-between font-semibold text-gray-900">
+                      <span>Total</span>
+                      <span>{subtotal}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping:</span>
-                  <span className="font-medium">₵30.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tax:</span>
-                  <span className="font-medium">₵0.00</span>
-                </div>
-              </div>
-              
-              <div className="flex justify-between py-4">
-                <span className="text-lg font-bold">Total:</span>
-                <span className="text-lg font-bold text-primary">
-                  ₵{(parseFloat(subtotal.replace(/[^\d.]/g, "")) + 30).toFixed(2)}
-                </span>
-              </div>
-              
-              <Button 
-                onClick={() => navigate("/checkout")}
-                className="w-full bg-primary text-secondary hover:bg-primary/90 flex items-center justify-center gap-2 py-6"
-              >
-                Proceed to Checkout <ArrowRight size={16} />
-              </Button>
-              
-              <button 
-                onClick={() => navigate("/home")}
-                className="w-full mt-4 text-secondary hover:text-primary flex items-center justify-center"
-              >
-                Continue Shopping
-              </button>
-            </div>
+                
+                <Button 
+                  onClick={() => navigate("/checkout")}
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3"
+                >
+                  Proceed to Checkout
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate("/collections")}
+                  className="w-full mt-3"
+                >
+                  Continue Shopping
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

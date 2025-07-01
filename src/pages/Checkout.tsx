@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Home, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/home/Footer";
 import { useCart } from "@/contexts/CartContext";
@@ -150,11 +152,30 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background/80">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-8">Checkout</h1>
+        <div className="flex items-center gap-4 mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/cart")}
+            className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+          >
+            <ArrowLeft size={20} />
+            Back to Cart
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/home")}
+            className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+          >
+            <Home size={20} />
+            Home
+          </Button>
+        </div>
+
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Checkout</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Checkout Form */}
