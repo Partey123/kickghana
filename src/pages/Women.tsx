@@ -63,6 +63,19 @@ const Women = () => {
     navigate(`/product/${productId}`);
   };
 
+  const handleAddToCart = (product: any) => {
+    const cartItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1,
+      size: product.sizes[0] || "",
+      color: product.colors[0] || ""
+    };
+    addToCart(cartItem);
+  };
+
   const filteredProducts = womensProducts.filter(product => 
     filterBy === "all" || product.category.toLowerCase() === filterBy
   );
@@ -139,8 +152,8 @@ const Women = () => {
               product={product}
               isInCart={cartItems.some(item => item.id === product.id)}
               isInWishlist={wishlist.includes(product.id)}
-              onAddToCart={addToCart}
-              onAddToWishlist={addToWishlist}
+              onAddToCart={() => handleAddToCart(product)}
+              onAddToWishlist={() => addToWishlist(product.id)}
               onClick={() => handleProductClick(product.id)}
             />
           ))}
