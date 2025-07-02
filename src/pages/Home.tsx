@@ -9,7 +9,7 @@ import FeaturedProducts from "@/components/home/FeaturedProducts";
 import HotDealsSlider from "@/components/home/HotDealsSlider";
 import CTASection from "@/components/home/CTASection";
 import Footer from "@/components/home/Footer";
-import SearchModal from "@/components/home/SearchModal";
+import FunctionalSearchModal from "@/components/home/FunctionalSearchModal";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -93,7 +93,7 @@ const Home = () => {
       
       <Footer />
       
-      <SearchModal 
+      <FunctionalSearchModal 
         showSearchModal={showSearchModal}
         setShowSearchModal={setShowSearchModal}
         searchTerm={searchTerm}
