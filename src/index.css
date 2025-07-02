@@ -9,67 +9,67 @@
 
 @layer base {
   :root {
-    /* Light mode - Kente Heritage palette */
-    --background: 0 0% 96%; /* #F5F5F5 - Neutral Light */
-    --foreground: 0 0% 10%; /* #1A1A1A - Neutral Dark */
+    /* Light mode - Modern Ghanaian Sunset palette */
+    --background: 30 15% 97%; /* #FAF8F5 - Warm Cream */
+    --foreground: 30 10% 15%; /* #2A2520 - Rich Dark Brown */
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 30 10% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 30 10% 15%;
 
-    --primary: 46 65% 52%; /* #D4AF37 - Rich Gold */
-    --primary-foreground: 0 0% 10%; /* Near Black on Gold */
+    --primary: 25 85% 55%; /* #E8761A - Vibrant Sunset Orange */
+    --primary-foreground: 0 0% 100%; /* White on Orange */
 
-    --secondary: 162 98% 20%; /* #016450 - Emerald Green */
-    --secondary-foreground: 0 0% 96%; /* Off-White on Green */
+    --secondary: 165 75% 35%; /* #15A085 - Teal Green */
+    --secondary-foreground: 0 0% 100%; /* White on Teal */
 
-    --accent: 350 100% 29%; /* #950020 - Deep Red */
-    --accent-foreground: 0 0% 96%; /* Off-White on Red */
+    --accent: 335 70% 50%; /* #D63384 - Deep Rose */
+    --accent-foreground: 0 0% 100%; /* White on Rose */
 
-    --muted: 0 0% 90%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 30 15% 92%; /* #F0EDE8 - Light Warm Gray */
+    --muted-foreground: 30 8% 45%; /* #6B645C - Medium Brown */
 
-    --destructive: 350 100% 29%; /* Deep Red */
-    --destructive-foreground: 0 0% 96%;
+    --destructive: 0 65% 55%; /* #D2342C - Vibrant Red */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 80%;
-    --input: 0 0% 80%;
-    --ring: 46 65% 52%; /* Gold */
+    --border: 30 12% 85%; /* #DDD8D0 - Soft Border */
+    --input: 30 12% 85%;
+    --ring: 25 85% 55%; /* Orange focus ring */
 
     --radius: 0.75rem;
   }
 
   .dark {
-    /* Dark mode - Kente Heritage with darker backgrounds */
-    --background: 0 0% 10%; /* #1A1A1A - Neutral Dark */
-    --foreground: 0 0% 96%; /* #F5F5F5 - Neutral Light */
+    /* Dark mode - Modern Ghanaian Sunset with darker backgrounds */
+    --background: 30 15% 8%; /* #181611 - Deep Warm Black */
+    --foreground: 30 15% 95%; /* #F7F5F2 - Warm White */
 
-    --card: 0 0% 15%;
-    --card-foreground: 0 0% 96%;
+    --card: 30 12% 12%; /* #1F1C17 - Dark Card */
+    --card-foreground: 30 15% 95%;
 
-    --popover: 0 0% 15%;
-    --popover-foreground: 0 0% 96%;
+    --popover: 30 12% 12%;
+    --popover-foreground: 30 15% 95%;
 
-    --primary: 46 65% 52%; /* #D4AF37 - Rich Gold */
-    --primary-foreground: 0 0% 10%; /* Near Black on Gold */
+    --primary: 25 85% 60%; /* #EA8B3A - Bright Sunset Orange */
+    --primary-foreground: 30 15% 8%; /* Dark on Orange */
 
-    --secondary: 162 98% 20%; /* #016450 - Emerald Green */
-    --secondary-foreground: 0 0% 96%; /* Off-White on Green */
+    --secondary: 165 70% 45%; /* #1BB899 - Bright Teal */
+    --secondary-foreground: 30 15% 8%; /* Dark on Teal */
 
-    --accent: 350 100% 29%; /* #950020 - Deep Red */
-    --accent-foreground: 0 0% 96%; /* Off-White on Red */
+    --accent: 335 65% 60%; /* #E056A3 - Bright Rose */
+    --accent-foreground: 30 15% 8%; /* Dark on Rose */
 
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 70%;
+    --muted: 30 10% 18%; /* #2E2A23 - Dark Muted */
+    --muted-foreground: 30 8% 65%; /* #A8A199 - Light Muted Text */
 
-    --destructive: 350 100% 29%; /* Deep Red */
-    --destructive-foreground: 0 0% 96%;
+    --destructive: 0 60% 60%; /* #E5524A - Bright Red */
+    --destructive-foreground: 30 15% 8%;
 
-    --border: 0 0% 25%;
-    --input: 0 0% 25%;
-    --ring: 46 65% 52%; /* Gold */
+    --border: 30 8% 25%; /* #3D3831 - Dark Border */
+    --input: 30 8% 25%;
+    --ring: 25 85% 60%; /* Orange focus ring */
   }
 }
 

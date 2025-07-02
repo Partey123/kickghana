@@ -59,7 +59,7 @@
 
 /* Glow effect for premium products */
 .premium-glow {
-  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+  box-shadow: 0 0 25px rgba(232, 118, 26, 0.6);
 }
 
 /* Product card hover effects */
@@ -91,16 +91,16 @@
   animation: shimmer 2s infinite;
 }
 
-/* Ghana flag colors */
+/* Modern Ghana flag colors */
 :root {
-  --ghana-red: #CE1126;
-  --ghana-gold: #FCD116;
-  --ghana-green: #006B3F;
+  --ghana-red: #D2342C;
+  --ghana-gold: #E8761A;
+  --ghana-green: #15A085;
 }
 
-/* Gradient text */
+/* Gradient text with new colors */
 .gradient-text {
-  background: linear-gradient(90deg, var(--ghana-gold) 0%, #E6A817 100%);
+  background: linear-gradient(90deg, var(--ghana-gold) 0%, #EA8B3A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -108,11 +108,11 @@
 
 /* Opaque backgrounds */
 .bg-primary-opaque {
-  background-color: rgba(var(--primary), 0.8);
+  background-color: rgba(232, 118, 26, 0.8);
 }
 
 .bg-secondary-opaque {
-  background-color: rgba(var(--secondary), 0.8);
+  background-color: rgba(21, 160, 133, 0.8);
 }
 
 /* Cart animation */
@@ -129,7 +129,7 @@
 /* Order tracking styles */
 .track-line {
   height: 2px;
-  background-color: #e5e7eb;
+  background-color: #DDD8D0;
   position: relative;
   margin: 0 1rem;
 }
@@ -137,7 +137,7 @@
 .track-line-progress {
   position: absolute;
   height: 100%;
-  background-color: var(--primary);
+  background-color: var(--ghana-gold);
   transition: width 0.5s ease;
 }
 
@@ -146,14 +146,14 @@
   height: 20px;
   border-radius: 50%;
   background-color: #fff;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #DDD8D0;
   position: relative;
   z-index: 1;
 }
 
 .track-point.active {
-  border-color: var(--primary);
-  background-color: var(--primary);
+  border-color: var(--ghana-gold);
+  background-color: var(--ghana-gold);
 }
 
 /* Background opacity classes */
@@ -169,4 +169,3 @@
 .bg-card-semi {
   background-color: rgba(255, 255, 255, 0.85);
 }
-
