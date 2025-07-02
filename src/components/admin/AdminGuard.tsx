@@ -20,7 +20,7 @@ const AdminGuard = ({ children }: AdminGuardProps) => {
 
   // For now, we'll check if user email contains 'admin' - in production, use proper role checking
   if (!user || !user.email?.includes('admin')) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return <>{children}</>;

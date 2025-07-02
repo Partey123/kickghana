@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { useSupabaseCart } from '@/hooks/useSupabaseCart';
@@ -61,9 +60,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     const savedCart = localStorage.getItem('cart');
     const savedWishlist = localStorage.getItem('wishlist');
     
+    console.log('Loading cart from localStorage:', savedCart);
+    console.log('Loading wishlist from localStorage:', savedWishlist);
+    
     if (savedCart) {
       try {
-        setLocalCartItems(JSON.parse(savedCart));
+        const parsedCart = JSON.parse(savedCart);
+        console.log('Parsed cart:', parsedCart);
+        setLocalCartItems(parsedCart);
       } catch (error) {
         console.error('Error loading cart from localStorage:', error);
       }
@@ -71,7 +75,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     
     if (savedWishlist) {
       try {
-        setLocalWishlist(JSON.parse(savedWishlist));
+        const parsedWishlist = JSON.parse(savedWishlist);
+        console.log('Parsed wishlist:', parsedWishlist);
+        setLocalWishlist(parsedWishlist);
       } catch (error) {
         console.error('Error loading wishlist from localStorage:', error);
       }
@@ -81,12 +87,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // Save local data to localStorage
   useEffect(() => {
     if (!user) {
+      console.log('Saving cart to localStorage:', localCartItems);
       localStorage.setItem('cart', JSON.stringify(localCartItems));
     }
   }, [localCartItems, user]);
 
   useEffect(() => {
     if (!user) {
+      console.log('Saving wishlist to localStorage:', localWishlist);
       localStorage.setItem('wishlist', JSON.stringify(localWishlist));
     }
   }, [localWishlist, user]);
@@ -95,12 +103,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const cartItems = user ? supabaseCartItems : localCartItems;
   const wishlist = user ? supabaseWishlist : localWishlist;
 
+  console.log('Current cart items:', cartItems);
+  console.log('Current user:', user);
+  console.log('Using Supabase cart:', !!user);
+
   const addToCart = async (item: CartItem) => {
-    console.log('Adding to cart:', item, 'User:', user);
+    console.log('CartContext - Adding to cart:', item, 'User:', user);
     
     if (user) {
+      console.log('Using Supabase cart');
       try {
         await addToSupabaseCart(item);
+        console.log('Successfully added to Supabase cart');
       } catch (error) {
         console.error('Error adding to Supabase cart:', error);
         toast({
@@ -110,8 +124,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         });
       }
     } else {
+      console.log('Using local cart');
       // Local storage logic
       setLocalCartItems(prev => {
+        console.log('Previous cart items:', prev);
         const existingItem = prev.find(cartItem => 
           cartItem.id === item.id && 
           cartItem.color === item.color && 
@@ -119,15 +135,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         );
         
         if (existingItem) {
-          return prev.map(cartItem =>
+          console.log('Item exists, updating quantity');
+          const updated = prev.map(cartItem =>
             cartItem.id === item.id && 
             cartItem.color === item.color && 
             cartItem.size === item.size
               ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
               : cartItem
           );
+          console.log('Updated cart:', updated);
+          return updated;
         } else {
-          return [...prev, item];
+          console.log('New item, adding to cart');
+          const updated = [...prev, item];
+          console.log('Updated cart:', updated);
+          return updated;
         }
       });
     }

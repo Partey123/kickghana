@@ -11,7 +11,6 @@ const DesktopNavLinks = () => {
     { to: "/collections", label: "Collections" },
     { to: "/men", label: "Men" },
     { to: "/women", label: "Women" },
-    { to: "/accessories", label: "Accessories" },
     { to: "/about", label: "About" },
   ];
   

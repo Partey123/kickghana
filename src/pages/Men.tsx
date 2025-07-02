@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -7,6 +8,7 @@ import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
+import { toast } from "@/components/ui/use-toast";
 
 // Mock men's products data
 const mensProducts = [
@@ -62,17 +64,37 @@ const Men = () => {
     navigate(`/product/${productId}`);
   };
 
-  const handleAddToCart = (product: any) => {
-    const cartItem = {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: 1,
-      size: product.sizes[0] || "",
-      color: product.colors[0] || ""
-    };
-    addToCart(cartItem);
+  const handleAddToCart = async (product: any) => {
+    console.log('Adding product to cart:', product);
+    
+    try {
+      const cartItem = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        quantity: 1,
+        size: product.sizes?.[0] || "",
+        color: product.colors?.[0] || ""
+      };
+      
+      console.log('Cart item prepared:', cartItem);
+      await addToCart(cartItem);
+      
+      toast({
+        title: "Added to Cart",
+        description: `${product.name} has been added to your cart.`,
+      });
+      
+      console.log('Item successfully added to cart');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredProducts = mensProducts.filter(product => 

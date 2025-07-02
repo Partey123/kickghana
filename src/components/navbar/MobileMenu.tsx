@@ -12,7 +12,7 @@ import AdvancedSearch from "@/components/search/AdvancedSearch";
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  onCartClick: () => void;
+  onCartClick: (e: React.MouseEvent) => void;
   cartItemsCount: number;
   onSearchSubmit: (query: string) => void;
 }
@@ -40,6 +40,11 @@ const MobileMenu = ({
   };
 
   const handleProductSelect = (id: number) => {
+    onClose();
+  };
+
+  const handleCartClick = (e: React.MouseEvent) => {
+    onCartClick(e);
     onClose();
   };
   
@@ -132,15 +137,6 @@ const MobileMenu = ({
                 </li>
                 <li>
                   <Link
-                    to="/accessories"
-                    className="block py-2 px-3 rounded-md hover:bg-accent"
-                    onClick={onClose}
-                  >
-                    Accessories
-                  </Link>
-                </li>
-                <li>
-                  <Link
                     to="/about"
                     className="block py-2 px-3 rounded-md hover:bg-accent"
                     onClick={onClose}
@@ -156,10 +152,7 @@ const MobileMenu = ({
                 <li>
                   <Link
                     to="/cart" 
-                    onClick={() => {
-                      onCartClick();
-                      onClose();
-                    }}
+                    onClick={handleCartClick}
                     className="block py-2 px-3 rounded-md hover:bg-accent flex items-center justify-between"
                   >
                     <span className="flex items-center">
@@ -212,7 +205,7 @@ const MobileMenu = ({
                 ) : (
                   <li>
                     <Link
-                      to="/auth/login"
+                      to="/login"
                       className="block py-2 px-3 rounded-md hover:bg-accent"
                       onClick={onClose}
                     >
