@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -154,7 +153,7 @@ const Men = () => {
               isInWishlist={wishlist.includes(product.id)}
               onAddToCart={() => handleAddToCart(product)}
               onAddToWishlist={() => addToWishlist(product.id)}
-              onClick={() => handleProductClick(product.id)}
+              onProductClick={() => handleProductClick(product.id)}
             />
           ))}
         </motion.div>
