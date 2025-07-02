@@ -1,6 +1,5 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -42,23 +41,6 @@ const DesktopNavLinks = () => {
           </Button>
         </Link>
       ))}
-      
-      {/* Hot Deals Link */}
-      <Link to="/collections">
-        <Button
-          variant="ghost"
-          className="font-medium bg-transparent hover:bg-red-50 hover:text-red-600 rounded-full px-4 py-2 h-auto text-red-600"
-        >
-          <motion.span 
-            className="flex items-center"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Flame className="mr-1 h-4 w-4" />
-            Hot Deals
-          </motion.span>
-        </Button>
-      </Link>
     </div>
   );
 };

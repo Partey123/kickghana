@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Search, Heart, User, X, Gift, Menu, ShoppingBag } from "lucide-react";
+import { Search, Heart, User, X, Menu, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { LanguageSelector } from "@/components/ui/language-selector";
@@ -110,18 +110,6 @@ const MobileMenu = ({
                     onClick={onClose}
                   >
                     Collections
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/promotions"
-                    className="block py-2 px-3 rounded-md hover:bg-accent"
-                    onClick={onClose}
-                  >
-                    <span className="flex items-center">
-                      <Gift size={16} className="mr-2" />
-                      Promotions
-                    </span>
                   </Link>
                 </li>
                 <li>

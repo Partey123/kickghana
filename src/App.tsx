@@ -33,6 +33,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Men = lazy(() => import("./pages/Men"));
 const Women = lazy(() => import("./pages/Women"));
 const About = lazy(() => import("./pages/About"));
+const Promotions = lazy(() => import("./pages/Promotions"));
+const PromotionDetail = lazy(() => import("./pages/PromotionDetail"));
 
 const App = () => {
   return (
@@ -55,6 +57,8 @@ const App = () => {
                     <Route path="/about" element={<About />} />
                     <Route path="/product/:id" element={<ProductDetail />} />
                     <Route path="/accessories" element={<Accessories />} />
+                    <Route path="/promotions" element={<Promotions />} />
+                    <Route path="/promotions/:id" element={<PromotionDetail />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/onboarding" element={<Onboarding />} />
