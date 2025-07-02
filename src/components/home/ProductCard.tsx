@@ -11,9 +11,10 @@ interface ProductCardProps {
   onAddToWishlist: (id: string | number) => void;
   onProductClick: (id: string | number) => void;
   isInWishlist: boolean;
+  isInCart?: boolean;
 }
 
-const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, isInWishlist }: ProductCardProps) => {
+const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, isInWishlist, isInCart = false }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleProductClick = () => {
@@ -52,6 +53,13 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, is
         {product.isNew && (
           <div className="absolute top-4 left-4 bg-primary text-secondary text-xs font-bold px-3 py-1 rounded-full">
             NEW
+          </div>
+        )}
+
+        {/* In Cart Badge */}
+        {isInCart && (
+          <div className="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+            IN CART
           </div>
         )}
         
@@ -103,9 +111,15 @@ const ProductCard = ({ product, onAddToCart, onAddToWishlist, onProductClick, is
               e.stopPropagation();
               onAddToCart(product.supabaseId || product.id);
             }}
-            className="w-full bg-primary text-secondary hover:bg-primary/90 rounded-full"
+            className={`w-full rounded-full ${
+              isInCart 
+                ? "bg-green-500 text-white hover:bg-green-600" 
+                : "bg-primary text-secondary hover:bg-primary/90"
+            }`}
+            disabled={isInCart}
           >
-            <ShoppingBag size={16} className="mr-2" /> Quick Add
+            <ShoppingBag size={16} className="mr-2" /> 
+            {isInCart ? "Added to Cart" : "Quick Add"}
           </Button>
         </div>
         
